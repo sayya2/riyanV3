@@ -31,7 +31,7 @@ export default async function LatestNewsSection() {
         <div className="grid md:grid-cols-3 gap-8">
           {posts.map((post, idx) => {
             const slug = post.post_name || post.ID;
-            const href = typeof slug === "string" ? `/posts/${slug}` : "#";
+            const href = typeof slug === "string" ? `/news/${slug}` : "#";
             const excerpt =
               post.post_excerpt && post.post_excerpt.trim().length > 0
                 ? stripHtml(post.post_excerpt)

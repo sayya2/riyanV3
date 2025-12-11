@@ -4,8 +4,9 @@ import Link from "next/link";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Projects", href: "/projects" },
-  { label: "Services", href: "/services" },
-  { label: "Firm", href: "/firm" },
+  { label: "About", href: "/firm/about" },
+  { label: "Contact", href: "/firm/contact" },
+  { label: "Careers", href: "/firm/career" },
 ];
 
 const isoBadges = [
