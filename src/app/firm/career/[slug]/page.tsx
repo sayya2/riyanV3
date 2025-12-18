@@ -1,5 +1,5 @@
-﻿import Link from "next/link";
-import { getAdjacentCareers, getCareerBySlug } from "@/lib/db";
+import Link from "next/link";
+import { getAdjacentCareers, getCareerBySlug } from "@/lib/directus";
 import { parseCareerSections } from "@/lib/parseCareerSections";
 
 const sanitizeContent = (input: string) =>
@@ -61,11 +61,11 @@ export default async function CareerDetailPage({ params }: PageProps) {
     );
   }
 
-  const lead = role.post_excerpt ? stripHtml(role.post_excerpt) : "";
-  const posted = formatDate(role.post_date);
+  const lead = role.excerpt ? stripHtml(role.excerpt) : "";
+  const posted = formatDate(role.published_at);
   const closing = formatDate(role.closing_date, "Open until filled");
 
-  const parsedSections = parseCareerSections(role.post_content || "");
+  const parsedSections = parseCareerSections(role.content || "");
 
   const jobDescription = role.job_description || parsedSections.description;
   const responsibilities =
@@ -74,7 +74,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
   const qualifications = role.qualifications || parsedSections.qualifications;
   const benefits = role.benefits || parsedSections.benefits;
 
-  const safeContent = sanitizeContent(role.post_content || "");
+  const safeContent = sanitizeContent(role.content || "");
 
   const hasMetaFields = !!(
     jobDescription ||
@@ -118,7 +118,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const shareUrl = `${siteUrl}/firm/career/${slug}`;
-  const shareText = role.post_title;
+  const shareText = role.title;
 
   const shareLinks = [
     {
@@ -165,7 +165,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
               Career Opportunity
             </p>
             <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
-              {role.post_title}
+              {role.title}
             </h1>
             {lead && (
               <p className="text-base text-gray-700 leading-relaxed">{lead}</p>
@@ -297,10 +297,10 @@ export default async function CareerDetailPage({ params }: PageProps) {
             <div className="flex flex-wrap justify-between items-center gap-3">
               {adjacent.previous ? (
                 <Link
-                  href={`/firm/career/${adjacent.previous.post_name}`}
+                  href={`/firm/career/${adjacent.previous.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100"
                 >
-                  &larr; {adjacent.previous.post_title}
+                  &larr; {adjacent.previous.title}
                 </Link>
               ) : (
                 <span />
@@ -308,10 +308,10 @@ export default async function CareerDetailPage({ params }: PageProps) {
 
               {adjacent.next ? (
                 <Link
-                  href={`/firm/career/${adjacent.next.post_name}`}
+                  href={`/firm/career/${adjacent.next.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100"
                 >
-                  {adjacent.next.post_title} &rarr;
+                  {adjacent.next.title} &rarr;
                 </Link>
               ) : (
                 <span />

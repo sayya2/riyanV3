@@ -60,3 +60,5 @@ delete-blobs.txt
 # Documentation (exclude from production repo)
 *.md
 !README.md
+
+*.sh

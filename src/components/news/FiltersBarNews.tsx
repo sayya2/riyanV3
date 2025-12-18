@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ProjectCategory } from "@/lib/db";
+import { DirectusNewsCategory } from "@/lib/directus";
 
 type Props = {
-  categories: ProjectCategory[];
+  categories: DirectusNewsCategory[];
   selectedCategory: string;
   search: string;
   perPage: number;
@@ -63,7 +63,7 @@ export default function FiltersBarNews({
         <option value="">All Categories</option>
         {categories.map((cat) => (
           <option key={cat.slug} value={cat.slug}>
-            {cat.name} ({cat.count})
+            {cat.name}
           </option>
         ))}
       </select>

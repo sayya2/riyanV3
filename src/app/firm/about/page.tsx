@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getClientLogos } from "@/lib/db";
+import { getClientLogos } from "@/lib/db-new";
 import ClientLogos from "@/components/ClientLogos";
 import PageHero from "@/components/PageHero";
 

@@ -22,6 +22,62 @@ services:
       timeout: 5s
       retries: 5
 
+  directus:
+    image: directus/directus:11.2
+    container_name: riyan_directus
+    restart: always
+    ports:
+      - "8055:8055"
+    environment:
+      # Security Keys (CHANGE THESE IN PRODUCTION!)
+      KEY: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
+      SECRET: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
+
+      # Admin User
+      ADMIN_EMAIL: "admin@riyan.com.mv"
+      ADMIN_PASSWORD: "ChangeThisPassword123!"
+
+      # Database Connection
+      DB_CLIENT: "mysql"
+      DB_HOST: "mariadb"
+      DB_PORT: "3306"
+      DB_DATABASE: "riyan_nextjs"
+      DB_USER: "user"
+      DB_PASSWORD: "Riyanitaccess@26+"
+
+      # General Settings
+      WEBSOCKETS_ENABLED: "true"
+      PUBLIC_URL: "http://localhost:8055"
+
+      # CORS Configuration for Next.js
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "http://localhost:3000,https://riyan.com.mv"
+      CORS_CREDENTIALS: "true"
+
+      # File Storage (use existing wp-content for media)
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_ROOT: "/app/public/wp-content/uploads"
+
+      # Cache
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "memory"
+
+    volumes:
+      - directus_data:/directus/uploads
+      - ./wp-content:/app/public/wp-content
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - riyan_network
+    healthcheck:
+      # Use 127.0.0.1 instead of localhost to avoid IPv6 (::1) resolution issues
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8055/server/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   web:
     build:
       context: .
@@ -38,15 +94,21 @@ services:
       - DB_NAME=riyan_nextjs
       - DB_PORT=3306
       - NEXT_PUBLIC_SITE_URL=https://riyan.com.mv
+      - DIRECTUS_URL=http://directus:8055
+      - DIRECTUS_TOKEN=your-directus-static-token-here
+      - REVALIDATE_SECRET=replace-with-random-secret
     volumes:
       - ./wp-content:/app/public/wp-content
     depends_on:
       mariadb:
         condition: service_healthy
+      directus:
+        condition: service_healthy
     networks:
       - riyan_network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      # Use 127.0.0.1 instead of localhost to avoid IPv6 (::1) resolution issues
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -58,4 +120,6 @@ networks:
 
 volumes:
   mariadb_data:
+    driver: local
+  directus_data:
     driver: local

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCareerPosts } from "@/lib/db";
+import { getCareerPosts } from "@/lib/directus";
 import { FirmPageBySlug } from "../_components/FirmPage";
 import { ArrowRight, Briefcase, CalendarClock, MapPin } from "lucide-react";
 
@@ -119,13 +119,13 @@ export default async function CareerPage() {
         {roles.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {roles.map((role) => {
-              const href = role.post_name
-                ? `/firm/career/${role.post_name}`
+              const href = role.slug
+                ? `/firm/career/${role.slug}`
                 : "#";
-              const cleanedContent = sanitizeContent(role.post_content || "");
+              const cleanedContent = sanitizeContent(role.content || "");
               const excerpt =
-                role.post_excerpt && role.post_excerpt.trim().length > 0
-                  ? stripHtml(sanitizeContent(role.post_excerpt))
+                role.excerpt && role.excerpt.trim().length > 0
+                  ? stripHtml(sanitizeContent(role.excerpt))
                   : stripHtml(cleanedContent).slice(0, 140);
               const deadline = formatDate(
                 role.closing_date,
@@ -134,7 +134,7 @@ export default async function CareerPage() {
 
               return (
                 <div
-                  key={role.ID}
+                  key={role.id}
                   className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md hover:shadow-xl transition-shadow duration-300"
                   style={{
                     clipPath:
@@ -156,7 +156,7 @@ export default async function CareerPage() {
                           {role.department || "Role"}
                         </p>
                         <h2 className="text-lg font-semibold text-gray-900">
-                          {role.post_title}
+                          {role.title}
                         </h2>
                         <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
                           {excerpt}

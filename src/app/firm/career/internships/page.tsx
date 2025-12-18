@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPageBySlug } from "@/lib/db";
+import { getPageBySlug } from "@/lib/db-new";
 import PageHero from "@/components/PageHero";
 
 export const dynamic = "force-dynamic";
@@ -72,11 +72,11 @@ export default async function InternshipsPage() {
     return notFound();
   }
 
-  const sections = parseInternshipContent(page.post_content || "");
-  const title = sections.title || page.post_title || "Riyan Internship Program";
+  const sections = parseInternshipContent(page.content || "");
+  const title = sections.title || page.title || "Riyan Internship Program";
   const description =
     sections.description ||
-    stripHtml(page.post_excerpt || "") ||
+    stripHtml(page.excerpt || "") ||
     "Join our internship program and gain hands-on experience in a dynamic professional environment.";
 
   return (

@@ -49,7 +49,13 @@
       "Bash(docker-compose restart:*)",
       "Bash(timeout 60 tail:*)",
       "Bash(docker restart:*)",
-      "Bash(timeout 10 bash:*)"
+      "Bash(timeout 10 bash:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(ls:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhiZTVjOGY4LWVlOGQtNGI4Yi04YjU0LTlmOWJjYzNhMWZiYiIsInJvbGUiOiI5MTdkNzVjYy03MTdmLTRkMWQtODk2MC0yMzk2ZjQ5MzU0ZDQiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsImlhdCI6MTc2NTk1NjExNiwiZXhwIjoxNzY1OTU3MDE2LCJpc3MiOiJkaXJlY3R1cyJ9.LBw8lVb95zt1GP801SG16FbUneNztnelYV6Msx96aqU\")",
+      "Bash(bash:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

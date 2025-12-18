@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getPosts } from "@/lib/db";
+import { getNewsPosts } from "@/lib/directus";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -15,7 +15,7 @@ function truncate(text: string, length: number) {
 }
 
 export default async function LatestNewsSection() {
-  const posts = await getPosts("post", 3);
+  const posts = await getNewsPosts({ limit: 3 });
 
   return (
     <section className="pb-24 bg-white">
@@ -30,28 +30,28 @@ export default async function LatestNewsSection() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {posts.map((post, idx) => {
-            const slug = post.post_name || post.ID;
+            const slug = post.slug || String(post.id);
             const href = typeof slug === "string" ? `/news/${slug}` : "#";
             const excerpt =
-              post.post_excerpt && post.post_excerpt.trim().length > 0
-                ? stripHtml(post.post_excerpt)
-                : truncate(stripHtml(post.post_content || ""), 140);
-            const date = new Date(post.post_date).toLocaleDateString(undefined, {
+              post.excerpt && post.excerpt.trim().length > 0
+                ? stripHtml(post.excerpt)
+                : truncate(stripHtml(post.content || ""), 140);
+            const date = new Date(post.published_at || post.created_at).toLocaleDateString(undefined, {
               year: "numeric",
               month: "short",
               day: "numeric",
             });
-            const thumb = post.thumbnail_url || fallbackImg;
+            const thumb = post.featured_image || fallbackImg;
 
             return (
               <article
-                key={post.ID ?? idx}
+                key={post.id ?? idx}
                 className="group border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white"
               >
                 <div className="relative h-40 w-full overflow-hidden">
                   <Image
                     src={thumb}
-                    alt={post.post_title}
+                    alt={post.title}
                     fill
                     sizes="(min-width:1024px) 33vw, 100vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -64,7 +64,7 @@ export default async function LatestNewsSection() {
                   </p>
                   <Link href={href} className="block">
                     <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
-                      {post.post_title}
+                      {post.title}
                     </h3>
                   </Link>
                   <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">{excerpt}</p>

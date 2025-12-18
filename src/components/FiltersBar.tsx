@@ -1,11 +1,11 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ProjectCategory, ProjectService } from "@/lib/db";
+import { DirectusProjectCategory, DirectusService } from "@/lib/directus";
 
 type Props = {
-  categories: ProjectCategory[];
-  services: ProjectService[];
+  categories: DirectusProjectCategory[];
+  services: DirectusService[];
   selectedCategory: string;
   selectedService: string;
   search: string;
@@ -69,7 +69,7 @@ export default function FiltersBar({
         <option value="">All Sectors</option>
         {categories.map((cat) => (
           <option key={cat.slug} value={cat.slug}>
-            {cat.name} ({cat.count})
+            {cat.name}
           </option>
         ))}
       </select>
@@ -81,7 +81,7 @@ export default function FiltersBar({
         <option value="">All Services</option>
         {services.map((svc) => (
           <option key={svc.slug} value={svc.slug}>
-            {svc.name} ({svc.count})
+            {svc.name}
           </option>
         ))}
       </select>

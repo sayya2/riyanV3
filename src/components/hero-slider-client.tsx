@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import type { HeroSlide } from "@/lib/db";
+import type { HeroSlide } from "@/lib/db-new";
 
 type Props = {
   slides: HeroSlide[];
@@ -10,11 +10,13 @@ type Props = {
 
 const fallbackSlide: HeroSlide = {
   id: -1,
-  order: 0,
   title: "Integrated Solutions.",
   description:
     "Design, engineering, project management, and research expertise from a Maldives-based team.",
-  imageUrl: "/wp-content/uploads/2022/06/hd-1800x900-1.png",
+  image_url: "/wp-content/uploads/2022/06/hd-1800x900-1.png",
+  link_url: "",
+  sort_order: 0,
+  status: "published",
 };
 
 const HeroSliderClient = ({ slides }: Props) => {
@@ -57,7 +59,7 @@ const HeroSliderClient = ({ slides }: Props) => {
             aria-hidden={idx !== activeIndex}
           >
             <Image
-              src={slide.imageUrl || fallbackSlide.imageUrl}
+              src={slide.image_url || fallbackSlide.image_url}
               alt={slide.title || "Riyan project"}
               fill
               priority={idx === 0}

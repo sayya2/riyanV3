@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import { Building2, CalendarClock, MapPin } from "lucide-react";
-import { getAdjacentProjects, getProjectBySlug } from "@/lib/db";
+import { getAdjacentProjects, getProjectBySlug } from "@/lib/directus";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -49,28 +49,30 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     );
   }
 
-  const { meta } = project;
-  const categories = project.categories || [];
-  const services = Array.from(
-    new Set(
-      [...(project.services || []), ...(meta.services || [])].filter(Boolean)
-    )
-  );
+  const categories = (project.categories || [])
+    .map(c => c.category_id?.name)
+    .filter(Boolean) as string[];
+  const services = (project.services || [])
+    .map(s => s.service_id?.name)
+    .filter(Boolean) as string[];
+  const gallery = (project.gallery || [])
+    .map(g => g.media_id?.filename ? `/wp-content/uploads/${g.media_id.filename}` : null)
+    .filter(Boolean) as string[];
   const categoriesText = categories.join(", ");
   const servicesText = services.join(", ");
-  const img = project.thumbnail_url || fallbackImg;
+  const img = project.featured_image || fallbackImg;
   const stats = [
-    { label: "Client", value: meta.client || "Not specified" },
-    { label: "Year", value: meta.year || "Not specified" },
-    { label: "Location", value: meta.location || "Not specified" },
+    { label: "Client", value: project.client || "Not specified" },
+    { label: "Year", value: project.year || "Not specified" },
+    { label: "Location", value: project.location || "Not specified" },
   ];
   const lead =
-    project.post_excerpt && project.post_excerpt.trim().length > 0
-      ? stripHtml(project.post_excerpt)
+    project.excerpt && project.excerpt.trim().length > 0
+      ? stripHtml(project.excerpt)
       : "";
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const shareUrl = `${siteUrl}/projects/${slug}`;
-  const shareText = project.post_title;
+  const shareText = project.title;
   const statIcons: Record<string, React.ReactElement> = {
     Client: <Building2 className="h-5 w-5" />,
     Year: <CalendarClock className="h-5 w-5" />,
@@ -146,7 +148,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-white">
       <PageHero
-        title={project.post_title}
+        title={project.title}
         eyebrow={categoriesText || servicesText || "Project"}
         description={lead}
         imageUrl={img}
@@ -190,7 +192,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             ) : null}
             <div
               className="prose prose-lg max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: project.post_content || "" }}
+              dangerouslySetInnerHTML={{ __html: project.content || "" }}
             />
             {(categories.length || services.length) ? (
               <div className="grid gap-4 md:grid-cols-2">
@@ -226,20 +228,20 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 ) : null}
               </div>
             ) : null}
-            {project.gallery && project.gallery.length ? (
+            {gallery && gallery.length ? (
               <div className="pt-6">
                 {/* <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   Project Gallery
                 </h3> */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {project.gallery.map((src, idx) => (
+                  {gallery.map((src, idx) => (
                     <div
                       key={`gallery-${idx}`}
                       className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
                     >
                       <Image
                         src={src}
-                        alt={`${project.post_title} image ${idx + 1}`}
+                        alt={`${project.title} image ${idx + 1}`}
                         fill
                         className="object-cover"
                         sizes="(min-width:1024px) 33vw, 50vw"
@@ -264,15 +266,15 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <div className="flex justify-between items-center gap-3 pt-2">
               {adjacent.previous ? (
                 <Link
-                  href={`/projects/${adjacent.previous.post_name}`}
+                  href={`/projects/${adjacent.previous.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                 >
-                  &larr; {adjacent.previous.post_title}
+                  &larr; {adjacent.previous.title}
                 </Link>
               ) : (
-                
+
                 <span />
-                
+
               )}
                <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm font-semibold text-gray-800">Share</span>
@@ -291,10 +293,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             </div>
               {adjacent.next ? (
                 <Link
-                  href={`/projects/${adjacent.next.post_name}`}
+                  href={`/projects/${adjacent.next.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                 >
-                  {adjacent.next.post_title} &rarr;
+                  {adjacent.next.title} &rarr;
                 </Link>
               ) : (
                 <span />

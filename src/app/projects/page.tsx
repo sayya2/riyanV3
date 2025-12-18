@@ -4,7 +4,7 @@ import {
   getProjectCategories,
   getProjectServices,
   getProjects,
-} from "@/lib/db";
+} from "@/lib/directus";
 import FiltersBar from "@/components/FiltersBar";
 
 const fallbackImg =
@@ -60,9 +60,9 @@ export default async function ProjectsPage({
     console.log(
       "[ProjectsPage] projects sample",
       projects.slice(0, 3).map((p) => ({
-        ID: p.ID,
-        slug: p.post_name,
-        title: p.post_title,
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
         categories: p.categories,
         services: p.services,
       })),
@@ -95,26 +95,32 @@ export default async function ProjectsPage({
 
         <div className="grid md:grid-cols-3 gap-8">
           {projects.map((project) => {
-            const href = project.post_name
-              ? `/projects/${project.post_name}`
+            const href = project.slug
+              ? `/projects/${project.slug}`
               : "#";
-            const categoriesText = (project.categories || []).join(", ");
-            const servicesText = (project.services || []).join(", ");
+            const categoriesText = (project.categories || [])
+              .map(c => c.category_id?.name)
+              .filter(Boolean)
+              .join(", ");
+            const servicesText = (project.services || [])
+              .map(s => s.service_id?.name)
+              .filter(Boolean)
+              .join(", ");
             const excerpt =
-              project.post_excerpt && project.post_excerpt.trim().length > 0
-                ? stripHtml(project.post_excerpt)
-                : stripHtml(project.post_content || "").slice(0, 140);
-            const img = project.thumbnail_url || fallbackImg;
+              project.excerpt && project.excerpt.trim().length > 0
+                ? stripHtml(project.excerpt)
+                : stripHtml(project.content || "").slice(0, 140);
+            const img = project.featured_image || fallbackImg;
 
             return (
               <Link
-                key={project.ID}
+                key={project.id}
                 href={href}
                 className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
               >
                 <Image
                   src={img}
-                  alt={project.post_title}
+                  alt={project.title}
                   fill
                   sizes="(min-width:1024px) 33vw, 100vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -126,7 +132,7 @@ export default async function ProjectsPage({
                     {categoriesText || servicesText || "Project"}
                   </p>
                   <h3 className="text-xl font-semibold text-white drop-shadow-sm">
-                    {project.post_title}
+                    {project.title}
                   </h3>
                   <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
                     {excerpt}

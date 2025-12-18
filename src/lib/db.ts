@@ -1,4 +1,6 @@
 import mysql from 'mysql2/promise';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -126,6 +128,50 @@ const parseSerializedArray = (value: string | null): string[] => {
   return matches;
 };
 
+const normalizeMediaUrl = (value?: string | null): string | null => {
+  if (!value) return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const withoutProtocol = trimmed.replace(/^https?:\/\/[^/]+/i, "");
+
+  const wpIndex = withoutProtocol.indexOf("/wp-content/");
+  if (wpIndex !== -1) {
+    const path = withoutProtocol.slice(wpIndex);
+    return path.startsWith("/") ? path : `/${path}`;
+  }
+
+  if (withoutProtocol.startsWith("wp-content/")) {
+    return `/${withoutProtocol}`;
+  }
+
+  if (withoutProtocol.startsWith("/wp-content/")) {
+    return withoutProtocol;
+  }
+
+  return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+};
+
+const normalizeMediaArray = (values?: (string | null)[]): string[] =>
+  (values || [])
+    .map((entry) => normalizeMediaUrl(entry))
+    .filter((entry): entry is string => Boolean(entry));
+
+const wpContentRoot = path.join(process.cwd(), 'wp-content');
+
+const getLocalImages = async (relativeDir: string): Promise<string[]> => {
+  try {
+    const dir = path.join(wpContentRoot, relativeDir);
+    const entries = await fs.readdir(dir);
+    return entries
+      .filter((name) => /\.(png|jpe?g|gif|webp|svg)$/i.test(name))
+      .map((name) => `/wp-content/${relativeDir.replace(/\\/g, "/")}/${name}`);
+  } catch (error) {
+    return [];
+  }
+};
+
 const getCareerPostTypes = (): string[] => {
   const envTypes =
     process.env.CAREER_POST_TYPES || process.env.CAREER_POST_TYPE
@@ -212,7 +258,17 @@ export async function getPosts(postType: string = 'post', limit: number = 10): P
     LIMIT ?
   `, [postType, limit]);
 
-  return rows as Post[];
+  return (rows as any[]).map((row) => ({
+    ID: Number(row.ID),
+    post_title: row.post_title,
+    post_content: row.post_content,
+    post_excerpt: row.post_excerpt,
+    post_name: row.post_name,
+    post_date: row.post_date,
+    post_type: row.post_type,
+    post_status: row.post_status,
+    thumbnail_url: normalizeMediaUrl(row.thumbnail_url),
+  }));
 }
 
 export async function getProjectCategories(): Promise<ProjectCategory[]> {
@@ -324,7 +380,7 @@ export async function getProjects(
     post_content: row.post_content,
     post_name: row.post_name,
     post_date: row.post_date,
-    thumbnail_url: row.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(row.thumbnail_url),
     categories: row.categories ? (row.categories as string).split(",") : [],
     services: row.services ? (row.services as string).split(",") : [],
   }));
@@ -343,51 +399,56 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function getHeroSlides(sliderAlias: string = 'slider-1'): Promise<HeroSlide[]> {
-  const [sliderRows] = await pool.query<any[]>(
-    'SELECT id FROM wp_revslider_sliders WHERE alias = ? LIMIT 1',
-    [sliderAlias]
-  );
+  try {
+    const [sliderRows] = await pool.query<any[]>(
+      'SELECT id FROM wp_revslider_sliders WHERE alias = ? LIMIT 1',
+      [sliderAlias]
+    );
 
-  if (!sliderRows.length) return [];
+    if (!sliderRows.length) return [];
 
-  const sliderId = sliderRows[0].id as number;
+    const sliderId = sliderRows[0].id as number;
 
-  const [rows] = await pool.query<any[]>(
-    'SELECT id, slide_order, params, layers FROM wp_revslider_slides WHERE slider_id = ? ORDER BY slide_order',
-    [sliderId]
-  );
+    const [rows] = await pool.query<any[]>(
+      'SELECT id, slide_order, params, layers FROM wp_revslider_slides WHERE slider_id = ? ORDER BY slide_order',
+      [sliderId]
+    );
 
-  return (rows as any[])
-    .map((row): HeroSlide | null => {
-      const params = safeJsonParse<any>(row.params);
-      const layers = safeJsonParse<Record<string, any>>(row.layers);
+    return (rows as any[])
+      .map((row): HeroSlide | null => {
+        const params = safeJsonParse<any>(row.params);
+        const layers = safeJsonParse<Record<string, any>>(row.layers);
 
-      if (params?.publish?.state === 'unpublished') return null;
+        if (params?.publish?.state === 'unpublished') return null;
 
-      const imageUrl = params?.bg?.image ?? '';
+        const imageUrl = normalizeMediaUrl(params?.bg?.image ?? '') || params?.bg?.image || '';
 
-      const textLayers = Object.entries(layers ?? {})
-        .filter(([key, value]) => {
-          if (['top', 'middle', 'bottom'].includes(key)) return false;
-          const text = (value as any)?.text;
-          return typeof text === 'string' && text.trim().length > 0;
-        })
-        .sort((a, b) => Number(a[0]) - Number(b[0]));
+        const textLayers = Object.entries(layers ?? {})
+          .filter(([key, value]) => {
+            if (['top', 'middle', 'bottom'].includes(key)) return false;
+            const text = (value as any)?.text;
+            return typeof text === 'string' && text.trim().length > 0;
+          })
+          .sort((a, b) => Number(a[0]) - Number(b[0]));
 
-      const title = stripHtmlAndWhitespace(textLayers[0]?.[1]?.text ?? '');
-      const description = stripHtmlAndWhitespace(textLayers[1]?.[1]?.text ?? '');
+        const title = stripHtmlAndWhitespace(textLayers[0]?.[1]?.text ?? '');
+        const description = stripHtmlAndWhitespace(textLayers[1]?.[1]?.text ?? '');
 
-      if (!imageUrl && !title && !description) return null;
+        if (!imageUrl && !title && !description) return null;
 
-      return {
-        id: Number(row.id),
-        order: Number(row.slide_order) || 0,
-        title,
-        description,
-        imageUrl,
-      };
-    })
-    .filter((slide): slide is HeroSlide => Boolean(slide));
+        return {
+          id: Number(row.id),
+          order: Number(row.slide_order) || 0,
+          title,
+          description,
+          imageUrl,
+        };
+      })
+      .filter((slide): slide is HeroSlide => Boolean(slide));
+  } catch (error) {
+    console.error("[getHeroSlides] failed, returning empty array", error);
+    return [];
+  }
 }
 
 export async function getProjectBySlug(
@@ -503,10 +564,10 @@ export async function getProjectBySlug(
     post_content: project.post_content,
     post_name: project.post_name,
     post_date: project.post_date,
-    thumbnail_url: project.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(project.thumbnail_url),
     categories: categoryRows.map((r) => r.name as string),
     services: serviceRows.map((r) => r.name as string),
-    gallery,
+    gallery: normalizeMediaArray(gallery),
     meta,
   };
 }
@@ -654,7 +715,7 @@ export async function getNewsPosts({
     post_date: row.post_date,
     post_type: "post",
     post_status: "publish",
-    thumbnail_url: row.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(row.thumbnail_url),
     categories: row.categories ? (row.categories as string).split(",") : [],
     tags: row.tags ? (row.tags as string).split(",") : [],
   }));
@@ -752,10 +813,10 @@ export async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
     post_date: article.post_date,
     post_type: "post",
     post_status: "publish",
-    thumbnail_url: article.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(article.thumbnail_url),
     categories: categoryRows.map((r) => r.name as string),
     tags: tagRows.map((r) => r.name as string),
-    gallery,
+    gallery: normalizeMediaArray(gallery),
   };
 }
 
@@ -911,7 +972,7 @@ export async function getCareerPosts({
     post_date: row.post_date,
     post_type: row.post_type,
     post_status: row.post_status,
-    thumbnail_url: row.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(row.thumbnail_url),
     location: row.location || null,
     employment_type: row.employment_type || null,
     department: row.department || null,
@@ -1015,7 +1076,7 @@ export async function getCareerBySlug(slug: string): Promise<CareerPost | null> 
     post_date: role.post_date,
     post_type: role.post_type,
     post_status: role.post_status,
-    thumbnail_url: role.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(role.thumbnail_url),
     location: role.location || null,
     employment_type: role.employment_type || null,
     department: role.department || null,
@@ -1153,7 +1214,7 @@ export async function getPageBySlug(slug: string): Promise<Post | null> {
     post_date: page.post_date,
     post_type: "page",
     post_status: "publish",
-    thumbnail_url: page.thumbnail_url,
+    thumbnail_url: normalizeMediaUrl(page.thumbnail_url),
   };
 }
 
@@ -1180,10 +1241,12 @@ export async function getClientLogos(): Promise<ClientLogo[]> {
     `
   );
 
-  return (rows as any[]).map((row) => ({
-    name: row.post_title as string,
-    url: row.guid as string,
-  }));
+  return (rows as any[])
+    .map((row) => ({
+      name: row.post_title as string,
+      url: normalizeMediaUrl(row.guid) || (row.guid as string),
+    }))
+    .filter((row) => Boolean(row.url));
 }
 
 export async function getGalleryImages(limit: number = 40): Promise<string[]> {
@@ -1201,22 +1264,30 @@ export async function getGalleryImages(limit: number = 40): Promise<string[]> {
     [limit]
   );
 
-  return (rows as any[]).map((row) => row.guid as string).filter(Boolean);
+  return normalizeMediaArray((rows as any[]).map((row) => row.guid as string));
 }
 
 export async function getAboutCarouselImages(): Promise<string[]> {
-  const [rows] = await pool.query<any[]>(
-    `
-      SELECT guid
-      FROM wp_posts
-      WHERE post_type = 'attachment'
-        AND post_mime_type LIKE 'image/%'
-        AND guid LIKE '%/about_carousel/%'
-        AND guid IS NOT NULL
-        AND guid != ''
-      ORDER BY post_title ASC
-    `
-  );
+  try {
+    const [rows] = await pool.query<any[]>(
+      `
+        SELECT guid
+        FROM wp_posts
+        WHERE post_type = 'attachment'
+          AND post_mime_type LIKE 'image/%'
+          AND guid LIKE '%/about_carousel/%'
+          AND guid IS NOT NULL
+          AND guid != ''
+        ORDER BY post_title ASC
+      `
+    );
 
-  return (rows as any[]).map((row) => row.guid as string).filter(Boolean);
+    const normalized = normalizeMediaArray((rows as any[]).map((row) => row.guid as string));
+    if (normalized.length) return normalized;
+  } catch (error) {
+    console.error("[getAboutCarouselImages] DB lookup failed, using local files", error);
+  }
+
+  const local = await getLocalImages(path.join('uploads', 'about_carousel'));
+  return local;
 }

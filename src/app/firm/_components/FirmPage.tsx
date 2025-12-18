@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPageBySlug } from "@/lib/db";
+import { getPageBySlug } from "@/lib/db-new";
 import PageHero from "@/components/PageHero";
 
 const fallbackImg = "/images/about-hero.png";
@@ -51,18 +51,18 @@ export async function FirmPageBySlug({
 
   if (process.env.NODE_ENV !== "production") {
     console.log("[FirmPage] page", {
-      ID: page.ID,
-      slug: page.post_name,
-      title: page.post_title,
+      id: page.id,
+      slug: page.slug,
+      title: page.title,
     });
   }
 
-  const img = page.thumbnail_url || fallbackImg;
+  const img = page.featured_image || fallbackImg;
   const lead =
-    page.post_excerpt && page.post_excerpt.trim().length > 0
-      ? stripHtml(page.post_excerpt)
+    page.excerpt && page.excerpt.trim().length > 0
+      ? stripHtml(page.excerpt)
       : "";
-  const title = titleOverride || page.post_title;
+  const title = titleOverride || page.title;
 
   const navLinks = firmPages.filter((link) => link.path !== currentPath);
   const heroImage = heroImageOverride || img;
@@ -85,7 +85,7 @@ export async function FirmPageBySlug({
             {!hideContent ? (
               <div
                 className="prose prose-lg max-w-none text-gray-800"
-                dangerouslySetInnerHTML={{ __html: page.post_content || "" }}
+                dangerouslySetInnerHTML={{ __html: page.content || "" }}
               />
             ) : null}
           </article>

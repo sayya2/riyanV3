@@ -1,5 +1,5 @@
 import Image from "next/image";
-import pool from "@/lib/db";
+import pool from "@/lib/db-new";
 
 export const dynamic = "force-dynamic";
 

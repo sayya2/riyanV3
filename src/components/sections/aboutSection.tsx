@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { AboutSection as AboutContent } from "@/data/Data";
-import { getAboutCarouselImages } from "@/lib/db";
+import { getAboutCarouselImages } from "@/lib/db-new";
 
 const AboutSection = async () => {
   const carouselImages = await getAboutCarouselImages();

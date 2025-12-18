@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getNewsCategories, getNewsPosts } from "@/lib/db";
+import { getNewsCategories, getNewsPosts } from "@/lib/directus";
 import FiltersBarNews from "@/components/news/FiltersBarNews";
 
 const fallbackImg =
@@ -54,9 +54,9 @@ export default async function NewsPage({
     console.log(
       "[NewsPage] articles sample",
       articles.slice(0, 3).map((a) => ({
-        ID: a.ID,
-        slug: a.post_name,
-        title: a.post_title,
+        id: a.id,
+        slug: a.slug,
+        title: a.title,
         categories: a.categories,
       })),
       "total",
@@ -88,23 +88,26 @@ export default async function NewsPage({
 
         <div className="grid md:grid-cols-3 gap-8">
           {articles.map((article) => {
-            const href = article.post_name ? `/news/${article.post_name}` : "#";
-            const categoriesText = (article.categories || []).join(", ");
+            const href = article.slug ? `/news/${article.slug}` : "#";
+            const categoriesText = (article.categories || [])
+              .map(c => c.category_id?.name)
+              .filter(Boolean)
+              .join(", ");
             const excerpt =
-              article.post_excerpt && article.post_excerpt.trim().length > 0
-                ? stripHtml(article.post_excerpt)
-                : stripHtml(article.post_content || "").slice(0, 140);
-            const img = article.thumbnail_url || fallbackImg;
+              article.excerpt && article.excerpt.trim().length > 0
+                ? stripHtml(article.excerpt)
+                : stripHtml(article.content || "").slice(0, 140);
+            const img = article.featured_image || fallbackImg;
 
             return (
               <Link
-                key={article.ID}
+                key={article.id}
                 href={href}
                 className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
               >
                 <Image
                   src={img}
-                  alt={article.post_title}
+                  alt={article.title}
                   fill
                   sizes="(min-width:1024px) 33vw, 100vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -116,7 +119,7 @@ export default async function NewsPage({
                     {categoriesText || "News"}
                   </p>
                   <h3 className="text-xl font-semibold text-white drop-shadow-sm">
-                    {article.post_title}
+                    {article.title}
                   </h3>
                   <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
                     {excerpt}

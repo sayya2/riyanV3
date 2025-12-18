@@ -1,5 +1,5 @@
 import HeroSliderClient from "./hero-slider-client";
-import { getHeroSlides, type HeroSlide } from "@/lib/db";
+import { getHeroSlides, type HeroSlide } from "@/lib/db-new";
 
 const Hero = async () => {
   let slides: HeroSlide[] = [];

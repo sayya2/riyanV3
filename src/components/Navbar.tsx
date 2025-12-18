@@ -285,23 +285,38 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* <div className="pt-4 border-t border-gray-200 space-y-2">
+              <div className="pt-4 border-t border-gray-200 space-y-2">
                 <p className="text-xs uppercase tracking-wide text-gray-500">
                   Navigation
                 </p>
                 <div className="flex flex-col gap-2">
                   {menuItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.url}
-                      className="text-gray-900 hover:text-primary font-medium"
-                      onClick={() => setIsPanelOpen(false)}
-                    >
-                      {item.title}
-                    </Link>
+                    <div key={item.id}>
+                      <Link
+                        href={item.url}
+                        className="text-gray-900 hover:text-primary font-medium block py-1"
+                        onClick={() => !item.children && setIsPanelOpen(false)}
+                      >
+                        {item.title}
+                      </Link>
+                      {item.children && (
+                        <div className="ml-4 mt-1 space-y-1">
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.id}
+                              href={child.url}
+                              className="text-sm text-gray-600 hover:text-primary block py-1"
+                              onClick={() => setIsPanelOpen(false)}
+                            >
+                              {child.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
-              </div> */}
+              </div>
               <button className=" right-4 top-20 text-xs tracking-[0.25em] uppercase text-gray-300 h-16 w-60 bg-primary flex items-center justify-center hover:bg-primary-dark transition-colors rounded-md shadow-md">
                 Get in Touch
                 <ChevronRightCircle className="ml-3 h-7 w-7 animate-wiggle-right" />

@@ -1,0 +1,38 @@
+{
+  "collection": "news",
+  "field": "categories",
+  "special": ["m2m"],
+  "interface": "list-m2m",
+  "options": {
+    "template": "{{news_categories_id.name}}"
+  },
+  "display": "related-values",
+  "display_options": {
+    "template": "{{news_categories_id.name}}"
+  },
+  "meta": {
+    "collection": "news",
+    "field": "categories",
+    "special": ["m2m"],
+    "interface": "list-m2m",
+    "options": {
+      "template": "{{news_categories_id.name}}"
+    },
+    "display": "related-values",
+    "display_options": {
+      "template": "{{news_categories_id.name}}"
+    },
+    "readonly": false,
+    "hidden": false,
+    "sort": null,
+    "width": "full",
+    "translations": null,
+    "note": null,
+    "conditions": null,
+    "required": false,
+    "group": null,
+    "validation": null,
+    "validation_message": null
+  },
+  "schema": null
+}

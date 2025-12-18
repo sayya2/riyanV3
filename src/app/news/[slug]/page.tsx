@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-import { getAdjacentNews, getNewsBySlug } from "@/lib/db";
+import { getAdjacentNews, getNewsBySlug } from "@/lib/directus";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -15,8 +15,6 @@ const stripHtml = (input: string) =>
 type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
-
-export const dynamic = "force-dynamic";
 
 const contentShell = "w-full mx-auto px-[10%]";
 
@@ -49,22 +47,29 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
   if (process.env.NODE_ENV !== "production") {
     console.log("[NewsDetail] article", {
-      ID: article.ID,
-      slug: article.post_name,
-      title: article.post_title,
-      categories: article.categories,
-      tags: article.tags,
-      galleryCount: article.gallery?.length || 0,
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      categoriesRaw: article.categories,
+      tagsRaw: article.tags,
+      galleryRaw: article.gallery,
     });
     console.log("[NewsDetail] adjacent", adjacent);
   }
 
-  const categories = article.categories || [];
-  const tags = article.tags || [];
-  const img = article.thumbnail_url || fallbackImg;
+  const categories = (article.categories || [])
+    .map(c => c.category_id?.name)
+    .filter(Boolean) as string[];
+  const tags = (article.tags || [])
+    .map(t => t.tag_id?.name)
+    .filter(Boolean) as string[];
+  const gallery = (article.gallery || [])
+    .map(g => g.media_id?.filename_disk ? `/wp-content/uploads/${g.media_id.filename_disk}` : null)
+    .filter(Boolean) as string[];
+  const img = article.featured_image || fallbackImg;
   const categoriesText = categories.join(", ");
-  const lead = article.post_excerpt ? stripHtml(article.post_excerpt) : "";
-  const publishedDate = article.post_date ? new Date(article.post_date) : null;
+  const lead = article.excerpt ? stripHtml(article.excerpt) : "";
+  const publishedDate = article.published_at ? new Date(article.published_at) : null;
   const published =
     publishedDate && !isNaN(publishedDate.getTime())
       ? publishedDate.toLocaleDateString(undefined, {
@@ -76,7 +81,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const shareUrl = `${siteUrl}/news/${slug}`;
-  const shareText = article.post_title;
+  const shareText = article.title;
   const shareLinks = [
     {
       label: "X",
@@ -125,7 +130,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-white">
       <PageHero
-        title={article.post_title}
+        title={article.title}
         eyebrow={categoriesText || "News"}
         description={lead || published}
         imageUrl={img}
@@ -138,7 +143,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
             {lead ? <p className="text-lg text-gray-700 leading-relaxed">{lead}</p> : null}
             <div
               className="prose prose-lg max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: article.post_content || "" }}
+              dangerouslySetInnerHTML={{ __html: article.content || "" }}
             />
             {tags.length ? (
               <div className="flex flex-wrap gap-2 pt-4">
@@ -153,17 +158,17 @@ export default async function NewsDetailPage({ params }: PageProps) {
               </div>
             ) : null}
 
-            {article.gallery && article.gallery.length ? (
+            {gallery && gallery.length ? (
               <div className="pt-6">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {article.gallery.map((src, idx) => (
+                  {gallery.map((src, idx) => (
                     <div
                       key={`gallery-${idx}`}
                       className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
                     >
                       <Image
                         src={src}
-                        alt={`${article.post_title} image ${idx + 1}`}
+                        alt={`${article.title} image ${idx + 1}`}
                         fill
                         className="object-cover"
                         sizes="(min-width:1024px) 33vw, 50vw"
@@ -220,10 +225,10 @@ export default async function NewsDetailPage({ params }: PageProps) {
             <div className="flex justify-between items-center gap-3">
               {adjacent.previous ? (
                 <Link
-                  href={`/news/${adjacent.previous.post_name}`}
+                  href={`/news/${adjacent.previous.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                 >
-                  &larr; {adjacent.previous.post_title}
+                  &larr; {adjacent.previous.title}
                 </Link>
               ) : (
                 <span />
@@ -231,10 +236,10 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
               {adjacent.next ? (
                 <Link
-                  href={`/news/${adjacent.next.post_name}`}
+                  href={`/news/${adjacent.next.slug}`}
                   className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                 >
-                  {adjacent.next.post_title} &rarr;
+                  {adjacent.next.title} &rarr;
                 </Link>
               ) : (
                 <span />

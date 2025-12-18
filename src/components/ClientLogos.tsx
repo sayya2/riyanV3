@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { ClientLogo } from "@/lib/db";
+
+type ClientLogo = { name: string; url: string };
 
 interface ClientLogosProps {
   logos: ClientLogo[];
