@@ -12,7 +12,7 @@ services:
       - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
-      - ./db_init:/docker-entrypoint-initdb.d
+      - /opt/riyan/db_init:/docker-entrypoint-initdb.d
     networks:
       - riyan_network
     healthcheck:
@@ -49,7 +49,7 @@ services:
       CACHE_STORE: "memory"
     volumes:
       - directus_data:/directus/uploads
-      - ./wp-content:/app/public/wp-content
+      - /opt/riyan/wp-content:/app/public/wp-content
     depends_on:
       mariadb:
         condition: service_healthy
@@ -82,7 +82,7 @@ services:
       - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
       - REVALIDATE_SECRET=replace-with-random-secret
     volumes:
-      - ./wp-content:/app/public/wp-content
+      - /opt/riyan/wp-content:/app/public/wp-content
     depends_on:
       mariadb:
         condition: service_healthy
