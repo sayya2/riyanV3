@@ -110,7 +110,7 @@ services:
       - riyan_network
     healthcheck:
       # Use 127.0.0.1 instead of localhost to avoid IPv6 (::1) resolution issues
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(() => process.exit(0)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
