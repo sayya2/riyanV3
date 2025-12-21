@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import { getAdjacentNews, getNewsBySlug } from "@/lib/directus";
+import { resolveFileUrl } from "@/lib/media";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -64,7 +65,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
     .map(t => t.tag_id?.name)
     .filter(Boolean) as string[];
   const gallery = (article.gallery || [])
-    .map(g => g.media_id?.filename_disk ? `/wp-content/uploads/${g.media_id.filename_disk}` : null)
+    .map(g => resolveFileUrl(g.media_id))
     .filter(Boolean) as string[];
   const img = article.featured_image || fallbackImg;
   const categoriesText = categories.join(", ");

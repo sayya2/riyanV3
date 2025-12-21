@@ -4,6 +4,7 @@ import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import { Building2, CalendarClock, MapPin } from "lucide-react";
 import { getAdjacentProjects, getProjectBySlug } from "@/lib/directus";
+import { resolveFileUrl } from "@/lib/media";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -56,7 +57,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     .map(s => s.service_id?.name)
     .filter(Boolean) as string[];
   const gallery = (project.gallery || [])
-    .map(g => g.media_id?.filename ? `/wp-content/uploads/${g.media_id.filename}` : null)
+    .map(g => resolveFileUrl(g.media_id))
     .filter(Boolean) as string[];
   const categoriesText = categories.join(", ");
   const servicesText = services.join(", ");

@@ -43,7 +43,6 @@ export default async function CareerPage() {
       titleOverride="Careers at Riyan"
       heroEyebrow="Join our team"
       heroDescriptionOverride="Grow with a multidisciplinary team delivering resilient, high-performance projects across the Maldives."
-      heroImageOverride="/wp-content/uploads/2025/03/11.png"
       heroHeightClass="min-h-[80vh] "
       hideContent
     >

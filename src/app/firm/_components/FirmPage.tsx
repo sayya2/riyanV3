@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/db-new";
 import PageHero from "@/components/PageHero";
+import { resolveImageUrl } from "@/lib/media";
 
 const fallbackImg = "/images/about-hero.png";
 const contentShell = "w-full mx-auto px-[10%]";
@@ -57,7 +58,7 @@ export async function FirmPageBySlug({
     });
   }
 
-  const img = page.featured_image || fallbackImg;
+  const img = resolveImageUrl(page.featured_image) || fallbackImg;
   const lead =
     page.excerpt && page.excerpt.trim().length > 0
       ? stripHtml(page.excerpt)
@@ -65,7 +66,7 @@ export async function FirmPageBySlug({
   const title = titleOverride || page.title;
 
   const navLinks = firmPages.filter((link) => link.path !== currentPath);
-  const heroImage = heroImageOverride || img;
+  const heroImage = resolveImageUrl(heroImageOverride) || img;
   const heroDescription = heroDescriptionOverride || lead;
   const eyebrow = heroEyebrow || "Firm";
   const heroHeight = heroHeightClass || "min-h-[60vh] md:min-h-[80vh]";

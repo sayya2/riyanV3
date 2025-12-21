@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { resolveImageUrl } from './media';
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -247,6 +248,7 @@ export async function getProjects({
 
   return rows.map((row) => ({
     ...row,
+    featured_image: resolveImageUrl(row.featured_image),
     categories: row.categories ? row.categories.split(', ') : [],
     services: row.services ? row.services.split(', ') : [],
   }));
@@ -274,9 +276,10 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
 
   // Get gallery images
   const [galleryRows] = await pool.query<any[]>(
-    `SELECT m.filepath
+    `SELECT df.id as directus_id, m.filepath
      FROM project_gallery pg
-     JOIN media m ON m.id = pg.media_id
+     LEFT JOIN directus_files df ON df.id = pg.media_id
+     LEFT JOIN media m ON m.id = pg.media_id
      WHERE pg.project_id = ?
      ORDER BY pg.sort_order`,
     [project.id]
@@ -284,9 +287,12 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
 
   return {
     ...project,
+    featured_image: resolveImageUrl(project.featured_image),
     categories: project.categories ? project.categories.split(', ') : [],
     services: project.services ? project.services.split(', ') : [],
-    gallery: galleryRows.map((row) => row.filepath),
+    gallery: galleryRows
+      .map((row) => resolveImageUrl(row.directus_id || row.filepath))
+      .filter(Boolean) as string[],
   };
 }
 
@@ -384,6 +390,7 @@ export async function getNewsPosts({
 
   return rows.map((row) => ({
     ...row,
+    featured_image: resolveImageUrl(row.featured_image),
     categories: row.categories ? row.categories.split(', ') : [],
     tags: row.tags ? row.tags.split(', ') : [],
   }));
@@ -410,9 +417,10 @@ export async function getNewsBySlug(slug: string): Promise<(NewsPost & { gallery
   const news = rows[0];
 
   const [galleryRows] = await pool.query<any[]>(
-    `SELECT m.filepath
+    `SELECT df.id as directus_id, m.filepath
      FROM news_gallery ng
-     JOIN media m ON m.id = ng.media_id
+     LEFT JOIN directus_files df ON df.id = ng.media_id
+     LEFT JOIN media m ON m.id = ng.media_id
      WHERE ng.news_id = ?
      ORDER BY ng.sort_order`,
     [news.id]
@@ -420,9 +428,12 @@ export async function getNewsBySlug(slug: string): Promise<(NewsPost & { gallery
 
   return {
     ...news,
+    featured_image: resolveImageUrl(news.featured_image),
     categories: news.categories ? news.categories.split(', ') : [],
     tags: news.tags ? news.tags.split(', ') : [],
-    gallery: galleryRows.map((row) => row.filepath),
+    gallery: galleryRows
+      .map((row) => resolveImageUrl(row.directus_id || row.filepath))
+      .filter(Boolean) as string[],
   };
 }
 
@@ -538,7 +549,11 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
     `SELECT * FROM pages WHERE slug = ? AND status = 'published' LIMIT 1`,
     [slug]
   );
-  return rows.length ? (rows[0] as Page) : null;
+  if (!rows.length) return null;
+  return {
+    ...(rows[0] as Page),
+    featured_image: resolveImageUrl(rows[0].featured_image),
+  };
 }
 
 // =====================================================
@@ -550,7 +565,10 @@ export async function getHeroSlides(sliderAlias?: string): Promise<HeroSlide[]> 
   const [rows] = await pool.query<any[]>(
     `SELECT * FROM hero_slides WHERE status = 'published' ORDER BY sort_order`
   );
-  return rows as HeroSlide[];
+  return rows.map((row) => ({
+    ...row,
+    image_url: resolveImageUrl(row.image_url) || row.image_url,
+  })) as HeroSlide[];
 }
 
 // =====================================================
@@ -558,6 +576,25 @@ export async function getHeroSlides(sliderAlias?: string): Promise<HeroSlide[]> 
 // =====================================================
 
 export async function getClientLogos(): Promise<{ name: string; url: string }[]> {
+  const folderId = process.env.DIRECTUS_CLIENT_LOGOS_FOLDER_ID;
+
+  if (folderId) {
+    const [rows] = await pool.query<any[]>(
+      `SELECT id, title, filename_download
+       FROM directus_files
+       WHERE folder = ?
+       ORDER BY title`,
+      [folderId]
+    );
+
+    return rows
+      .map((row) => ({
+        name: row.title || row.filename_download || "Client logo",
+        url: resolveImageUrl(row.id) || "",
+      }))
+      .filter((row) => row.url);
+  }
+
   const [rows] = await pool.query<any[]>(
     `SELECT title as name, filepath as url
      FROM media
@@ -569,6 +606,21 @@ export async function getClientLogos(): Promise<{ name: string; url: string }[]>
 }
 
 export async function getAboutCarouselImages(): Promise<string[]> {
+  const folderId = process.env.DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID;
+
+  if (folderId) {
+    const [rows] = await pool.query<any[]>(
+      `SELECT id
+       FROM directus_files
+       WHERE folder = ?
+       ORDER BY title`,
+      [folderId]
+    );
+    return rows
+      .map((row) => resolveImageUrl(row.id))
+      .filter(Boolean) as string[];
+  }
+
   const [rows] = await pool.query<any[]>(
     `SELECT filepath FROM media
      WHERE filepath LIKE '%/about_carousel/%'

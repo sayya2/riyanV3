@@ -94,8 +94,10 @@ services:
       - DB_NAME=riyan_nextjs
       - DB_PORT=3306
       - NEXT_PUBLIC_SITE_URL=https://riyan.com.mv
+      - NEXT_PUBLIC_DIRECTUS_URL=http://localhost:8055
       - DIRECTUS_URL=http://directus:8055
       - DIRECTUS_TOKEN=your-directus-static-token-here
+      - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
       - REVALIDATE_SECRET=replace-with-random-secret
     volumes:
       - ./wp-content:/app/public/wp-content

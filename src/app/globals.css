@@ -118,3 +118,13 @@ h6 {
     transform: translateY(0);
   }
 }
+
+/* Hide scrollbars but keep scrolling */
+.panel-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.panel-scroll::-webkit-scrollbar {
+  display: none;
+}

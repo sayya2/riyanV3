@@ -103,7 +103,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className={`${contentShell} py-16 md:py-20 space-y-12`}>
+      <section id="contact-form" className={`${contentShell} py-16 md:py-20 space-y-12`}>
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6">
             <div className="flex items-center justify-between gap-4">

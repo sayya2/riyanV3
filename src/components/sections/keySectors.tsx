@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { keySectors, keySectorsIntro } from "@/data/keySectors";
+import { resolveImageUrl } from "@/lib/media";
 
 const KeySectors = () => {
   const firstRow = keySectors.slice(0, 2);
@@ -43,13 +44,15 @@ type SectorCardProps = {
 };
 
 function SectorCard({ title, image, href }: SectorCardProps) {
+  const resolvedImage = resolveImageUrl(image) || image;
+
   return (
     <Link
       href={href || "#"}
       className="group relative block overflow-hidden rounded-lg h-72 md:h-[360px] bg-gray-200"
     >
       <Image
-        src={image}
+        src={resolvedImage}
         alt={title}
         fill
         sizes="(min-width: 1024px) 33vw, 100vw"

@@ -1,4 +1,5 @@
 import { createDirectus, rest, readItems, readItem } from '@directus/sdk';
+import { resolveImageUrl } from './media';
 
 // Directus URL - use Docker internal hostname in production
 const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://localhost:8055';
@@ -52,9 +53,9 @@ export interface DirectusNewsPost {
   }[];
   gallery?: {
     media_id: {
-      id: string;
-      title: string;
-      filename_disk: string;
+      id?: string | number | null;
+      title?: string | null;
+      filename_disk?: string | null;
     };
   }[];
 }
@@ -72,29 +73,9 @@ export interface DirectusTag {
   slug: string;
 }
 
-// Helper to normalize media URLs
-const normalizeMediaUrl = (value?: string | null): string | null => {
-  if (!value) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-
-  // If it's already a full URL, return as is
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
-  }
-
-  // If it starts with /wp-content/, return as is
-  if (trimmed.startsWith('/wp-content/')) {
-    return trimmed;
-  }
-
-  // Otherwise prepend /wp-content/ if not present
-  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-};
-
 const normalizeNewsPost = (post: any): DirectusNewsPost => ({
   ...(post as DirectusNewsPost),
-  featured_image: normalizeMediaUrl(post?.featured_image),
+  featured_image: resolveImageUrl(post?.featured_image),
 });
 
 // Get all news categories
@@ -361,9 +342,9 @@ export interface DirectusProject {
   }[];
   gallery?: {
     media_id: {
-      id: number;
-      title: string;
-      filename: string;
+      id?: string | number | null;
+      title?: string | null;
+      filename?: string | null;
     };
   }[];
 }
@@ -384,7 +365,7 @@ export interface DirectusService {
 
 const normalizeProject = (project: any): DirectusProject => ({
   ...(project as DirectusProject),
-  featured_image: normalizeMediaUrl(project?.featured_image),
+  featured_image: resolveImageUrl(project?.featured_image),
 });
 
 // Get all project categories

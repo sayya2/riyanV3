@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/db-new";
 import PageHero from "@/components/PageHero";
+import { resolveImageUrl } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,9 @@ export default async function InternshipsPage() {
     sections.description ||
     stripHtml(page.excerpt || "") ||
     "Join our internship program and gain hands-on experience in a dynamic professional environment.";
+  const heroImage =
+    resolveImageUrl(page.featured_image) ||
+    "/wp-content/uploads/2025/05/5h-floor-Multipurpose-room_1.png";
 
   return (
     <main className="min-h-screen bg-white">
@@ -85,7 +89,7 @@ export default async function InternshipsPage() {
         title={title}
         eyebrow="Career Opportunities"
         description={description}
-        imageUrl="/wp-content/uploads/2025/05/5h-floor-Multipurpose-room_1.png"
+        imageUrl={heroImage}
         heightClass="min-h-[60vh] md:min-h-[80vh]"
       />
 

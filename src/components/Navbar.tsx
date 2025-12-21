@@ -41,6 +41,9 @@ export default function Navbar() {
   const [isSticky, setIsSticky] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const panelItems = menuItems.flatMap((item) =>
+    item.children && item.children.length > 0 ? item.children : [item]
+  );
 
   useEffect(() => {
     const handleScroll = () => setIsSticky(window.scrollY > 100);
@@ -149,7 +152,9 @@ export default function Navbar() {
                         href={child.url}
                         className="px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                       >
-                        <p className="text-sm font-semibold text-gray-900">{child.title}</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {child.title}
+                        </p>
                         <p className="text-xs text-gray-600">
                           Learn more about {child.title.toLowerCase()} at Riyan.
                         </p>
@@ -158,7 +163,6 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Contact Panel Toggle */}
@@ -201,7 +205,7 @@ export default function Navbar() {
           onClick={() => setIsPanelOpen(false)}
         />
         <aside
-          className={`absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl transform transition-transform duration-300 ${
+          className={`absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl transform transition-transform duration-300 h-[100dvh] flex flex-col ${
             isPanelOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -223,8 +227,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          <div className="relative h-full overflow-y-auto">
-            <div className="px-6 py-6 space-y-6 max-w-xl">
+          <div className="flex-1 overflow-y-auto panel-scroll">
+            <div className="px-6 py-6 space-y-6 max-w-xl pb-24">
               <p className="text-gray-700 leading-relaxed">
                 Reach out to us, let&apos;s discuss about how we can help you.
               </p>
@@ -290,38 +294,29 @@ export default function Navbar() {
                   Navigation
                 </p>
                 <div className="flex flex-col gap-2">
-                  {menuItems.map((item) => (
-                    <div key={item.id}>
-                      <Link
-                        href={item.url}
-                        className="text-gray-900 hover:text-primary font-medium block py-1"
-                        onClick={() => !item.children && setIsPanelOpen(false)}
-                      >
-                        {item.title}
-                      </Link>
-                      {item.children && (
-                        <div className="ml-4 mt-1 space-y-1">
-                          {item.children.map((child) => (
-                            <Link
-                              key={child.id}
-                              href={child.url}
-                              className="text-sm text-gray-600 hover:text-primary block py-1"
-                              onClick={() => setIsPanelOpen(false)}
-                            >
-                              {child.title}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                  {panelItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.url}
+                      className="text-gray-900 hover:text-primary font-medium block py-1"
+                      onClick={() => setIsPanelOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
                   ))}
                 </div>
               </div>
-              <button className=" right-4 top-20 text-xs tracking-[0.25em] uppercase text-gray-300 h-16 w-60 bg-primary flex items-center justify-center hover:bg-primary-dark transition-colors rounded-md shadow-md">
-                Get in Touch
-                <ChevronRightCircle className="ml-3 h-7 w-7 animate-wiggle-right" />
-              </button>
             </div>
+          </div>
+          <div className="border-t border-gray-200 px-6 py-5">
+            <Link
+              href="/firm/contact#contact-form"
+              className="w-full text-xs tracking-[0.25em] uppercase text-gray-300 h-12 sm:h-14 bg-primary flex items-center justify-center hover:bg-primary-dark transition-colors rounded-md shadow-md"
+              onClick={() => setIsPanelOpen(false)}
+            >
+              Get in Touch
+              <ChevronRightCircle className="ml-3 h-6 w-6 sm:h-7 sm:w-7 animate-wiggle-right" />
+            </Link>
           </div>
         </aside>
       </div>
