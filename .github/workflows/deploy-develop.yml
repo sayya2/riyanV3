@@ -43,7 +43,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   deploy:
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: self-hosted
     needs: build-and-push
     steps:
       - name: Checkout
@@ -53,5 +53,13 @@ jobs:
         run: |
           set -e
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
-          docker compose -f docker-compose.prod.yml pull web
-          docker compose -f docker-compose.prod.yml up -d
+          if docker compose version >/dev/null 2>&1; then
+            DC="docker compose"
+          elif command -v docker-compose >/dev/null 2>&1; then
+            DC="docker-compose"
+          else
+            echo "docker compose not available on runner" >&2
+            exit 1
+          fi
+          $DC -f docker-compose.prod.yml pull web
+          $DC -f docker-compose.prod.yml up -d
