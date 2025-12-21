@@ -39,9 +39,9 @@ services:
       DB_USER: "user"
       DB_PASSWORD: "Riyanitaccess@26+"
       WEBSOCKETS_ENABLED: "true"
-      PUBLIC_URL: "http://192.168.1.215:8055"
+      PUBLIC_URL: "http://100.80.223.36:8055"
       CORS_ENABLED: "true"
-      CORS_ORIGIN: "http://192.168.1.215:3000,https://riyan.com.mv"
+      CORS_ORIGIN: "http://100.80.223.36:3000,https://riyan.com.mv"
       CORS_CREDENTIALS: "true"
       STORAGE_LOCATIONS: "local"
       STORAGE_LOCAL_ROOT: "/app/public/wp-content/uploads"
@@ -75,8 +75,8 @@ services:
       - DB_PASSWORD=Riyanitaccess@26+
       - DB_NAME=riyan_nextjs
       - DB_PORT=3306
-      - NEXT_PUBLIC_SITE_URL=http://192.168.1.215:3000
-      - NEXT_PUBLIC_DIRECTUS_URL=http://192.168.1.215:8055
+      - NEXT_PUBLIC_SITE_URL=http://100.80.223.36:3000
+      - NEXT_PUBLIC_DIRECTUS_URL=http://100.80.223.36:8055
       - DIRECTUS_URL=http://directus:8055
       - DIRECTUS_TOKEN=your-directus-static-token-here
       - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
