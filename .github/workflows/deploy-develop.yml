@@ -43,26 +43,15 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, arm64]
     needs: build-and-push
     steps:
-      - name: Deploy to Pi
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.PI_HOST }}
-          username: ${{ secrets.PI_USER }}
-          port: ${{ secrets.PI_PORT }}
-          key: ${{ secrets.PI_SSH_KEY }}
-          script: |
-            set -e
-            if [ ! -d /opt/riyan ]; then
-              git clone --branch develop https://github.com/sayya2/riyanV3.git /opt/riyan
-            else
-              cd /opt/riyan
-              git fetch origin develop
-              git reset --hard origin/develop
-            fi
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
-            cd /opt/riyan
-            docker compose -f docker-compose.prod.yml pull web
-            docker compose -f docker-compose.prod.yml up -d
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy on Pi
+        run: |
+          set -e
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+          docker compose -f docker-compose.prod.yml pull web
+          docker compose -f docker-compose.prod.yml up -d
