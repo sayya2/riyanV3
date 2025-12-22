@@ -326,8 +326,8 @@ export interface DirectusProject {
   published_at: string;
   created_at: string;
   updated_at: string;
-  categories?: {
-    category_id: {
+  sectors?: {
+    sector_id: {
       id: number;
       name: string;
       slug: string;
@@ -349,7 +349,7 @@ export interface DirectusProject {
   }[];
 }
 
-export interface DirectusProjectCategory {
+export interface DirectusSector {
   id: number;
   name: string;
   slug: string;
@@ -368,18 +368,18 @@ const normalizeProject = (project: any): DirectusProject => ({
   featured_image: resolveImageUrl(project?.featured_image),
 });
 
-// Get all project categories
-export async function getProjectCategories(): Promise<DirectusProjectCategory[]> {
+// Get all project sectors
+export async function getProjectSectors(): Promise<DirectusSector[]> {
   try {
-    const categories = await directus.request(
-      readItems('project_categories', {
+    const sectors = await directus.request(
+      readItems('sectors', {
         fields: ['id', 'name', 'slug', 'description'],
         sort: ['name'],
       })
     );
-    return categories as DirectusProjectCategory[];
+    return sectors as DirectusSector[];
   } catch (error) {
-    console.error('[getProjectCategories] Directus API error:', error);
+    console.error('[getProjectSectors] Directus API error:', error);
     return [];
   }
 }
@@ -402,12 +402,12 @@ export async function getProjectServices(): Promise<DirectusService[]> {
 
 // Get projects with optional filtering
 export async function getProjects({
-  categorySlug,
+  sectorSlug,
   serviceSlug,
   search,
   limit = 24,
 }: {
-  categorySlug?: string;
+  sectorSlug?: string;
   serviceSlug?: string;
   search?: string;
   limit?: number;
@@ -417,11 +417,11 @@ export async function getProjects({
       status: { _eq: 'published' },
     };
 
-    // Filter by category slug if provided
-    if (categorySlug) {
-      filter.categories = {
-        category_id: {
-          slug: { _eq: categorySlug },
+    // Filter by sector slug if provided
+    if (sectorSlug) {
+      filter.sectors = {
+        sector_id: {
+          slug: { _eq: sectorSlug },
         },
       };
     }
@@ -460,9 +460,9 @@ export async function getProjects({
           'published_at',
           'created_at',
           'updated_at',
-          'categories.category_id.id',
-          'categories.category_id.name',
-          'categories.category_id.slug',
+          'sectors.sector_id.id',
+          'sectors.sector_id.name',
+          'sectors.sector_id.slug',
           'services.service_id.id',
           'services.service_id.name',
           'services.service_id.slug',
@@ -499,9 +499,9 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
           'published_at',
           'created_at',
           'updated_at',
-          'categories.category_id.id',
-          'categories.category_id.name',
-          'categories.category_id.slug',
+          'sectors.sector_id.id',
+          'sectors.sector_id.name',
+          'sectors.sector_id.slug',
           'services.service_id.id',
           'services.service_id.name',
           'services.service_id.slug',
@@ -536,9 +536,9 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
               'published_at',
               'created_at',
               'updated_at',
-              'categories.category_id.id',
-              'categories.category_id.name',
-              'categories.category_id.slug',
+              'sectors.sector_id.id',
+              'sectors.sector_id.name',
+              'sectors.sector_id.slug',
               'services.service_id.id',
               'services.service_id.name',
               'services.service_id.slug',

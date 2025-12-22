@@ -65,6 +65,7 @@ services:
     volumes:
       - directus_data:/directus/uploads
       - ./wp-content:/app/public/wp-content
+      - ./directus/extensions:/directus/extensions
     depends_on:
       mariadb:
         condition: service_healthy

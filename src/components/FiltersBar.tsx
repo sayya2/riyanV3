@@ -1,12 +1,12 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { DirectusProjectCategory, DirectusService } from "@/lib/directus";
+import { DirectusSector, DirectusService } from "@/lib/directus";
 
 type Props = {
-  categories: DirectusProjectCategory[];
+  sectors: DirectusSector[];
   services: DirectusService[];
-  selectedCategory: string;
+  selectedSector: string;
   selectedService: string;
   search: string;
   perPage: number;
@@ -15,9 +15,9 @@ type Props = {
 const perPageOptions = [20, 40, 60, 100];
 
 export default function FiltersBar({
-  categories,
+  sectors,
   services,
-  selectedCategory,
+  selectedSector,
   selectedService,
   search,
   perPage,
@@ -40,12 +40,13 @@ export default function FiltersBar({
   };
 
   const onSubmit = (formData: FormData) => {
-    const nextCategory = (formData.get("category") as string) || "";
+    const nextSector = (formData.get("sector") as string) || "";
     const nextService = (formData.get("service") as string) || "";
     const nextSearch = (formData.get("q") as string) || "";
     const nextPerPage = (formData.get("perPage") as string) || "";
     updateParams({
-      category: nextCategory,
+      sector: nextSector,
+      category: undefined,
       service: nextService,
       q: nextSearch,
       perPage: nextPerPage,
@@ -62,14 +63,14 @@ export default function FiltersBar({
         className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-primary/50"
       />
       <select
-        name="category"
-        defaultValue={selectedCategory}
+        name="sector"
+        defaultValue={selectedSector}
         className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50"
       >
         <option value="">All Sectors</option>
-        {categories.map((cat) => (
-          <option key={cat.slug} value={cat.slug}>
-            {cat.name}
+        {sectors.map((sector) => (
+          <option key={sector.slug} value={sector.slug}>
+            {sector.name}
           </option>
         ))}
       </select>

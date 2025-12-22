@@ -50,8 +50,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     );
   }
 
-  const categories = (project.categories || [])
-    .map(c => c.category_id?.name)
+  const sectors = (project.sectors || [])
+    .map(c => c.sector_id?.name)
     .filter(Boolean) as string[];
   const services = (project.services || [])
     .map(s => s.service_id?.name)
@@ -59,7 +59,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const gallery = (project.gallery || [])
     .map(g => resolveFileUrl(g.media_id))
     .filter(Boolean) as string[];
-  const categoriesText = categories.join(", ");
+  const sectorsText = sectors.join(", ");
   const servicesText = services.join(", ");
   const img = project.featured_image || fallbackImg;
   const stats = [
@@ -150,7 +150,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     <main className="min-h-screen bg-white">
       <PageHero
         title={project.title}
-        eyebrow={categoriesText || servicesText || "Project"}
+        eyebrow={sectorsText || servicesText || "Project"}
         description={lead}
         imageUrl={img}
         heightClass="min-h-[60vh] md:min-h-[80vh]"
@@ -195,18 +195,18 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               className="prose prose-lg max-w-none text-gray-800"
               dangerouslySetInnerHTML={{ __html: project.content || "" }}
             />
-            {(categories.length || services.length) ? (
+            {(sectors.length || services.length) ? (
               <div className="grid gap-4 md:grid-cols-2">
-                {categories.length ? (
+                {sectors.length ? (
                   <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
                     <h3 className="text-lg font-semibold text-gray-900">Sectors</h3>
                     <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => (
+                      {sectors.map((sector) => (
                         <span
-                          key={`cat-${cat}`}
+                          key={`sector-${sector}`}
                           className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
                         >
-                          {cat}
+                          {sector}
                         </span>
                       ))}
                     </div>

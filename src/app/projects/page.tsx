@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  getProjectCategories,
+  getProjectSectors,
   getProjectServices,
   getProjects,
 } from "@/lib/directus";
@@ -33,8 +33,11 @@ export default async function ProjectsPage({
         >)
       : ((searchParams || {}) as Record<string, string | string[] | undefined>);
 
-  const category =
+  const sector =
+    typeof resolvedParams?.sector === "string" ? resolvedParams.sector : "";
+  const legacyCategory =
     typeof resolvedParams?.category === "string" ? resolvedParams.category : "";
+  const selectedSector = sector || legacyCategory;
   const service =
     typeof resolvedParams?.service === "string" ? resolvedParams.service : "";
   const search = typeof resolvedParams?.q === "string" ? resolvedParams.q : "";
@@ -44,11 +47,11 @@ export default async function ProjectsPage({
       : 24;
   const limit = [20, 40, 60, 100].includes(perPage) ? perPage : 24;
 
-  const [categories, services, projects] = await Promise.all([
-    getProjectCategories(),
+  const [sectors, services, projects] = await Promise.all([
+    getProjectSectors(),
     getProjectServices(),
     getProjects({
-      categorySlug: category || undefined,
+      sectorSlug: selectedSector || undefined,
       serviceSlug: service || undefined,
       search: search || undefined,
       limit,
@@ -56,14 +59,14 @@ export default async function ProjectsPage({
   ]);
 
   if (process.env.NODE_ENV !== "production") {
-    console.log("[ProjectsPage] filters", { category, service, search, limit });
+    console.log("[ProjectsPage] filters", { sector: selectedSector, service, search, limit });
     console.log(
       "[ProjectsPage] projects sample",
       projects.slice(0, 3).map((p) => ({
         id: p.id,
         slug: p.slug,
         title: p.title,
-        categories: p.categories,
+        sectors: p.sectors,
         services: p.services,
       })),
       "total",
@@ -84,9 +87,9 @@ export default async function ProjectsPage({
             </p>
           </div>
           <FiltersBar
-            categories={categories}
+            sectors={sectors}
             services={services}
-            selectedCategory={category}
+            selectedSector={selectedSector}
             selectedService={service}
             search={search}
             perPage={limit}
@@ -98,8 +101,8 @@ export default async function ProjectsPage({
             const href = project.slug
               ? `/projects/${project.slug}`
               : "#";
-            const categoriesText = (project.categories || [])
-              .map(c => c.category_id?.name)
+            const sectorsText = (project.sectors || [])
+              .map(c => c.sector_id?.name)
               .filter(Boolean)
               .join(", ");
             const servicesText = (project.services || [])
@@ -129,7 +132,7 @@ export default async function ProjectsPage({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5 space-y-2">
                   <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
-                    {categoriesText || servicesText || "Project"}
+                    {sectorsText || servicesText || "Project"}
                   </p>
                   <h3 className="text-xl font-semibold text-white drop-shadow-sm">
                     {project.title}

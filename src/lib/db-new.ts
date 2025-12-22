@@ -41,7 +41,7 @@ export interface Project {
   location?: string;
   status: 'draft' | 'published' | 'archived';
   published_at: string;
-  categories?: string[];
+  sectors?: string[];
   services?: string[];
   gallery?: string[];
 }
@@ -101,7 +101,7 @@ export interface HeroSlide {
   status: 'draft' | 'published';
 }
 
-export interface ProjectCategory {
+export interface Sector {
   id: number;
   name: string;
   slug: string;
@@ -164,18 +164,18 @@ export async function getMenuItems(location: string = 'primary'): Promise<MenuIt
 // PROJECT FUNCTIONS
 // =====================================================
 
-export async function getProjectCategories(): Promise<ProjectCategory[]> {
+export async function getProjectSectors(): Promise<Sector[]> {
   const [rows] = await pool.query<any[]>(
     `SELECT
        pc.*,
-       COUNT(ppc.project_id) as count
-     FROM project_categories pc
-     LEFT JOIN project_project_categories ppc ON pc.id = ppc.category_id
-     LEFT JOIN projects p ON p.id = ppc.project_id AND p.status = 'published'
+       COUNT(ps.project_id) as count
+     FROM sectors pc
+     LEFT JOIN project_sectors ps ON pc.id = ps.sector_id
+     LEFT JOIN projects p ON p.id = ps.project_id AND p.status = 'published'
      GROUP BY pc.id
      ORDER BY pc.sort_order, pc.name`
   );
-  return rows as ProjectCategory[];
+  return rows as Sector[];
 }
 
 export async function getProjectServices(): Promise<Service[]> {
@@ -193,12 +193,12 @@ export async function getProjectServices(): Promise<Service[]> {
 }
 
 export async function getProjects({
-  categorySlug,
+  sectorSlug,
   serviceSlug,
   search,
   limit = 24,
 }: {
-  categorySlug?: string;
+  sectorSlug?: string;
   serviceSlug?: string;
   search?: string;
   limit?: number;
@@ -206,11 +206,11 @@ export async function getProjects({
   let query = `
     SELECT DISTINCT
       p.*,
-      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS categories,
+      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS sectors,
       GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS services
     FROM projects p
-    LEFT JOIN project_project_categories ppc ON p.id = ppc.project_id
-    LEFT JOIN project_categories pc ON pc.id = ppc.category_id
+    LEFT JOIN project_sectors pse ON p.id = pse.project_id
+    LEFT JOIN sectors pc ON pc.id = pse.sector_id
     LEFT JOIN project_services ps ON p.id = ps.project_id
     LEFT JOIN services s ON s.id = ps.service_id
     WHERE p.status = 'published'
@@ -218,13 +218,13 @@ export async function getProjects({
 
   const params: any[] = [];
 
-  if (categorySlug) {
+  if (sectorSlug) {
     query += ` AND EXISTS (
-      SELECT 1 FROM project_project_categories ppc2
-      JOIN project_categories pc2 ON pc2.id = ppc2.category_id
-      WHERE ppc2.project_id = p.id AND pc2.slug = ?
+      SELECT 1 FROM project_sectors ps2
+      JOIN sectors pc2 ON pc2.id = ps2.sector_id
+      WHERE ps2.project_id = p.id AND pc2.slug = ?
     )`;
-    params.push(categorySlug);
+    params.push(sectorSlug);
   }
 
   if (serviceSlug) {
@@ -249,7 +249,7 @@ export async function getProjects({
   return rows.map((row) => ({
     ...row,
     featured_image: resolveImageUrl(row.featured_image),
-    categories: row.categories ? row.categories.split(', ') : [],
+    sectors: row.sectors ? row.sectors.split(', ') : [],
     services: row.services ? row.services.split(', ') : [],
   }));
 }
@@ -257,11 +257,11 @@ export async function getProjects({
 export async function getProjectBySlug(slug: string): Promise<(Project & { gallery: string[] }) | null> {
   const [rows] = await pool.query<any[]>(
     `SELECT p.*,
-      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS categories,
+      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS sectors,
       GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS services
      FROM projects p
-     LEFT JOIN project_project_categories ppc ON p.id = ppc.project_id
-     LEFT JOIN project_categories pc ON pc.id = ppc.category_id
+     LEFT JOIN project_sectors pse ON p.id = pse.project_id
+     LEFT JOIN sectors pc ON pc.id = pse.sector_id
      LEFT JOIN project_services ps ON p.id = ps.project_id
      LEFT JOIN services s ON s.id = ps.service_id
      WHERE p.slug = ? AND p.status = 'published'
@@ -279,7 +279,7 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
     `SELECT df.id as directus_id, m.filepath
      FROM project_gallery pg
      LEFT JOIN directus_files df ON df.id = pg.media_id
-     LEFT JOIN media m ON m.id = pg.media_id
+     LEFT JOIN media m ON m.id = pg.media_id_legacy
      WHERE pg.project_id = ?
      ORDER BY pg.sort_order`,
     [project.id]
@@ -288,7 +288,7 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
   return {
     ...project,
     featured_image: resolveImageUrl(project.featured_image),
-    categories: project.categories ? project.categories.split(', ') : [],
+    sectors: project.sectors ? project.sectors.split(', ') : [],
     services: project.services ? project.services.split(', ') : [],
     gallery: galleryRows
       .map((row) => resolveImageUrl(row.directus_id || row.filepath))
