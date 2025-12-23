@@ -24,7 +24,7 @@ export default async function AboutPage() {
         description="Founded in 1997, Riyan Pvt. Ltd. is a leading multi-disciplinary consultancy firm based in the Maldives."
         // imageUrl="https://www.riyan.com.mv/wp-content/uploads/2018/05/Riyan-About.gif"
         imageUrl= "/wp-content/uploads/2024/12/Sonevafushi-e1759852363152-1140x740.jpg"
-        heightClass="min-h-[60vh] md:min-h-[80vh]"
+        heightClass="min-h-[60vh] md:min-h-[100vh]"
         bgColor="bg-[#1a1a2e]"
       />
 

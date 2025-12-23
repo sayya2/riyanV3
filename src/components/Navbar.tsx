@@ -69,7 +69,7 @@ export default function Navbar() {
         isSticky ? "bg-white shadow-md" : baseBg
       }`}
     >
-      <div className="container mx-auto  ">
+      <div className="container mx-auto px-10 ">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex ">

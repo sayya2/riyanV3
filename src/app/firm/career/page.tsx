@@ -34,7 +34,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CareerPage() {
   const roles = await getCareerPosts({ limit: 30 });
-  const contentShell = "w-full mx-auto px-[6%]";
+  const contentShell = "w-full mx-auto px-[0%]";
 
   return (
     <FirmPageBySlug
@@ -43,11 +43,11 @@ export default async function CareerPage() {
       titleOverride="Careers at Riyan"
       heroEyebrow="Join our team"
       heroDescriptionOverride="Grow with a multidisciplinary team delivering resilient, high-performance projects across the Maldives."
-      heroHeightClass="min-h-[80vh] "
+      heroHeightClass="min-h-[100vh] "
       hideContent
     >
       {/* Intro */}
-      <section className={`${contentShell} py-12 md:py-16`}>
+      <section className={`${contentShell} py-12 md:py-12`}>
         <div className="grid lg:grid-cols-[1.4fr,1fr] gap-10 items-start">
           <div className="space-y-5">
             <p className="text-xs uppercase tracking-[0.3em] text-primary font-semibold">

@@ -25,7 +25,7 @@ const AboutSection = async () => {
                 "Riyan provides comprehensive professional services tailored to meet the unique needs of our clients. With years of experience and a commitment to excellence, we deliver results that exceed expectations."}
             </p>
             <Link
-              href="/firm"
+              href="/firm/about"
               className="inline-block text-primary hover:text-primary/80 font-medium"
             >
               Learn More
