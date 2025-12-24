@@ -131,6 +131,16 @@ export interface Tag {
   slug: string;
 }
 
+export type ClientLogoCategory =
+  | "Government of Maldives"
+  | "Local Brands"
+  | "International Brands"
+  | "Bilateral & Multilateral Agencies";
+
+export type ClientLogo = { name: string; url: string };
+
+export type ClientLogosByCategory = Record<ClientLogoCategory, ClientLogo[]>;
+
 export interface AdjacentProject {
   slug: string;
   title: string;
@@ -575,34 +585,92 @@ export async function getHeroSlides(sliderAlias?: string): Promise<HeroSlide[]> 
 // MEDIA FUNCTIONS
 // =====================================================
 
-export async function getClientLogos(): Promise<{ name: string; url: string }[]> {
-  const folderId = process.env.DIRECTUS_CLIENT_LOGOS_FOLDER_ID;
+export async function getClientLogos(): Promise<ClientLogosByCategory> {
+  const categories: ClientLogoCategory[] = [
+    "Government of Maldives",
+    "Local Brands",
+    "International Brands",
+    "Bilateral & Multilateral Agencies",
+  ];
 
-  if (folderId) {
-    const [rows] = await pool.query<any[]>(
-      `SELECT id, title, filename_download
-       FROM directus_files
-       WHERE folder = ?
-       ORDER BY title`,
-      [folderId]
-    );
+  const empty: ClientLogosByCategory = {
+    "Government of Maldives": [],
+    "Local Brands": [],
+    "International Brands": [],
+    "Bilateral & Multilateral Agencies": [],
+  };
 
-    return rows
-      .map((row) => ({
-        name: row.title || row.filename_download || "Client logo",
-        url: resolveImageUrl(row.id) || "",
-      }))
-      .filter((row) => row.url);
-  }
+  const categoryFolderSlugs: Record<ClientLogoCategory, string> = {
+    "Government of Maldives": "government_of_maldives",
+    "Local Brands": "local_brands",
+    "International Brands": "international_brands",
+    "Bilateral & Multilateral Agencies": "bilateral_and_multilateral_agencies",
+  };
 
-  const [rows] = await pool.query<any[]>(
-    `SELECT title as name, filepath as url
-     FROM media
-     WHERE filepath LIKE '%/2025/09/%'
-       AND (filepath LIKE '%.png' OR filepath LIKE '%.jpg' OR filepath LIKE '%.svg')
-     ORDER BY title`
+  const [clientFolderRows] = await pool.query<any[]>(
+    `SELECT id FROM directus_folders
+     WHERE LOWER(TRIM(name)) = 'clients'
+     LIMIT 1`
   );
-  return rows as { name: string; url: string }[];
+
+  if (!clientFolderRows.length) return empty;
+
+  const clientsFolderId = clientFolderRows[0]?.id as string | undefined;
+  if (!clientsFolderId) return empty;
+
+  const folderSlugs = categories.map((category) => categoryFolderSlugs[category]);
+  const folderPlaceholders = folderSlugs.map(() => "?").join(", ");
+
+  const [categoryFolders] = await pool.query<any[]>(
+    `SELECT id, LOWER(TRIM(name)) as name
+     FROM directus_folders
+     WHERE parent = ?
+       AND LOWER(TRIM(name)) IN (${folderPlaceholders})`,
+    [clientsFolderId, ...folderSlugs]
+  );
+
+  if (!categoryFolders.length) return empty;
+
+  const folderIdByCategory = new Map<ClientLogoCategory, string>();
+  categoryFolders.forEach((row) => {
+    const name = String(row.name || "").toLowerCase();
+    const category = categories.find(
+      (item) => categoryFolderSlugs[item] === name
+    );
+    if (category && row.id) {
+      folderIdByCategory.set(category, row.id);
+    }
+  });
+
+  const folderIds = Array.from(folderIdByCategory.values());
+  if (!folderIds.length) return empty;
+
+  const folderIdPlaceholders = folderIds.map(() => "?").join(", ");
+  const [rows] = await pool.query<any[]>(
+    `SELECT id, title, filename_download, filename_disk, folder
+     FROM directus_files
+     WHERE folder IN (${folderIdPlaceholders})
+     ORDER BY title`,
+    folderIds
+  );
+
+  const result: ClientLogosByCategory = { ...empty };
+
+  rows.forEach((row) => {
+    const folderId = row.folder as string | null;
+    const category = categories.find(
+      (item) => folderIdByCategory.get(item) === folderId
+    );
+    if (!category) return;
+
+    const name =
+      row.title || row.filename_download || row.filename_disk || "Client logo";
+    const url = resolveImageUrl(row.id) || "";
+    if (!url) return;
+    result[category].push({ name, url });
+  });
+
+  return result;
 }
 
 export async function getAboutCarouselImages(): Promise<string[]> {

@@ -5,6 +5,7 @@ import {
   Facebook,
   Instagram,
   Twitter,
+  Linkedin,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -32,6 +33,24 @@ const menuItems: MenuItem[] = [
       { id: 43, title: "Internships", url: "/firm/career/internships" },
       { id: 44, title: "Contact", url: "/firm/contact" },
     ],
+  },
+];
+
+const socialLinks = [
+  {
+    label: "LinkedIn",
+    href: "https://mv.linkedin.com/company/riyan-pvt-ltd",
+    icon: Linkedin,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/riyanprivatelimited",
+    icon: Instagram,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/RiyanPvtLtd/",
+    icon: Facebook,
   },
 ];
 
@@ -267,24 +286,18 @@ export default function Navbar() {
                     On Social Media
                   </p>
                   <div className="flex gap-6 flex-wrap">
-                    <a
-                      href="#"
-                      className="text-gray-700 hover:text-primary font-medium"
-                    >
-                      <Facebook />
-                    </a>
-                    <a
-                      href="#"
-                      className="text-gray-700 hover:text-primary font-medium"
-                    >
-                      <Twitter />
-                    </a>
-                    <a
-                      href="#"
-                      className="text-gray-700 hover:text-primary font-medium"
-                    >
-                      <Instagram />
-                    </a>
+                    {socialLinks.map(({ label, href, icon: Icon }) => (
+                      <Link
+                        key={label}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 text-primary hover:scale-105 transition-transform"
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{label}</span>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>

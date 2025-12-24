@@ -247,7 +247,7 @@ export default async function AboutPage() {
           proven track record of success.
         </p>
 
-        <ClientLogos logos={clientLogos} />
+        <ClientLogos logosByCategory={clientLogos} />
       </section>
 
       {/* Navigation to other Firm pages */}

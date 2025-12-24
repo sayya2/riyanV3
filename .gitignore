@@ -13,11 +13,13 @@ dist/
 build/
 coverage/
 wp-content/
-
+wp-content
 *.yml
 !docker-compose.yml
 !docker-compose.prod.yml
 !.github/workflows/*.yml
+
+scripts/
 # Production
 .vercel
 

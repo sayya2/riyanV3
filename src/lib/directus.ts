@@ -344,7 +344,7 @@ export interface DirectusProject {
     media_id: {
       id?: string | number | null;
       title?: string | null;
-      filename?: string | null;
+      filename_disk?: string | null;
     };
   }[];
 }
@@ -507,7 +507,7 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
           'services.service_id.slug',
           'gallery.media_id.id',
           'gallery.media_id.title',
-          'gallery.media_id.filename',
+          'gallery.media_id.filename_disk',
         ],
         filter: {
           slug: { _eq: slug },
@@ -544,7 +544,7 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
               'services.service_id.slug',
               'gallery.media_id.id',
               'gallery.media_id.title',
-              'gallery.media_id.filename',
+              'gallery.media_id.filename_disk',
             ],
           })
         );
