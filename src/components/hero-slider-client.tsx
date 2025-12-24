@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import type { KeyboardEvent } from "react";
+import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/db-new";
 
 type Props = {
@@ -25,6 +27,7 @@ const HeroSliderClient = ({ slides }: Props) => {
     [slides]
   );
 
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -42,13 +45,36 @@ const HeroSliderClient = ({ slides }: Props) => {
   }, [preparedSlides.length]);
 
   const currentSlide = preparedSlides[activeIndex];
+  const canNavigate = Boolean(currentSlide?.link_url);
 
   const goTo = (index: number) => setActiveIndex(index);
   const step = (delta: number) =>
     setActiveIndex((prev) => (prev + delta + preparedSlides.length) % preparedSlides.length);
 
+  const handleSlideClick = () => {
+    if (!canNavigate || !currentSlide?.link_url) return;
+    router.push(currentSlide.link_url);
+  };
+
+  const handleSlideKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!canNavigate || !currentSlide?.link_url) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      router.push(currentSlide.link_url);
+    }
+  };
+
   return (
-    <section className="full-bleed relative isolate h-[80vh] md:h-screen overflow-hidden bg-secondary text-white">
+    <section
+      className={`full-bleed relative isolate h-[80vh] md:h-screen overflow-hidden bg-secondary text-white ${
+        canNavigate ? "cursor-pointer" : ""
+      }`}
+      role={canNavigate ? "link" : undefined}
+      tabIndex={canNavigate ? 0 : -1}
+      aria-label={canNavigate ? `Open ${currentSlide?.title || "project"}` : undefined}
+      onClick={handleSlideClick}
+      onKeyDown={handleSlideKeyDown}
+    >
       <div className="absolute inset-0">
         {preparedSlides.map((slide, idx) => (
           <div
@@ -89,7 +115,10 @@ const HeroSliderClient = ({ slides }: Props) => {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => step(-1)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  step(-1);
+                }}
                 className="h-12 w-12 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
                 aria-label="Previous slide"
               >
@@ -97,7 +126,10 @@ const HeroSliderClient = ({ slides }: Props) => {
               </button>
               <button
                 type="button"
-                onClick={() => step(1)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  step(1);
+                }}
                 className="h-12 w-12 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
                 aria-label="Next slide"
               >
@@ -110,7 +142,10 @@ const HeroSliderClient = ({ slides }: Props) => {
                 <button
                   key={slide.id ?? idx}
                   type="button"
-                  onClick={() => goTo(idx)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    goTo(idx);
+                  }}
                   aria-label={`Go to slide ${idx + 1}`}
                   aria-current={idx === activeIndex}
                   className={`h-2.5 rounded-full transition-all duration-300 ${
