@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsCategories, getNewsPosts } from "@/lib/directus";
 import FiltersBarNews from "@/components/news/FiltersBarNews";
+import Reveal from "@/components/Reveal";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -67,27 +68,29 @@ export default async function NewsPage({
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="w-full mx-auto px-[10%] py-16 space-y-10 mt-30">
-        <div className="flex flex-col gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
-              News &amp; Updates
-            </h1>
-            <p className="text-gray-700 mt-2 max-w-2xl">
-              Browse articles, announcements, and press from our multidisciplinary teams.
-            </p>
-          </div>
+      <div className={`${contentShell} py-16 space-y-10 mt-30`}>
+        <Reveal>
+          <div className="flex flex-col gap-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
+                News &amp; Updates
+              </h1>
+              <p className="text-gray-700 mt-2 max-w-2xl">
+                Browse articles, announcements, and press from our multidisciplinary teams.
+              </p>
+            </div>
 
-          <FiltersBarNews
-            categories={categories}
-            selectedCategory={category}
-            search={search}
-            perPage={limit}
-          />
-        </div>
+            <FiltersBarNews
+              categories={categories}
+              selectedCategory={category}
+              search={search}
+              perPage={limit}
+            />
+          </div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {articles.map((article) => {
+          {articles.map((article, index) => {
             const href = article.slug ? `/news/${article.slug}` : "#";
             const categoriesText = (article.categories || [])
               .map(c => c.category_id?.name)
@@ -100,32 +103,33 @@ export default async function NewsPage({
             const img = article.featured_image || fallbackImg;
 
             return (
-              <Link
-                key={article.id}
-                href={href}
-                className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
-              >
-                <Image
-                  src={img}
-                  alt={article.title}
-                  fill
-                  sizes="(min-width:1024px) 33vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute inset-0 flex flex-col justify-end p-5 space-y-2">
-                  <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
-                    {categoriesText || "News"}
-                  </p>
-                  <h3 className="text-xl font-semibold text-white drop-shadow-sm">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
-                    {excerpt}
-                  </p>
-                </div>
-              </Link>
+              <Reveal key={article.id} delay={index * 0.05}>
+                <Link
+                  href={href}
+                  className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
+                >
+                  <Image
+                    src={img}
+                    alt={article.title}
+                    fill
+                    sizes="(min-width:1024px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority={false}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5">
+                    <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
+                      {categoriesText || "News"}
+                    </p>
+                    <h3 className="news-card-title line-clamp-2 min-h-[2.6rem] font-semibold text-white drop-shadow-sm">
+                      {article.title}
+                    </h3>
+                    <p className="hidden sm:block min-h-[2.6rem] text-sm text-white/80 leading-relaxed md:line-clamp-3">
+                      {excerpt}
+                    </p>
+                  </div>
+                </Link>
+              </Reveal>
             );
           })}
         </div>

@@ -89,7 +89,7 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto  ">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 mx-12 md:mx-12">
           {/* Logo */}
           <div className="flex ">
             <Link href="/" className="flex items-center">

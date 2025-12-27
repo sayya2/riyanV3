@@ -36,11 +36,11 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer className="bg-secondary text-white">
-      <div className="container mx-auto px-4 py-12 grid gap-10 md:grid-cols-4 items-center place-items-center">
+      <div className="container mx-auto px-12 py-12 grid gap-10 grid-cols-1 md:grid-cols-4 md:items-center md:place-items-center  ">
         {/* Column 1 — Brand */}
-        <div className="space-y-4 md:ml-12">
+        <div className="space-y-4  ">
           <Link href="/" aria-label="Riyan Home">
-            <div className="relative h-24 w-80 my-4">
+            <div className="relative md:h-24 w-full my-8 h-28">
               <Image
                 src="/wp-content/uploads/2021/06/logoWhite.png"
                 alt="Riyan Pvt Ltd logo"
@@ -51,7 +51,7 @@ const Footer = () => {
             </div>
           </Link>
 
-          <p className="text-sm text-white/80 leading-relaxed max-w-lg ml-10">
+          <p className="text-sm text-white/80 leading-relaxed max-w-lg md:ml-10">
             Integrated solutions in design, engineering, project management, and
             research tailored for the Maldives and beyond.
           </p>
