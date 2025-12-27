@@ -98,46 +98,38 @@ const HeroSliderClient = ({ slides }: Props) => {
       </div>
 
       <div className="relative z-10 h-full flex items-end">
-        <div className="container mx-auto px-16 pb-12 md:pb-20">
+        <div className="container mx-auto px-6 sm:px-10 md:px-16 pb-12 md:pb-20">
           <div className="max-w-4xl space-y-4 md:space-y-6 drop-shadow-xl">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">Riyan Pvt Ltd</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
+              Riyan Pvt Ltd
+            </p>
+            <h1 className="hero-slide-title font-semibold leading-tight">
               {currentSlide?.title || fallbackSlide.title}
             </h1>
             {currentSlide?.description && (
-              <p className="text-lg md:text-xl text-white/80 leading-relaxed max-w-3xl">
+              <p className="hidden sm:block text-base sm:text-lg md:text-xl text-white/80 leading-relaxed max-w-3xl">
                 {currentSlide.description}
               </p>
             )}
           </div>
 
-          <div className="mt-10 flex items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  step(-1);
-                }}
-                className="h-12 w-12 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
-                aria-label="Previous slide"
-              >
-                {"<"}
-              </button>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  step(1);
-                }}
-                className="h-12 w-12 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
-                aria-label="Next slide"
-              >
-                {">"}
-              </button>
-            </div>
+          <div className="mt-6 grid w-full grid-cols-3 items-center gap-3 md:mt-10 md:flex md:w-full md:items-center md:gap-4">
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                step(-1);
+              }}
+              className="h-9 w-9 justify-self-start rounded-full border border-white/40 bg-white/10 backdrop-blur-sm transition-colors hover:bg-white/20 sm:h-12 sm:w-12 md:order-1"
+              aria-label="Previous slide"
+            >
+              {"<"}
+            </button>
 
-            <div className="flex items-center gap-3" aria-label="Hero slides">
+            <div
+              className="flex items-center justify-center gap-2 md:order-3 md:ml-auto"
+              aria-label="Hero slides"
+            >
               {preparedSlides.map((slide, idx) => (
                 <button
                   key={slide.id ?? idx}
@@ -148,12 +140,26 @@ const HeroSliderClient = ({ slides }: Props) => {
                   }}
                   aria-label={`Go to slide ${idx + 1}`}
                   aria-current={idx === activeIndex}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    idx === activeIndex ? "w-10 bg-white" : "w-5 bg-white/40 hover:bg-white/70"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === activeIndex
+                      ? "w-8 sm:w-10 bg-white"
+                      : "w-4 sm:w-5 bg-white/40 hover:bg-white/70"
                   }`}
                 />
               ))}
             </div>
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                step(1);
+              }}
+              className="h-9 w-9 justify-self-end rounded-full border border-white/40 bg-white/10 backdrop-blur-sm transition-colors hover:bg-white/20 sm:h-12 sm:w-12 md:order-2 md:ml-2"
+              aria-label="Next slide"
+            >
+              {">"}
+            </button>
           </div>
         </div>
       </div>

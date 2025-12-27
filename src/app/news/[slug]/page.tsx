@@ -1,8 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
+import { Share2 } from "lucide-react";
 import { getAdjacentNews, getNewsBySlug } from "@/lib/directus";
 import { resolveFileUrl } from "@/lib/media";
+import Reveal from "@/components/Reveal";
+import ProjectGalleryCarousel from "@/components/ProjectGalleryCarousel";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -141,111 +143,180 @@ export default async function NewsDetailPage({ params }: PageProps) {
       <section className={`${contentShell} py-12 space-y-10`}>
         <div className="grid lg:grid-cols-[2fr,1fr] gap-10">
           <article className="space-y-6">
-            {lead ? <p className="text-lg text-gray-700 leading-relaxed">{lead}</p> : null}
-            <div
-              className="prose prose-lg max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: article.content || "" }}
-            />
+            {lead ? (
+              <Reveal>
+                <p className="text-lg text-gray-700 leading-relaxed">{lead}</p>
+              </Reveal>
+            ) : null}
+            <Reveal>
+              <div
+                className="prose prose-lg max-w-none text-gray-800"
+                dangerouslySetInnerHTML={{ __html: article.content || "" }}
+              />
+            </Reveal>
             {tags.length ? (
-              <div className="flex flex-wrap gap-2 pt-4">
-                {tags.map((tag) => (
-                  <span
-                    key={`tag-${tag}`}
-                    className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
+              <Reveal>
+                <div className="flex flex-wrap gap-2 pt-4">
+                  {tags.map((tag) => (
+                    <span
+                      key={`tag-${tag}`}
+                      className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </Reveal>
             ) : null}
 
             {gallery && gallery.length ? (
-              <div className="pt-6">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {gallery.map((src, idx) => (
-                    <div
-                      key={`gallery-${idx}`}
-                      className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
-                    >
-                      <Image
-                        src={src}
-                        alt={`${article.title} image ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width:1024px) 33vw, 50vw"
-                      />
-                    </div>
-                  ))}
+              <Reveal>
+                <div className="pt-6">
+                  <ProjectGalleryCarousel
+                    images={gallery}
+                    title={article.title}
+                  />
                 </div>
-              </div>
+              </Reveal>
             ) : null}
           </article>
 
           <div className="space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">Details</h3>
-              <div className="space-y-2 text-sm text-gray-700">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Published</p>
-                  <p className="text-base font-semibold text-gray-900">{published}</p>
-                </div>
-                {categories.length ? (
+            <Reveal>
+              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
+                <h3 className="text-lg font-semibold text-gray-900">Details</h3>
+                <div className="space-y-2 text-sm text-gray-700">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Categories</p>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {categories.map((cat) => (
-                        <span
-                          key={`cat-${cat}`}
-                          className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
+                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Published</p>
+                    <p className="text-base font-semibold text-gray-900">{published}</p>
+                  </div>
+                  {categories.length ? (
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Categories</p>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {categories.map((cat) => (
+                          <span
+                            key={`cat-${cat}`}
+                            className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal>
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+                <div className="md:hidden">
+                  <div className="grid grid-cols-3 items-center gap-3">
+                    {adjacent.previous ? (
+                      <Link
+                        href={`/news/${adjacent.previous.slug}`}
+                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                      >
+                        &larr; Prev
+                      </Link>
+                    ) : (
+                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
+                        Prev
+                      </span>
+                    )}
+
+                    <details className="relative">
+                      <summary className="share-summary flex h-12 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
+                        <Share2 className="h-4 w-4" />
+                        Share
+                      </summary>
+                      <div className="absolute left-1/2 bottom-full mb-3 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+                        <div className="flex items-center gap-2">
+                          {shareLinks.map((link) => (
+                            <a
+                              key={link.label}
+                              href={link.href}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
+                              aria-label={`Share on ${link.label}`}
+                            >
+                              {link.icon}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </details>
+
+                    {adjacent.next ? (
+                      <Link
+                        href={`/news/${adjacent.next.slug}`}
+                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                      >
+                        Next &rarr;
+                      </Link>
+                    ) : (
+                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
+                        Next
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="hidden md:block">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                        Share this article
+                      </p>
+                      <p className="text-sm text-gray-600">Send the story to your team.</p>
+                    </div>
+
+                    <div className="grid grid-cols-3 items-center gap-4">
+                      {adjacent.previous ? (
+                        <Link
+                          href={`/news/${adjacent.previous.slug}`}
+                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-start rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                         >
-                          {cat}
-                        </span>
-                      ))}
+                          <span className="text-base">&larr;</span>
+                          <span className="line-clamp-1">{adjacent.previous.title}</span>
+                        </Link>
+                      ) : (
+                        <span />
+                      )}
+
+                      <div className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2">
+                        {shareLinks.map((link) => (
+                          <a
+                            key={link.label}
+                            href={link.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
+                            aria-label={`Share on ${link.label}`}
+                          >
+                            {link.icon}
+                          </a>
+                        ))}
+                      </div>
+
+                      {adjacent.next ? (
+                        <Link
+                          href={`/news/${adjacent.next.slug}`}
+                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-end rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                        >
+                          <span className="line-clamp-1">{adjacent.next.title}</span>
+                          <span className="text-base">&rarr;</span>
+                        </Link>
+                      ) : (
+                        <span />
+                      )}
                     </div>
                   </div>
-                ) : null}
+                </div>
               </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <span className="text-sm font-semibold text-gray-800">Share</span>
-              {shareLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                  aria-label={`Share on ${link.label}`}
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </div>
-
-            <div className="flex justify-between items-center gap-3">
-              {adjacent.previous ? (
-                <Link
-                  href={`/news/${adjacent.previous.slug}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                >
-                  &larr; {adjacent.previous.title}
-                </Link>
-              ) : (
-                <span />
-              )}
-
-              {adjacent.next ? (
-                <Link
-                  href={`/news/${adjacent.next.slug}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                >
-                  {adjacent.next.title} &rarr;
-                </Link>
-              ) : (
-                <span />
-              )}
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
