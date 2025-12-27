@@ -1,0 +1,106 @@
+services:
+  mariadb:
+    image: mariadb:10.4
+    container_name: riyan_mariadb
+    restart: unless-stopped
+    platform: linux/arm64
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/docker-volumes/${PROJECT_SLUG}-mariadb:/var/lib/mysql
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    image: directus/directus:11.2
+    container_name: riyan_directus
+    restart: unless-stopped
+    platform: linux/arm64
+    ports:
+      - "8055:8055"
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      DB_CLIENT: "mysql"
+      DB_HOST: "mariadb"
+      DB_PORT: "3306"
+      DB_DATABASE: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      WEBSOCKETS_ENABLED: "true"
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: ${DIRECTUS_CORS_ORIGIN}
+      CORS_CREDENTIALS: "true"
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_ROOT: "/app/public/wp-content/uploads"
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "memory"
+      EXTENSIONS_PATH: ${DIRECTUS_EXTENSIONS_PATH}
+    volumes:
+      - ${DATA_ROOT}/docker-volumes/${PROJECT_SLUG}-directus-uploads:/directus/uploads
+      - ${DATA_ROOT}/docker-volumes/${PROJECT_SLUG}-wp-content:/app/public/wp-content
+      - ${DATA_ROOT}/projects/${PROJECT_SLUG}/directus/extensions:/directus/extensions
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8055/server/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web:
+    image: ghcr.io/sayya2/riyanwebsite:develop
+    container_name: riyan_web
+    restart: unless-stopped
+    platform: linux/arm64
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      NEXT_TELEMETRY_DISABLED: "1"
+      DB_HOST: "mariadb"
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_PORT: "3306"
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      NEXT_PUBLIC_DIRECTUS_URL: ${NEXT_PUBLIC_DIRECTUS_URL}
+      DIRECTUS_PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+      DIRECTUS_URL: "http://directus:8055"
+      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN}
+      DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID: ${DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    volumes:
+      - ${DATA_ROOT}/docker-volumes/${PROJECT_SLUG}-wp-content:/app/public/wp-content
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      directus:
+        condition: service_healthy
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  riyan_network:
+    driver: bridge
