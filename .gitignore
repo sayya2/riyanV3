@@ -20,7 +20,6 @@ wp-content
 !docker-compose.pi.yml
 !.github/workflows/*.yml
 
-scripts/
 # Production
 .vercel
 
@@ -31,6 +30,7 @@ scripts/
 .env.test.local
 .env.production.local
 .env.production
+.env.pi
 
 # Logs
 *.log
@@ -66,5 +66,11 @@ delete-blobs.txt
 # Documentation (exclude from production repo)
 *.md
 !README.md
+!docs/DEPLOYMENT.md
 
-*.sh
+# Scripts - only ignore data files in scripts/, not the scripts themselves
+scripts/*.sql
+scripts/*.tsv
+scripts/*.json
+scripts/New folder/
+scripts/tailscale/

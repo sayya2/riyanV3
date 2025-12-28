@@ -1,3 +1,14 @@
+# ========================================
+# LOCAL DEVELOPMENT ONLY - DO NOT USE IN PRODUCTION
+# ========================================
+# This docker-compose.yml contains hardcoded credentials for local development convenience.
+#
+# For production/Pi deployments, use:
+#   - docker-compose.pi.yml (Pi dev server)
+#   - docker-compose.prod.yml (Production)
+#
+# These files use environment variables from .env.pi or .env.prod for secure credential management.
+# ========================================
 
 services:
   mariadb:
