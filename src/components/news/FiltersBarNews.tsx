@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import type { FormEvent } from "react";
 import { DirectusNewsCategory } from "@/lib/directus";
 
 type Props = {
@@ -35,7 +36,9 @@ export default function FiltersBarNews({
     router.replace(`${pathname}${query ? `?${query}` : ""}`);
   };
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const nextCategory = (formData.get("category") as string) || "";
     const nextSearch = (formData.get("q") as string) || "";
     const nextPerPage = (formData.get("perPage") as string) || "";
@@ -47,7 +50,7 @@ export default function FiltersBarNews({
   };
 
   return (
-    <form action={onSubmit} className="flex flex-col md:flex-row gap-3 w-full md:w-auto text-[80%]">
+    <form onSubmit={onSubmit} className="flex flex-col md:flex-row gap-3 w-full md:w-auto text-[80%]">
       <input
         type="text"
         name="q"

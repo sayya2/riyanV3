@@ -55,7 +55,12 @@
       "Bash(docker-compose logs:*)",
       "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhiZTVjOGY4LWVlOGQtNGI4Yi04YjU0LTlmOWJjYzNhMWZiYiIsInJvbGUiOiI5MTdkNzVjYy03MTdmLTRkMWQtODk2MC0yMzk2ZjQ5MzU0ZDQiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsImlhdCI6MTc2NTk1NjExNiwiZXhwIjoxNzY1OTU3MDE2LCJpc3MiOiJkaXJlY3R1cyJ9.LBw8lVb95zt1GP801SG16FbUneNztnelYV6Msx96aqU\")",
       "Bash(bash:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep:*)",
+      "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" show b911e36 --stat)",
+      "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" log --oneline --grep=\"Pi\\\\|pi\\\\|deploy\" -10)",
+      "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" show b911e36:docker-compose.pi.yml)",
+      "Bash(git check-ignore:*)"
     ],
     "deny": [],
     "ask": []
