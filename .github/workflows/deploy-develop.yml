@@ -54,6 +54,8 @@ jobs:
           git -C "$REPO_DIR" fetch origin develop
           git -C "$REPO_DIR" checkout develop
           git -C "$REPO_DIR" reset --hard origin/develop
+          bash "$REPO_DIR/scripts/install-directus-slug-generator.sh" \
+            "$REPO_DIR/directus/extensions/interfaces/slug-generator"
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
           if docker compose version >/dev/null 2>&1; then
             DC="docker compose"
