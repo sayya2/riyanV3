@@ -24,6 +24,7 @@
   "dependencies": {
     "@directus/sdk": "^20.3.0",
     "@tailwindcss/postcss": "^4.1.17",
+    "directus-slug-generator": "^1.1.5",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.555.0",
     "mysql2": "^3.15.3",
