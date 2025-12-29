@@ -65,6 +65,7 @@ jobs:
               bash /repo/scripts/install-directus-slug-generator.sh \
               /repo/directus/extensions/interfaces/slug-generator
           fi
+          rm -rf "$REPO_DIR/directus/extensions/.registry"
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
           if docker compose version >/dev/null 2>&1; then
             DC="docker compose"
@@ -75,4 +76,5 @@ jobs:
             exit 1
           fi
           $DC -f "$REPO_DIR/docker-compose.pi.yml" --env-file "$REPO_DIR/.env.pi" pull web
+          $DC -f "$REPO_DIR/docker-compose.pi.yml" --env-file "$REPO_DIR/.env.pi" up -d --force-recreate directus
           $DC -f "$REPO_DIR/docker-compose.pi.yml" --env-file "$REPO_DIR/.env.pi" up -d
