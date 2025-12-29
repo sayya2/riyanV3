@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
@@ -49,7 +49,9 @@ const HeroSliderClient = ({ slides }: Props) => {
 
   const goTo = (index: number) => setActiveIndex(index);
   const step = (delta: number) =>
-    setActiveIndex((prev) => (prev + delta + preparedSlides.length) % preparedSlides.length);
+    setActiveIndex(
+      (prev) => (prev + delta + preparedSlides.length) % preparedSlides.length
+    );
 
   const handleSlideClick = () => {
     if (!canNavigate || !currentSlide?.link_url) return;
@@ -66,12 +68,14 @@ const HeroSliderClient = ({ slides }: Props) => {
 
   return (
     <section
-      className={`full-bleed relative isolate h-[80vh] md:h-screen overflow-hidden bg-secondary text-white ${
+      className={`full-bleed relative isolate h-[100vh] md:h-screen overflow-hidden bg-secondary text-white ${
         canNavigate ? "cursor-pointer" : ""
       }`}
       role={canNavigate ? "link" : undefined}
       tabIndex={canNavigate ? 0 : -1}
-      aria-label={canNavigate ? `Open ${currentSlide?.title || "project"}` : undefined}
+      aria-label={
+        canNavigate ? `Open ${currentSlide?.title || "project"}` : undefined
+      }
       onClick={handleSlideClick}
       onKeyDown={handleSlideKeyDown}
     >

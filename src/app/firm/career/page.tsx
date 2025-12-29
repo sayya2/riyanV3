@@ -35,7 +35,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CareerPage() {
   const roles = await getCareerPosts({ limit: 30 });
-  const contentShell = "w-full mx-auto px-[0%]";
+  const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 
   return (
     <FirmPageBySlug
@@ -48,7 +48,7 @@ export default async function CareerPage() {
       hideContent
     >
       {/* Intro */}
-      <section className={`${contentShell} py-12 md:py-0`}>
+      <section className={`${contentShell} py-4 md:py-0`}>
         <div className="grid lg:grid-cols-[1.2fr,1fr] gap-10 items-start">
           <Reveal>
             <div className="space-y-6">

@@ -17,7 +17,10 @@ export default function ProjectGalleryCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const prefersReducedMotion = useReducedMotion();
   const total = images.length;
-  const currentSrc = useMemo(() => images[currentIndex], [images, currentIndex]);
+  const currentSrc = useMemo(
+    () => images[currentIndex],
+    [images, currentIndex]
+  );
 
   const goTo = (index: number) => {
     if (!total) return;
@@ -42,7 +45,10 @@ export default function ProjectGalleryCarousel({
           exit={
             prefersReducedMotion ? { opacity: 1 } : { opacity: 0, scale: 1.02 }
           }
-          transition={{ duration: prefersReducedMotion ? 0 : 0.35, ease: "easeOut" }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : 0.35,
+            ease: "easeOut",
+          }}
         >
           <Image
             src={currentSrc}
@@ -59,7 +65,7 @@ export default function ProjectGalleryCarousel({
       <button
         type="button"
         onClick={() => goTo(currentIndex - 1)}
-        className="absolute left-4 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white backdrop-blur transition hover:bg-black/60"
+        className="hidden: absolute left-4 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white backdrop-blur transition hover:bg-black/60"
         aria-label="Previous image"
       >
         <ChevronLeft className="h-5 w-5" />
@@ -74,7 +80,7 @@ export default function ProjectGalleryCarousel({
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/35 px-3 py-2 backdrop-blur">
+      <div className="hidden md:absolute md:bottom-4 md:left-1/2 md:z-10 md:flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/35 px-3 py-2 backdrop-blur">
         {images.map((_, index) => (
           <button
             key={`gallery-dot-${index}`}

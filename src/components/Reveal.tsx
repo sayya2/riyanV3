@@ -23,11 +23,11 @@ export default function Reveal({
   children,
   className,
   once = true,
-  threshold = 0.2,
+  threshold = 0.1,
   rootMargin = "0px 0px -10% 0px" as InViewMargin,
   style,
   delay = 0,
-  duration = 0.6,
+  duration = 0.5,
   offsetY = 24,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);

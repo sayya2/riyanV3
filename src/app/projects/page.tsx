@@ -11,7 +11,7 @@ import Reveal from "@/components/Reveal";
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 
 function stripHtml(input: string) {
   return input
@@ -82,7 +82,7 @@ export default async function ProjectsPage({
 
   return (
     <main className="min-h-screen bg-white">
-      <div className={`${contentShell} py-16 space-y-10 mt-30`}>
+      <div className={`${contentShell} py-16 space-y-10 mt-17`}>
         <Reveal>
           <div className="flex flex-col gap-6">
             <div>

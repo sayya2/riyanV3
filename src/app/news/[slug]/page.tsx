@@ -19,7 +19,7 @@ type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[11%] md:px-[10%] ";
 
 export default async function NewsDetailPage({ params }: PageProps) {
   const resolvedParams =
@@ -137,7 +137,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
         eyebrow={categoriesText || "News"}
         description={lead || published}
         imageUrl={img}
-        heightClass="min-h-[65vh] md:min-h-[85vh]"
+        heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
       <section className={`${contentShell} py-12 space-y-10`}>

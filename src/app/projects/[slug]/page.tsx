@@ -10,7 +10,7 @@ import ProjectGalleryCarousel from "@/components/ProjectGalleryCarousel";
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 
 const stripHtml = (input: string) =>
   input
@@ -154,7 +154,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         eyebrow={sectorsText || servicesText || "Project"}
         description={lead}
         imageUrl={img}
-        heightClass="min-h-[60vh] md:min-h-[80vh]"
+        heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
       <section className={`${contentShell} mt-8 md:mt-10 flex flex-col`}>
@@ -193,12 +193,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 dangerouslySetInnerHTML={{ __html: project.content || "" }}
               />
             </Reveal>
-            {(sectors.length || services.length) ? (
+            {sectors.length || services.length ? (
               <Reveal>
                 <div className="grid gap-4 md:grid-cols-2">
                   {sectors.length ? (
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900">Sectors</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Sectors
+                      </h3>
                       <div className="flex flex-wrap gap-2">
                         {sectors.map((sector) => (
                           <span
@@ -213,7 +215,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ) : null}
                   {services.length ? (
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900">Services</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Services
+                      </h3>
                       <div className="flex flex-wrap gap-2">
                         {services.map((svc) => (
                           <span
@@ -232,7 +236,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {gallery && gallery.length ? (
               <Reveal>
                 <div className="pt-6">
-                  <ProjectGalleryCarousel images={gallery} title={project.title} />
+                  <ProjectGalleryCarousel
+                    images={gallery}
+                    title={project.title}
+                  />
                 </div>
               </Reveal>
             ) : null}
@@ -300,7 +307,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
                         Share this project
                       </p>
-                      <p className="text-sm text-gray-600">Send the story to your team.</p>
+                      <p className="text-sm text-gray-600">
+                        Send the story to your team.
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-3 items-center gap-4">
@@ -310,7 +319,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                           className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-start rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                         >
                           <span className="text-base">&larr;</span>
-                          <span className="line-clamp-1">{adjacent.previous.title}</span>
+                          <span className="line-clamp-1">
+                            {adjacent.previous.title}
+                          </span>
                         </Link>
                       ) : (
                         <span />
@@ -336,7 +347,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                           href={`/projects/${adjacent.next.slug}`}
                           className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-end rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
                         >
-                          <span className="line-clamp-1">{adjacent.next.title}</span>
+                          <span className="line-clamp-1">
+                            {adjacent.next.title}
+                          </span>
                           <span className="text-base">&rarr;</span>
                         </Link>
                       ) : (

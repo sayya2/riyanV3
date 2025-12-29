@@ -1,6 +1,21 @@
-# Deployment Guide - Riyan Website (Dev Pi)
+# Riyan Website - Production Deployment Guide
 
-This guide covers deployment to the Raspberry Pi development server via Tailscale.
+Complete deployment guide for the Riyan website to the Raspberry Pi dev server.
+
+**Infrastructure:** Raspberry Pi 5 (ARM64) running Debian 13, accessed via Tailscale VPN
+
+---
+
+## Table of Contents
+
+1. [Quick Reference](#quick-reference)
+2. [Architecture Overview](#architecture-overview)
+3. [Initial Setup (One-Time)](#initial-setup-one-time)
+4. [Normal Deployment Workflow](#normal-deployment-workflow)
+5. [Database Management](#database-management)
+6. [Media Management](#media-management)
+7. [Troubleshooting](#troubleshooting)
+8. [Maintenance](#maintenance)
 
 ---
 
@@ -8,205 +23,503 @@ This guide covers deployment to the Raspberry Pi development server via Tailscal
 
 | Action | Command |
 |--------|---------|
-| Deploy code | `git push origin develop` (automatic via GitHub Actions) |
-| Import database | `./scripts/db-import-pi.sh /tmp/backup.sql` |
-| Export database | `./scripts/db-export-pi.sh` |
+| Deploy code | `git push origin develop` |
 | View logs | `docker compose -f docker-compose.pi.yml logs -f` |
 | Restart services | `docker compose -f docker-compose.pi.yml --env-file .env.pi restart` |
+| Import database | `./scripts/db-import-pi.sh /tmp/backup.sql` |
+| Export database | `./scripts/db-export-pi.sh` |
+| Check status | `docker compose -f docker-compose.pi.yml ps` |
+
+**Access URLs:**
+- Website: `http://<tailscale-ip>:3000`
+- Directus CMS: `http://<tailscale-ip>:8055`
 
 ---
 
-## Automated Code Deployment
+## Architecture Overview
 
-### Normal Workflow
+### Infrastructure Design
+
+The Pi follows a **production-grade infrastructure model** with strict separation of concerns:
+
+```
+/data
+├── projects/riyan          # Code only (docker-compose, .env, docs)
+├── docker-volumes/         # ALL persistent container data
+│   ├── riyan-mariadb/     # Database files
+│   ├── riyan-directus-uploads/
+│   └── riyan-wp-content/  # Media files (1.4GB+)
+└── backups/riyan/         # Database backups (last 7 kept)
+```
+
+**Key Principles:**
+- `/data/projects/` - Code and configuration ONLY, no persistent data
+- `/data/docker-volumes/` - ALL container persistence
+- Service accounts (`svc-docker`) own container data
+- Admin user (`admin`) owns project code
+
+### Technology Stack
+
+- **Frontend:** Next.js 14 (App Router)
+- **CMS:** Directus 11.2
+- **Database:** MariaDB 10.4
+- **Container Runtime:** Docker + Docker Compose
+- **CI/CD:** GitHub Actions with self-hosted ARM64 runner
+- **Registry:** GitHub Container Registry (GHCR)
+- **Network:** Tailscale VPN mesh
+
+---
+
+## Initial Setup (One-Time)
+
+This section is for **first-time deployment only**. Skip to [Normal Deployment](#normal-deployment-workflow) if already set up.
+
+### Prerequisites
+
+- Pi already configured per infrastructure playbook (`Initial Setup Version.md`)
+- Tailscale installed and connected
+- GitHub self-hosted runner configured with `dev` label
+- Docker and Docker Compose installed
+
+### Step 1: Clone Repository
 
 ```bash
-# On your development machine
+# SSH to Pi via Tailscale
+ssh admin@<tailscale-ip>
+
+# Navigate to projects directory
+cd /data/projects
+
+# Clone repository
+git clone https://github.com/sayya2/riyanV3.git riyan
+cd riyan
+git checkout develop
+```
+
+### Step 2: Set Permissions
+
+```bash
+# Ensure project follows /data policy
+sudo chown -R admin:dev /data/projects/riyan
+sudo chmod -R 2775 /data/projects/riyan
+
+# Create docker-volumes directories
+sudo mkdir -p /data/docker-volumes/riyan-mariadb
+sudo mkdir -p /data/docker-volumes/riyan-directus-uploads
+sudo mkdir -p /data/docker-volumes/riyan-wp-content
+
+# Set ownership per policy
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-mariadb
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-directus-uploads
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-wp-content
+
+# Create backup directory
+sudo mkdir -p /data/backups/riyan
+sudo chown -R admin:ops /data/backups/riyan
+sudo chmod 2770 /data/backups/riyan
+```
+
+### Step 3: Configure Environment
+
+```bash
+cd /data/projects/riyan
+
+# Copy template
+cp .env.pi.template .env.pi
+
+# Get Tailscale IP
+tailscale ip -4
+
+# Edit environment file
+nano .env.pi
+```
+
+**Required Configuration:**
+
+```bash
+# Database Credentials (GENERATE STRONG PASSWORDS!)
+MYSQL_ROOT_PASSWORD=<20+ character password>
+MYSQL_USER=user
+MYSQL_PASSWORD=<20+ character password>
+MYSQL_DATABASE=riyan_nextjs
+
+# Directus Security Keys (GENERATE RANDOM 32+ CHAR STRINGS!)
+DIRECTUS_KEY=<random 32+ character string>
+DIRECTUS_SECRET=<random 32+ character string>
+DIRECTUS_ADMIN_EMAIL=admin@riyan.com.mv
+DIRECTUS_ADMIN_PASSWORD=<strong password>
+
+# Public URLs (use your Tailscale IP)
+DIRECTUS_PUBLIC_URL=http://<tailscale-ip>:8055
+NEXT_PUBLIC_SITE_URL=http://<tailscale-ip>:3000
+NEXT_PUBLIC_DIRECTUS_URL=http://<tailscale-ip>:8055
+
+# Security
+REVALIDATE_SECRET=<random string>
+DIRECTUS_TOKEN=<optional static token>
+
+# Docker settings
+DATA_ROOT=/data
+```
+
+**Save and exit:** Ctrl+X, Y, Enter
+
+**⚠️ SECURITY:** Never commit `.env.pi` to git!
+
+### Step 4: Initial Database Import
+
+**From development machine:**
+
+```powershell
+# Export database
+cd "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan"
+New-Item -ItemType Directory -Force -Path "backups" | Out-Null
+docker compose exec -T mariadb mysqldump -u user -p'Riyanitaccess@26+' riyan_nextjs | Out-File -Encoding utf8 "backups\riyan_latest.sql"
+
+# Transfer to Pi
+scp "backups\riyan_latest.sql" admin@<tailscale-ip>:/tmp/
+```
+
+**On Pi:**
+
+```bash
+cd /data/projects/riyan
+
+# Start MariaDB only
+docker compose -f docker-compose.pi.yml --env-file .env.pi up -d mariadb
+
+# Wait 30 seconds
+sleep 30
+
+# Import database
+./scripts/db-import-pi.sh /tmp/riyan_latest.sql
+# Type "yes" to confirm
+
+# Clean up
+rm /tmp/riyan_latest.sql
+```
+
+### Step 5: Media Files Sync (One-Time)
+
+**From development machine:**
+
+```powershell
+# Sync 1.4GB of media files (takes 10-15 minutes)
+rsync -avz --progress `
+  "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan\wp-content\uploads/" `
+  admin@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
+```
+
+**On Pi - fix ownership:**
+
+```bash
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-wp-content
+```
+
+**📝 Note:** This is a ONE-TIME operation. After this, all uploads happen directly on the Pi via Directus.
+
+### Step 6: Pull Docker Image
+
+```bash
+cd /data/projects/riyan
+
+# Pull latest image from GHCR
+docker pull ghcr.io/sayya2/riyanwebsite:develop
+```
+
+### Step 7: Start All Services
+
+```bash
+# Start everything
+docker compose -f docker-compose.pi.yml --env-file .env.pi up -d
+
+# Verify all services running
+docker compose -f docker-compose.pi.yml ps
+
+# Expected output:
+# NAME               STATUS
+# riyan_mariadb      running
+# riyan_directus     running
+# riyan_web          running
+
+# Check logs
+docker compose -f docker-compose.pi.yml logs -f
+```
+
+Press Ctrl+C to stop watching logs.
+
+### Step 8: Verify Deployment
+
+Test from any device on Tailscale network:
+
+- **Website:** `http://<tailscale-ip>:3000`
+- **Directus:** `http://<tailscale-ip>:8055`
+
+Login to Directus with credentials from `.env.pi`
+
+---
+
+## Normal Deployment Workflow
+
+Once initial setup is complete, deployments are **fully automated**.
+
+### Deploying Code Changes
+
+```bash
+# On development machine
+cd "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan"
+
+# Make your changes...
+
+# Commit and push
 git add .
-git commit -m "Your changes"
+git commit -m "Description of changes"
 git push origin develop
 ```
 
-**What happens automatically:**
-1. ✅ GitHub Actions triggers on push to `develop`
-2. ✅ Builds ARM64 Docker image for Raspberry Pi
-3. ✅ Pushes image to GitHub Container Registry (GHCR)
-4. ✅ Self-hosted runner on Pi pulls latest code
-5. ✅ Runner pulls updated Docker image
-6. ✅ Runner restarts services with new code
+**What Happens Automatically:**
 
-**Expected deployment time:** 3-5 minutes
+1. ✅ GitHub Actions workflow triggers
+2. ✅ Builds ARM64 Docker image on Pi (15-20 min)
+3. ✅ Pushes image to GHCR
+4. ✅ Pi runner pulls latest code
+5. ✅ Pi runner pulls updated image
+6. ✅ Pi runner restarts services
+
+**Total Time:** ~20-25 minutes (most time is ARM64 build)
 
 ### Monitoring Deployment
 
 **GitHub Actions:**
-- Go to: https://github.com/[your-repo]/actions
-- Check "Build and Deploy (develop)" workflow
-- View real-time logs
+```
+https://github.com/sayya2/riyanV3/actions
+```
 
 **On the Pi:**
 ```bash
-# SSH to Pi
-ssh pi@<tailscale-ip>
+ssh admin@<tailscale-ip>
 
-# Watch deployment logs
+# Watch deployment happen
 cd /data/projects/riyan
 docker compose -f docker-compose.pi.yml logs -f
+```
+
+**Check GitHub Runner Status:**
+```bash
+# On Pi
+sudo systemctl status actions.runner.*
 ```
 
 ---
 
 ## Database Management
 
+### Exporting Database from Dev Environment
+
+**From development machine:**
+
+```powershell
+cd "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan"
+
+# Export database
+docker compose exec -T mariadb mysqldump -u user -p'Riyanitaccess@26+' riyan_nextjs | Out-File -Encoding utf8 "backups\riyan_export_$(Get-Date -Format 'yyyyMMdd_HHmmss').sql"
+```
+
 ### Exporting Database from Pi
 
 ```bash
 # SSH to Pi
-ssh pi@<tailscale-ip>
+ssh admin@<tailscale-ip>
 cd /data/projects/riyan
 
-# Export database
+# Export with automatic retention (keeps last 7)
 ./scripts/db-export-pi.sh
 ```
 
 **Output location:** `/data/backups/riyan/riyan_db_YYYYMMDD_HHMMSS.sql`
 
-**Retention:** Last 7 backups are kept automatically
+**Features:**
+- Includes routines and triggers
+- Single transaction (no locking)
+- Automatic old backup cleanup
 
 ### Importing Database to Pi
 
 **Step 1: Transfer SQL file**
-```bash
-# From your development machine
-scp db_init/riyan_nextjs_20251228-0502.sql pi@<tailscale-ip>:/tmp/
+
+```powershell
+# From dev machine
+scp "backups\riyan_latest.sql" admin@<tailscale-ip>:/tmp/
 ```
 
 **Step 2: Import on Pi**
+
 ```bash
 # SSH to Pi
-ssh pi@<tailscale-ip>
+ssh admin@<tailscale-ip>
 cd /data/projects/riyan
 
-# Import database (will prompt for confirmation)
-./scripts/db-import-pi.sh /tmp/riyan_nextjs_20251228-0502.sql
+# Import (will prompt for confirmation)
+./scripts/db-import-pi.sh /tmp/riyan_latest.sql
+
+# Type "yes" to confirm
+
+# Clean up
+rm /tmp/riyan_latest.sql
 ```
 
-**What the script does:**
+**What the import script does:**
 1. Validates SQL file exists
 2. Reads credentials from `.env.pi`
-3. Prompts for confirmation (safety check)
+3. Shows file size and prompts for confirmation
 4. Imports database
-5. Restarts Directus to apply changes
+5. Automatically restarts Directus to apply changes
+
+### Database Backup Best Practices
+
+**Before major changes:**
+```bash
+# On Pi - create backup before risky operation
+./scripts/db-export-pi.sh
+```
+
+**Regular backups:**
+Consider setting up a cron job:
+```bash
+# On Pi
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * cd /data/projects/riyan && ./scripts/db-export-pi.sh
+```
 
 ---
 
-## Media File Management
+## Media Management
 
-### Initial Setup (One-Time)
+### Understanding Media Storage
 
-Media files are **NOT** stored in Git. Initial sync required:
+- **Development:** `./wp-content/uploads/` (gitignored, 1.4GB+)
+- **Production (Pi):** `/data/docker-volumes/riyan-wp-content/uploads/`
 
-```bash
-# On your development machine
-cd "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan"
+Media files are **NOT synced automatically**.
 
-rsync -avz --progress \
-  ./wp-content/uploads/ \
-  pi@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
-```
+### Initial Sync (Already Done in Setup)
 
-**Transfer time:** ~10-15 minutes (1.4GB over Tailscale)
+The one-time rsync during initial setup synced all media.
 
 ### Ongoing Operations
 
-After initial setup:
+**After initial setup:**
 - ✅ All new uploads happen directly on Pi via Directus
 - ✅ No manual syncing required
-- ✅ Media is persisted in `/data/docker-volumes/riyan-wp-content/`
+- ✅ Media persisted in `/data/docker-volumes/riyan-wp-content/`
 
-### Re-syncing Media (if needed)
+### Re-syncing Media (If Needed)
 
-If you need to sync updated media from development:
+**If development has updated media:**
 
-```bash
-# On dev machine
-rsync -avz --progress \
-  ./wp-content/uploads/ \
-  pi@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
+```powershell
+# From dev machine
+rsync -avz --progress `
+  --delete `
+  "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan\wp-content\uploads/" `
+  admin@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
 ```
 
----
-
-## Environment Configuration
-
-### Critical Files on Pi
-
-| File | Location | Purpose | In Git? |
-|------|----------|---------|---------|
-| `.env.pi` | `/data/projects/riyan/.env.pi` | All secrets & configuration | ❌ No (security) |
-| MariaDB data | `/data/docker-volumes/riyan-mariadb/` | Database files | ❌ No (too large) |
-| Media files | `/data/docker-volumes/riyan-wp-content/` | Uploaded media | ❌ No (too large) |
-| Directus uploads | `/data/docker-volumes/riyan-directus-uploads/` | Directus files | ❌ No |
-
-### Creating `.env.pi` (One-Time Setup)
-
+**On Pi - fix ownership:**
 ```bash
-# SSH to Pi
-ssh pi@<tailscale-ip>
-cd /data/projects/riyan
-
-# Copy template
-cp .env.pi.template .env.pi
-
-# Edit with secure values
-nano .env.pi
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-wp-content
 ```
 
-**Required values to set:**
+**⚠️ Warning:** `--delete` flag removes files on Pi not in dev. Omit if unsure.
+
+### Checking Media
+
 ```bash
-# Database credentials (generate strong passwords)
-MYSQL_ROOT_PASSWORD=your-strong-root-password-20-chars
-MYSQL_PASSWORD=your-strong-user-password-20-chars
-
-# Directus security keys (generate random 32+ character strings)
-DIRECTUS_KEY=random-32-char-string-here
-DIRECTUS_SECRET=another-random-32-char-string
-
-# Directus admin credentials
-DIRECTUS_ADMIN_PASSWORD=your-directus-admin-password
-
-# URLs (update with your Tailscale URLs)
-DIRECTUS_PUBLIC_URL=https://directus-your-funnel.ts.net
-NEXT_PUBLIC_SITE_URL=https://site-your-funnel.ts.net
-NEXT_PUBLIC_DIRECTUS_URL=https://directus-your-funnel.ts.net
-
-# Other secrets
-REVALIDATE_SECRET=random-string-for-revalidation
-DIRECTUS_TOKEN=optional-static-token-if-needed
+# On Pi
+ls -lh /data/docker-volumes/riyan-wp-content/uploads/ | head -20
+du -sh /data/docker-volumes/riyan-wp-content/uploads/
 ```
-
-**Security Note:** Never commit `.env.pi` to Git!
 
 ---
 
 ## Troubleshooting
 
-### Directus Login Issues
+### GitHub Actions Build Hanging
 
-**Symptom:** Cannot login to Directus after database import
+**Symptom:** Build stuck at `npm ci` step for 20+ minutes
 
-**Cause:** Database contains different admin credentials than `.env.pi`
+**Cause:** ARM64 build on Pi is slow (15-20 min normal)
 
-**Solution 1: Reset via database**
+**Solutions:**
+
+1. **Wait it out** - First build takes 20-30 minutes
+2. **Check Pi CPU:**
+   ```bash
+   ssh admin@<tailscale-ip>
+   htop
+   # CPU should be at ~100% if building
+   ```
+
+3. **Manual pull if build succeeded:**
+   ```bash
+   # On Pi
+   cd /data/projects/riyan
+   docker pull ghcr.io/sayya2/riyanwebsite:develop
+   docker compose -f docker-compose.pi.yml --env-file .env.pi up -d
+   ```
+
+### Git Conflict on Pi During Deployment
+
+**Symptom:**
+```
+error: Your local changes to the following files would be overwritten by merge
+```
+
+**Cause:** Local files modified on Pi
+
+**Solution 1 - Discard local changes (recommended):**
 ```bash
-ssh pi@<tailscale-ip>
+# On Pi
+cd /data/projects/riyan
+git reset --hard origin/develop
+git pull origin develop
+```
+
+**Solution 2 - Stash changes:**
+```bash
+# On Pi
+cd /data/projects/riyan
+git stash
+git pull origin develop
+# Later: git stash pop
+```
+
+**Prevention:** The workflow now uses `git reset --hard origin/develop` to auto-fix this.
+
+### Directus Login Issues After DB Import
+
+**Symptom:** Cannot login to Directus with known password
+
+**Cause:** Imported database has different admin credentials than `.env.pi`
+
+**Solution 1 - Use credentials from imported database:**
+
+Try the password that was used in the development environment.
+
+**Solution 2 - Reset password via database:**
+
+```bash
+# On Pi
 docker exec -it riyan_mariadb mysql -u root -p
 
 USE riyan_nextjs;
-SELECT * FROM directus_users WHERE email = 'admin@riyan.com.mv';
+SELECT email FROM directus_users WHERE email LIKE '%admin%';
 
-# Note the user ID, then update password
-# Generate hash: https://argon2.online/ or use Directus to get hash
+# Generate new hash at: https://argon2.online/
+# Or get hash from another working Directus instance
+
 UPDATE directus_users
 SET password = '$argon2id$v=19$m=65536,t=3,p=4$...'
 WHERE email = 'admin@riyan.com.mv';
@@ -214,44 +527,51 @@ WHERE email = 'admin@riyan.com.mv';
 exit;
 ```
 
-**Solution 2: Recreate admin via environment variables**
+**Solution 3 - Let Directus recreate admin:**
+
 ```bash
-# Stop all services
+# On Pi
+cd /data/projects/riyan
+
+# Stop services
 docker compose -f docker-compose.pi.yml down
 
-# Edit .env.pi and set DIRECTUS_ADMIN_PASSWORD
+# Edit .env.pi, ensure DIRECTUS_ADMIN_PASSWORD is set
 nano .env.pi
 
-# Restart services (Directus will recreate admin on startup)
+# Restart - Directus will recreate admin if not exists
 docker compose -f docker-compose.pi.yml --env-file .env.pi up -d
 ```
 
----
+### Missing Media Files / 404 Errors
 
-### Missing Media Files
-
-**Symptom:** Images not loading, 404 errors
+**Symptom:** Images not loading, 404 errors for media
 
 **Check if media exists:**
 ```bash
-ssh pi@<tailscale-ip>
+# On Pi
 ls -lh /data/docker-volumes/riyan-wp-content/uploads/ | head -20
 ```
 
 **If empty or incomplete:**
-```bash
-# Re-run media sync from dev machine
-rsync -avz --progress \
-  ./wp-content/uploads/ \
-  pi@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
+```powershell
+# From dev machine - re-sync media
+rsync -avz --progress `
+  "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan\wp-content\uploads/" `
+  admin@<tailscale-ip>:/data/docker-volumes/riyan-wp-content/uploads/
 ```
 
----
+**Then fix ownership:**
+```bash
+# On Pi
+sudo chown -R svc-docker:docker /data/docker-volumes/riyan-wp-content
+```
 
 ### Service Won't Start
 
 **Check logs:**
 ```bash
+# On Pi
 docker compose -f docker-compose.pi.yml logs -f
 ```
 
@@ -260,13 +580,15 @@ docker compose -f docker-compose.pi.yml logs -f
 df -h /data
 ```
 
-If disk is full:
+**If disk full:**
 ```bash
-# Clean up old backups
+# Clean old backups
 rm /data/backups/riyan/riyan_db_*.sql
 
-# Clean up Docker
+# Clean Docker
 docker system prune -a
+
+# WARNING: Above removes ALL unused Docker data
 ```
 
 **Check container status:**
@@ -279,105 +601,141 @@ docker compose -f docker-compose.pi.yml ps
 # Restart just one service
 docker compose -f docker-compose.pi.yml restart directus
 
-# Or restart all services
+# Or restart all
 docker compose -f docker-compose.pi.yml restart
 ```
 
----
-
-### GitHub Actions Deployment Failing
-
-**Check runner status:**
+**Nuclear option - full restart:**
 ```bash
-ssh pi@<tailscale-ip>
-sudo systemctl status actions.runner.*
+docker compose -f docker-compose.pi.yml down
+docker compose -f docker-compose.pi.yml up -d
 ```
-
-**Check runner logs:**
-```bash
-cd /actions-runner
-./run.sh
-```
-
-**Common issues:**
-- ✅ Check GHCR_TOKEN and GHCR_USERNAME secrets are set in GitHub
-- ✅ Verify runner has `dev` label
-- ✅ Ensure `.env.pi` exists at `/data/projects/riyan/.env.pi`
-- ✅ Check disk space: `df -h /data`
-
----
 
 ### Database Import Hangs
 
 **Symptom:** Import script runs but never completes
 
-**Cause:** Large SQL file or slow Pi
-
-**Solution:**
+**Check progress:**
 ```bash
-# Monitor progress in another terminal
+# In another terminal on Pi
 docker exec -it riyan_mariadb mysql -u root -p
 
 SHOW PROCESSLIST;
 
-# Check database size growth
+# Check table counts
 USE riyan_nextjs;
 SELECT COUNT(*) FROM news;
 SELECT COUNT(*) FROM projects;
 ```
 
-**For very large imports:**
+**For large imports, use progress indicator:**
 ```bash
-# Import with progress indicator
-pv /tmp/backup.sql | docker exec -i riyan_mariadb mysql -u root -p riyan_nextjs
+# On Pi
+pv /tmp/backup.sql | docker exec -i riyan_mariadb mysql -u root -p$(grep MYSQL_ROOT_PASSWORD .env.pi | cut -d '=' -f2 | tr -d '"' | tr -d "'") riyan_nextjs
+```
+
+### GitHub Runner Not Working
+
+**Check runner status:**
+```bash
+# On Pi
+sudo systemctl status actions.runner.*
+```
+
+**If stopped:**
+```bash
+sudo systemctl start actions.runner.*
+```
+
+**Check runner logs:**
+```bash
+# On Pi
+cd /actions-runner
+./run.sh
+```
+
+**Common issues:**
+- ✅ Verify runner has `dev` label in GitHub settings
+- ✅ Check `GITHUB_TOKEN` secret exists in repo
+- ✅ Ensure `/data/projects/riyan` exists
+- ✅ Check disk space: `df -h /data`
+
+### Port Already in Use
+
+**Symptom:**
+```
+Error: bind: address already in use
+```
+
+**Find what's using the port:**
+```bash
+# On Pi
+sudo netstat -tulpn | grep :3000
+sudo netstat -tulpn | grep :8055
+```
+
+**Kill conflicting service:**
+```bash
+# Find container using port
+docker ps
+
+# Stop it
+docker stop <container-name>
 ```
 
 ---
 
-## Health Checks
+## Maintenance
 
-### Quick Health Check
+### Health Checks
 
+**Quick health check:**
 ```bash
-ssh pi@<tailscale-ip>
+# On Pi
 cd /data/projects/riyan
 
-# Check all services
+# All services running?
 docker compose -f docker-compose.pi.yml ps
 
-# Should show:
-# riyan_mariadb    running
-# riyan_directus   running
-# riyan_web        running
+# Check logs for errors
+docker compose -f docker-compose.pi.yml logs --tail=100
 ```
 
-### Detailed Health Check
-
+**Detailed health check:**
 ```bash
-# Check MariaDB
+# Database
 docker exec riyan_mariadb mysql -u root -p -e "SELECT VERSION();"
 
-# Check Directus
+# Directus
 curl -I http://localhost:8055/server/health
 
-# Check Next.js web
+# Next.js
 curl -I http://localhost:3000
 
-# Check disk usage
+# Disk usage
 df -h /data
 
-# Check container resources
+# Container resources
 docker stats --no-stream
 ```
 
----
+### Regular Maintenance Tasks
 
-## Rollback Procedures
+**Weekly:**
+- Check disk space: `df -h /data`
+- Review logs for errors
+- Verify backups exist: `ls -lh /data/backups/riyan/`
 
-### Rollback Code Deployment
+**Monthly:**
+- Clean old Docker images: `docker image prune -a`
+- Review backup retention
+- Check for OS updates: `sudo apt update && sudo apt upgrade`
 
+### Rollback Procedures
+
+**Rollback code deployment:**
 ```bash
-ssh pi@<tailscale-ip>
+# On Pi
 cd /data/projects/riyan
 
 # Find previous commit
@@ -386,39 +744,69 @@ git log --oneline -10
 # Reset to previous commit
 git reset --hard <previous-commit-sha>
 
-# Rebuild and restart
-docker compose -f docker-compose.pi.yml --env-file .env.pi up -d --build
+# Pull specific image version
+docker pull ghcr.io/sayya2/riyanwebsite:<commit-sha>
+
+# Update docker-compose to use specific tag, then:
+docker compose -f docker-compose.pi.yml --env-file .env.pi up -d
 ```
 
-### Rollback Database
-
+**Rollback database:**
 ```bash
-ssh pi@<tailscale-ip>
-cd /data/projects/riyan
-
-# List available backups
+# On Pi
 ls -lh /data/backups/riyan/
 
 # Import previous backup
 ./scripts/db-import-pi.sh /data/backups/riyan/riyan_db_YYYYMMDD_HHMMSS.sql
 ```
 
-### Complete Reset (Nuclear Option)
-
-⚠️ **Warning:** This will destroy all data!
-
+**Complete reset (⚠️ DESTRUCTIVE):**
 ```bash
-ssh pi@<tailscale-ip>
+# On Pi
 cd /data/projects/riyan
 
-# Stop and remove all containers and volumes
+# Stop and remove everything
 docker compose -f docker-compose.pi.yml down -v
 
 # Remove all data
 sudo rm -rf /data/docker-volumes/riyan-*
 
-# Re-run initial setup from deployment plan
-# See: C:\Users\ninet\.claude\plans\swift-sauteeing-honey.md
+# Then re-run initial setup steps
+```
+
+### Updating Dependencies
+
+**Update Next.js dependencies:**
+```bash
+# On dev machine
+cd "D:\VIPERTIK\Riayn PVT LTD\RiyanSite\riyan"
+
+npm update
+npm audit fix
+
+# Test locally
+npm run build
+npm run dev
+
+# Commit and push
+git add package.json package-lock.json
+git commit -m "Update dependencies"
+git push origin develop
+
+# Automatic deployment will build with new deps
+```
+
+**Update Directus:**
+```bash
+# On Pi
+nano docker-compose.pi.yml
+
+# Change version:
+# directus/directus:11.2 → directus/directus:11.3
+
+# Pull new image and restart
+docker compose -f docker-compose.pi.yml pull directus
+docker compose -f docker-compose.pi.yml up -d directus
 ```
 
 ---
@@ -437,14 +825,24 @@ docker compose -f docker-compose.pi.yml logs -f web
 # Restart all services
 docker compose -f docker-compose.pi.yml restart
 
-# Rebuild and restart
+# Restart specific service
+docker compose -f docker-compose.pi.yml restart directus
+
+# Rebuild and restart (after docker-compose changes)
 docker compose -f docker-compose.pi.yml up -d --build
 
 # Stop all services
 docker compose -f docker-compose.pi.yml down
 
+# Stop and remove volumes (⚠️ DELETES DATA)
+docker compose -f docker-compose.pi.yml down -v
+
 # Check resource usage
 docker stats
+
+# Clean unused resources
+docker system prune
+docker image prune -a
 ```
 
 ### Database Operations
@@ -457,7 +855,7 @@ docker exec -it riyan_mariadb mysql -u root -p
 ./scripts/db-export-pi.sh
 
 # Import database
-./scripts/db-import-pi.sh /path/to/backup.sql
+./scripts/db-import-pi.sh /tmp/backup.sql
 
 # Check database size
 docker exec riyan_mariadb mysql -u root -p -e "
@@ -483,39 +881,150 @@ ping google.com
 
 # Check Tailscale status
 tailscale status
+tailscale ip -4
 
 # Check open ports
 sudo netstat -tulpn | grep LISTEN
+
+# View systemd service status
+sudo systemctl status docker
+sudo systemctl status actions.runner.*
+```
+
+### Git Operations
+
+```bash
+# On Pi
+cd /data/projects/riyan
+
+# Check status
+git status
+
+# Pull latest
+git pull origin develop
+
+# Force reset to remote
+git fetch origin develop
+git reset --hard origin/develop
+
+# View commit history
+git log --oneline -10
+
+# Show specific commit
+git show <commit-sha>
 ```
 
 ---
 
-## Support
+## Security Considerations
 
-### Getting Help
+### Credential Management
 
-1. **Check logs first:** `docker compose -f docker-compose.pi.yml logs -f`
-2. **Review this guide:** Look for similar issues in Troubleshooting section
-3. **Check the deployment plan:** See full implementation details in plan file
-4. **GitHub Actions logs:** Check workflow runs for deployment issues
+**Never commit to git:**
+- `.env.pi` - Contains all production secrets
+- `.env` - Contains dev credentials
+- `*.pem` - SSH keys
+- `*.sql` - Database dumps may contain sensitive data
 
-### Escalation Path
+**Verify .gitignore:**
+```bash
+# On dev machine
+git check-ignore -v .env.pi
+# Should show it's ignored
+```
 
-1. Check service logs
-2. Verify environment configuration
-3. Test rollback procedures
-4. Contact team lead if issue persists
+### Access Control
+
+**Pi follows strict RBAC:**
+- `admin` user - Full access to projects and operations
+- `svc-docker` - Docker service account, owns container data
+- `svc-samba` - Samba service account
+
+**Verify permissions:**
+```bash
+# On Pi
+ls -ld /data/projects/riyan
+# Should be: admin:dev
+
+ls -ld /data/docker-volumes/riyan-*
+# Should be: svc-docker:docker
+```
+
+### Network Security
+
+**Tailscale only:**
+- All services accessible only via Tailscale VPN
+- No public internet exposure
+- Tailscale ACLs control access
+
+**Verify:**
+```bash
+# On Pi
+tailscale status
+```
+
+### Backup Security
+
+**Backups contain sensitive data:**
+```bash
+# On Pi
+ls -ld /data/backups/riyan
+# Should be: admin:ops, permissions: 2770
+```
+
+Only `admin` and `ops` group can access backups.
 
 ---
 
 ## Related Documentation
 
-- **Deployment Plan:** `C:\Users\ninet\.claude\plans\swift-sauteeing-honey.md`
-- **Pi Setup Guide:** `db_init/AdamPi-Dev-Server-Guide.md`
+- **Infrastructure Playbook:** `D:\notesApp\dev brain\Devices\Initial Setup Version.md`
 - **Docker Compose (Pi):** `docker-compose.pi.yml`
 - **Environment Template:** `.env.pi.template`
+- **GitHub Workflow:** `.github/workflows/deploy-develop.yml`
+
+---
+
+## Support & Escalation
+
+### Getting Help
+
+1. **Check logs first:**
+   ```bash
+   docker compose -f docker-compose.pi.yml logs -f
+   ```
+
+2. **Review this guide:** Search for similar issues in Troubleshooting section
+
+3. **Check GitHub Actions:** View workflow runs for deployment issues
+
+4. **Verify infrastructure:** Ensure Pi follows `/data` policy
+
+### Escalation Path
+
+1. Check service logs and status
+2. Verify environment configuration (`.env.pi`)
+3. Test rollback procedures
+4. Check GitHub Actions workflow logs
+5. Contact team lead with:
+   - Error messages from logs
+   - Steps to reproduce
+   - Recent changes made
+
+---
+
+## Changelog
+
+**2025-12-28:**
+- ✅ Initial deployment completed
+- ✅ Automated GitHub Actions workflow configured
+- ✅ Database import/export scripts created
+- ✅ Media sync completed (1.4GB)
+- ✅ All services verified working
+- ✅ Documentation created
 
 ---
 
 **Last Updated:** 2025-12-28
 **Maintained By:** Development Team
+**Status:** Production Ready ✅

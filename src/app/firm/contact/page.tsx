@@ -52,7 +52,7 @@ export const metadata = {
 };
 
 export default function ContactPage() {
-  const contentShell = "w-full mx-auto px-[10%]";
+  const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 
   return (
     <main className="min-h-screen bg-white">
@@ -61,7 +61,7 @@ export default function ContactPage() {
         eyebrow="Contact"
         description="Dedicated design, engineering, and research teams based in the Maldives, ready to partner on your next project."
         imageUrl="/wp-content/uploads/2015/05/13-1600x900-1.jpg"
-        heightClass="min-h-[60vh] md:min-h-[80vh]"
+        heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
       <section className={`${contentShell} mt-8 md:mt-10 relative z-10`}>

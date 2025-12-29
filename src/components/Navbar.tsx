@@ -89,7 +89,7 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto">
-        <div className="flex items-center justify-between h-20 mx-12 md:mx-12">
+        <div className="flex items-center justify-between h-20 mx-4 md:mx-12">
           {/* Logo */}
           <div className="flex ">
             <Link href="/" className="flex items-center">
@@ -114,7 +114,7 @@ export default function Navbar() {
             className="hidden lg:block relative"
             onMouseLeave={() => setIsFirmOpen(false)}
           >
-            <nav className="flex items-center space-x-8">
+            <nav className="flex items-center space-x-12 md:pr-23">
               {menuItems.map((item) =>
                 item.children ? (
                   <button
@@ -154,7 +154,7 @@ export default function Navbar() {
             </nav>
 
             <div
-              className={`absolute left-0 top-full pt-3 transition-all duration-200 ${
+              className={`absolute left-20 top-full pt-3 transition-all duration-200 ${
                 isFirmOpen
                   ? "opacity-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 -translate-y-2 pointer-events-none"

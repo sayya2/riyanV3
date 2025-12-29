@@ -65,7 +65,7 @@ function parseInternshipContent(html: string) {
   return sections;
 }
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 
 export default async function InternshipsPage() {
   const page = await getPageBySlug("internships");
@@ -91,7 +91,7 @@ export default async function InternshipsPage() {
         eyebrow="Career Opportunities"
         description={description}
         imageUrl={heroImage}
-        heightClass="min-h-[60vh] md:min-h-[80vh]"
+        heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
       {/* Introduction Section */}
