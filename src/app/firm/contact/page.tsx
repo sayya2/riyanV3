@@ -322,7 +322,7 @@ export default function ContactPage() {
                     </a>
                     <a
                       href="mailto:info@riyan.com.mv"
-                      className="inline-flex items-center gap-2  bg-white px-3 py-2 text-xs font-semibold text-primary border border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
+                      className="inline-flex items-center gap-2   bg-white px-3 py-2 text-xs font-semibold text-primary border border-primary/20 hover:border-primary hover:bg-primary/5 transition-colors"
                     >
                       <Mail className="h-4 w-4" />
                       Email
