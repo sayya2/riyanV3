@@ -60,6 +60,7 @@ export default function Navbar() {
   const [isSticky, setIsSticky] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isFirm = pathname?.startsWith("/firm");
   const panelItems = menuItems.flatMap((item) =>
     item.children && item.children.length > 0 ? item.children : [item]
   );
@@ -75,11 +76,11 @@ export default function Navbar() {
     setIsFirmOpen(false);
   }, [pathname]);
 
-  const borderColor = isSticky ? "border-gray-200" : "border-red-700/0";
+  const borderColor = isSticky ? "border-white" : "border-red-700/0";
   const textColor = isSticky ? "text-gray-900" : "text-white";
   const baseBg =
-    isHome && !isSticky
-      ? "bg-transparent"
+    (isHome || isFirm) && !isSticky
+      ? "bg-white/10 w-full bg-clip-padding backdrop-filter backdrop-blur-sm border border-white/15"
       : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
 
   return (
@@ -93,7 +94,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex ">
             <Link href="/" className="flex items-center">
-              <div className="relative w-36 h-12">
+              <div className="relative w-36 h-22">
                 <Image
                   src={
                     isSticky
@@ -187,25 +188,34 @@ export default function Navbar() {
           {/* Contact Panel Toggle */}
           <button
             onClick={() => setIsPanelOpen(true)}
-            className="flex flex-col items-center justify-center w-11 h-10 space-y-1.5 rounded-full border border-transparent hover:border-white/40 hover:bg-white/10 transition-colors"
+            className="flex flex-col items-center justify-center w-10 h-10 space-y-1.5 rounded-full border border-transparent hover:border-white/40 hover:bg-white/10 transition-colors"
             aria-label="Open contact panel"
             aria-expanded={isPanelOpen}
           >
-            <span
-              className={`block w-4 h-0.5 transition-all ${
-                isSticky ? "bg-gray-900" : "bg-white"
-              }`}
-            />
-            <span
-              className={`block w-4 h-0.5 transition-all ${
-                isSticky ? "bg-gray-900" : "bg-white"
-              }`}
-            />
-            <span
-              className={`block w-4 h-0.5 transition-all ${
-                isSticky ? "bg-gray-900" : "bg-white"
-              }`}
-            />
+            <div className="flex gap-2 items-center justify-center">
+              <span
+                className={`block w-1.5 h-1.5 rounded transition-all ${
+                  isSticky ? "bg-gray-900" : "bg-white"
+                }`}
+              />
+              <span
+                className={`block w-1.5 h-1.5 rounded transition-all ${
+                  isSticky ? "bg-gray-900" : "bg-white"
+                }`}
+              />
+            </div>
+            <div className="flex gap-2 items-center justify-center">
+              <span
+                className={`block w-1.5 h-1.5 rounded transition-all ${
+                  isSticky ? "bg-gray-900" : "bg-white"
+                }`}
+              />
+              <span
+                className={`block w-1.5 h-1.5 rounded transition-all ${
+                  isSticky ? "bg-gray-900" : "bg-white"
+                }`}
+              />
+            </div>
           </button>
         </div>
       </div>
@@ -218,7 +228,7 @@ export default function Navbar() {
         aria-hidden={!isPanelOpen}
       >
         <div
-          className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
+          className={`absolute inset-0 top-20 bg-black/60 transition-opacity duration-300 ${
             isPanelOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setIsPanelOpen(false)}

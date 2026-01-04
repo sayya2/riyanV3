@@ -9,7 +9,7 @@ type PageHeroProps = {
   bgColor?: string;
 };
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[4%]";
 
 export default function PageHero({
   title,
@@ -30,7 +30,7 @@ export default function PageHero({
         priority
         className="object-cover"
         sizes="100vw"
-        unoptimized={imageUrl.endsWith('.gif')}
+        unoptimized={imageUrl.endsWith(".gif")}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
 

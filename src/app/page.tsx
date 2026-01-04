@@ -15,7 +15,7 @@ export default function Home() {
       <Reveal>
         <Hero />
       </Reveal>
-      <div className="ml-[10%] mr-[10%]">
+      <div className="ml-[138px] mr-[138px]">
         <Reveal>
           <AboutSection />
         </Reveal>

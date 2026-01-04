@@ -46,6 +46,7 @@ export default function Reveal({
       ref={ref}
       className={className}
       style={style}
+      data-inview={reduceMotion || isInView ? "true" : "false"}
       initial={initial}
       animate={animate}
       transition={{ duration: reduceMotion ? 0 : duration, ease: "easeOut", delay }}

@@ -35,7 +35,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CareerPage() {
   const roles = await getCareerPosts({ limit: 30 });
-  const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
+  const contentShell = "w-full mx-auto px-[2%] md:px-[0%]";
 
   return (
     <FirmPageBySlug
@@ -48,7 +48,7 @@ export default async function CareerPage() {
       hideContent
     >
       {/* Intro */}
-      <section className={`${contentShell} py-4 md:py-0`}>
+      <section className={`${contentShell} py-4`}>
         <div className="grid lg:grid-cols-[1.2fr,1fr] gap-10 items-start">
           <Reveal>
             <div className="space-y-6">
@@ -59,9 +59,12 @@ export default async function CareerPage() {
                 Where project diversity meets a supportive culture
               </h2>
               <p className="text-gray-700 text-lg leading-relaxed">
-                We provide career development opportunities through comprehensive learning and development initiatives.
-                Exposure to a wide range of projects ensures our team gains diverse knowledge and experience, while a
-                flat hierarchy and welcoming atmosphere foster collaboration and growth.
+                We provide career development opportunities through our
+                comprehensive in-house learning and development initiatives.
+                Offering exposure to a wide range of projects in the built
+                environment, we ensure our staff gain diverse knowledge and
+                experience. With a flat hierarchy and a welcoming atmosphere, we
+                cultivate a friendly work environment.
               </p>
             </div>
           </Reveal>
@@ -73,15 +76,23 @@ export default async function CareerPage() {
                 value: "Buildings, resorts, infrastructure, research",
                 icon: Briefcase,
               },
-              { label: "Culture", value: "Flat hierarchy, mentorship, learning", icon: CalendarClock },
+              {
+                label: "Culture",
+                value: "Flat hierarchy, mentorship, learning",
+                icon: CalendarClock,
+              },
               { label: "Location", value: "Male, Maldives", icon: MapPin },
-              { label: "Balance", value: "Flexible, people-first environment", icon: CalendarClock },
+              {
+                label: "Balance",
+                value: "Flexible, people-first environment",
+                icon: CalendarClock,
+              },
             ].map((item, index) => {
               const Icon = item.icon;
               return (
                 <Reveal key={item.label} delay={index * 0.05}>
-                  <div className="flex items-start gap-4 rounded-lg border border-gray-200 bg-gray-50 p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#781213] text-white">
+                  <div className="flex items-start gap-4  border border-gray-200 bg-gray-50 p-5 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                    <span className="flex h-10 w-10 items-center justify-center  bg-[#781213] text-white">
                       <Icon className="h-5 w-5" />
                     </span>
                     <div className="space-y-1">
@@ -108,13 +119,15 @@ export default async function CareerPage() {
               <p className="text-xs uppercase tracking-[0.3em] text-primary font-semibold">
                 Opportunities
               </p>
-              <h3 className="text-3xl md:text-5xl font-semibold text-gray-900">
+              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900">
                 Open roles
-              </h3>
+              </h2>
             </div>
             <p className="text-sm text-gray-600">
               {roles.length
-                ? `${roles.length} position${roles.length > 1 ? "s" : ""} available`
+                ? `${roles.length} position${
+                    roles.length > 1 ? "s" : ""
+                  } available`
                 : "No active listings"}
             </p>
           </div>
@@ -123,9 +136,7 @@ export default async function CareerPage() {
         {roles.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {roles.map((role, index) => {
-              const href = role.slug
-                ? `/firm/career/${role.slug}`
-                : "#";
+              const href = role.slug ? `/firm/career/${role.slug}` : "#";
               const cleanedContent = sanitizeContent(role.content || "");
               const excerpt =
                 role.excerpt && role.excerpt.trim().length > 0
@@ -137,11 +148,11 @@ export default async function CareerPage() {
               );
 
               return (
-                <Reveal key={role.id} delay={index * 0.05}>
-                  <div className="group flex flex-col rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-                    <div className="space-y-4">
+                <Reveal key={role.id} delay={index * 0.05} className="h-full">
+                  <div className="group flex h-full flex-col border border-gray-200 bg-gray-50 p-6 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                    <div className="flex flex-1 flex-col space-y-4">
                       {role.closing_date && (
-                        <span className="text-xs font-semibold text-gray-700 bg-white px-4 py-2 rounded inline-block border border-gray-200">
+                        <span className="text-xs font-semibold text-gray-700">
                           Deadline: {deadline}
                         </span>
                       )}
@@ -151,7 +162,7 @@ export default async function CareerPage() {
                           <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
                             {role.department || "Role"}
                           </p>
-                          <h2 className="text-lg font-semibold text-gray-900">
+                          <h2 className="text-base !text-2xl text-primary font-semibold text-gray-900">
                             {role.title}
                           </h2>
                           <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
@@ -177,7 +188,7 @@ export default async function CareerPage() {
 
                     <Link
                       href={href}
-                      className="mt-6 inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
+                      className="mt-6 inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2  transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
                     >
                       View details
                       <ArrowRight className="h-4 w-4" />
@@ -189,7 +200,7 @@ export default async function CareerPage() {
           </div>
         ) : (
           <Reveal>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-gray-700">
+            <div className=" border border-gray-200 bg-gray-50 p-8 text-gray-700">
               <p className="font-semibold text-gray-900 text-lg mb-2">
                 No current openings
               </p>

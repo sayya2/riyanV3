@@ -35,7 +35,7 @@ const socialLinks = [
 
 const Footer = () => {
   return (
-    <footer className="bg-secondary text-white">
+    <footer className="bg-primary text-white">
       <div className="container mx-auto px-12 py-12 grid gap-10 grid-cols-1 md:grid-cols-4 md:items-center md:place-items-center">
         {/* Column 1 — Brand */}
         <div className="space-y-4">
@@ -65,7 +65,7 @@ const Footer = () => {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-secondary transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -84,7 +84,7 @@ const Footer = () => {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 text-white/80 hover:text-primary transition-colors"
+                className="flex items-center gap-3 text-white/80 hover:text-secondary transition-colors"
               >
                 <Icon className="h-5 w-5" />
                 <span>{label}</span>

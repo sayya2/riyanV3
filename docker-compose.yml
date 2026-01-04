@@ -21,7 +21,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: Riyanitaccess@26+
     ports:
-      - "3307:3306"
+      - "3310:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./db_init:/docker-entrypoint-initdb.d

@@ -66,6 +66,8 @@ function parseInternshipContent(html: string) {
 }
 
 const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
+const sectionY = "py-[2.5rem] md:py-[4rem]";
+const sectionBottom = "pb-[2.5rem] md:pb-[4rem]";
 
 export default async function InternshipsPage() {
   const page = await getPageBySlug("internships");
@@ -95,9 +97,9 @@ export default async function InternshipsPage() {
       />
 
       {/* Introduction Section */}
-      <section className={`${contentShell} py-12 md:py-20`}>
+      <section className={`${contentShell} ${sectionY}`}>
         <Reveal>
-          <div className="space-y-6">
+          <div className="space-y-[1rem]">
             <div className="prose prose-lg max-w-none text-gray-800">
               <p className="text-lg leading-relaxed">{description}</p>
               <p className="text-lg leading-relaxed">
@@ -119,60 +121,91 @@ export default async function InternshipsPage() {
       </section>
 
       {/* What We Offer Section */}
-      <section className={`${contentShell} py-12 md:py-20`}>
+      <section className={`${contentShell} ${sectionY}`}>
         <Reveal>
           <div>
-            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
               What We Offer
             </h2>
-            <p className="text-lg text-gray-700 mb-10">
+            <p className="text-lg text-gray-700 mb-[1.5rem]">
               Our internship program is designed to provide comprehensive learning
               experiences that bridge academic knowledge with professional practice.
             </p>
           </div>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <div className="bg-[#781213] text-white p-8 md:p-10 rounded-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">
-                  Professional Development
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Real project experience</li>
-                  <li>Mentorship from senior professionals</li>
-                  <li>Skill development workshops</li>
-                  <li>Industry networking opportunities</li>
-                  <li>Career guidance and support</li>
-                </ul>
-              </div>
+        <Reveal delay={0.1} className="reveal-stagger">
+          <div className="bg-[#781213] text-white p-8 md:p-10 rounded-2xl border border-white/10 shadow-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {[
+                {
+                  title: "Professional Development",
+                  items: [
+                    "Real project experience",
+                    "Mentorship from senior professionals",
+                    "Skill development workshops",
+                    "Industry networking opportunities",
+                    "Career guidance and support",
+                  ],
+                },
+                {
+                  title: "Work Experience",
+                  items: [
+                    "Multi-disciplinary exposure",
+                    "Client interaction experience",
+                    "Technical software training",
+                    "Site visits and field work",
+                    "Team collaboration",
+                  ],
+                },
+                {
+                  title: "Benefits",
+                  items: [
+                    "Competitive stipend",
+                    "Flexible working arrangements",
+                    "Modern office environment",
+                    "Professional references",
+                    "Potential for full-time opportunities",
+                  ],
+                },
+              ].map((group, groupIndex) => {
+                const baseDelay = 0.1 + groupIndex * 0.12;
+                const lineDuration = Math.max(
+                  0.5,
+                  group.items.length * 0.08 + 0.3
+                );
 
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">
-                  Work Experience
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Multi-disciplinary exposure</li>
-                  <li>Client interaction experience</li>
-                  <li>Technical software training</li>
-                  <li>Site visits and field work</li>
-                  <li>Team collaboration</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">
-                  Benefits
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Competitive stipend</li>
-                  <li>Flexible working arrangements</li>
-                  <li>Modern office environment</li>
-                  <li>Professional references</li>
-                  <li>Potential for full-time opportunities</li>
-                </ul>
-              </div>
+                return (
+                  <div key={group.title} className="space-y-4">
+                    <h3 className="text-xl md:text-2xl font-semibold">
+                      {group.title}
+                    </h3>
+                    <div className="relative pl-6">
+                      <span
+                        className="absolute left-0 top-1 h-full w-px bg-white/35"
+                        data-reveal-line
+                        style={{
+                          transitionDelay: `${baseDelay}s`,
+                          transitionDuration: `${lineDuration}s`,
+                        }}
+                      />
+                      <ul className="space-y-2 text-white/90">
+                        {group.items.map((item, itemIndex) => (
+                          <li
+                            key={item}
+                            data-reveal-item
+                            style={{
+                              transitionDelay: `${baseDelay + itemIndex * 0.08}s`,
+                            }}
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </Reveal>
@@ -180,13 +213,13 @@ export default async function InternshipsPage() {
 
       {/* Eligibility Criteria Section */}
       {sections.criteria && sections.criteria.length > 0 ? (
-        <section className={`${contentShell} py-12 md:py-20`}>
+        <section className={`${contentShell} ${sectionY}`}>
           <Reveal>
             <div>
-              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
                 Eligibility Criteria
               </h2>
-              <p className="text-lg text-gray-700 mb-10">
+              <p className="text-lg text-gray-700 mb-[1.5rem]">
                 We welcome applications from motivated individuals who meet the
                 following requirements.
               </p>
@@ -209,13 +242,13 @@ export default async function InternshipsPage() {
           </div>
         </section>
       ) : (
-        <section className={`${contentShell} py-12 md:py-20`}>
+        <section className={`${contentShell} ${sectionY}`}>
           <Reveal>
             <div>
-              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
                 Eligibility Criteria
               </h2>
-              <p className="text-lg text-gray-700 mb-10">
+              <p className="text-lg text-gray-700 mb-[1.5rem]">
                 We welcome applications from motivated individuals who meet the
                 following requirements.
               </p>
@@ -246,10 +279,10 @@ export default async function InternshipsPage() {
 
       {/* Key Details Section */}
       {sections.keyDetails && sections.keyDetails.length > 0 && (
-        <section className={`${contentShell} py-12 md:py-20`}>
+        <section className={`${contentShell} ${sectionY}`}>
           <Reveal>
             <div>
-              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
                 Program Details
               </h2>
             </div>
@@ -284,13 +317,13 @@ export default async function InternshipsPage() {
         )} */}
 
       {/* How to Apply Section - Prominent CTA */}
-      <section className={`${contentShell} py-12 md:py-20`}>
+      <section className={`${contentShell} ${sectionY}`}>
         <Reveal>
           <div className="bg-gradient-to-br from-gray-900 to-[#781213] text-white rounded-lg p-8 md:p-12 text-center">
-            <h2 className="text-3xl md:text-5xl font-semibold mb-4">
+            <h2 className="text-3xl md:text-5xl font-semibold mb-[1rem]">
               Ready to Start Your Journey?
             </h2>
-            <p className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-white/90 mb-[1.5rem] max-w-3xl mx-auto leading-relaxed">
               We welcome applications throughout the year. Submit your CV, cover
               letter, and portfolio (if applicable) to join our team of passionate
               professionals shaping the future of the Maldives.
@@ -314,7 +347,7 @@ export default async function InternshipsPage() {
       </section>
 
       {/* Navigation Links */}
-      <section className={`${contentShell} pb-12 md:pb-20`}>
+      <section className={`${contentShell} ${sectionBottom}`}>
         <Reveal>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link

@@ -7,7 +7,17 @@ import Reveal from "@/components/Reveal";
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[11%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[138px]";
+const cardHeights = [
+  "h-52 md:h-60",
+  "h-96 md:h-[32rem]",
+  "h-72 md:h-[24rem]",
+  "h-56 md:h-64",
+  "h-80 md:h-[26rem]",
+  "h-52 md:h-60",
+  "h-[18rem] md:h-[28rem]",
+  "h-60 md:h-[20rem]",
+];
 
 function stripHtml(input: string) {
   return input
@@ -73,7 +83,7 @@ export default async function NewsPage({
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
-                News &amp; Updates
+                News &amp; Announcements
               </h1>
               <p className="text-gray-700 mt-2 max-w-2xl">
                 Browse articles, announcements, and press from our multidisciplinary teams.
@@ -89,7 +99,7 @@ export default async function NewsPage({
           </div>
         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="columns-1 md:columns-2 xl:columns-3 gap-x-4">
           {articles.map((article, index) => {
             const href = article.slug ? `/news/${article.slug}` : "#";
             const categoriesText = (article.categories || [])
@@ -101,12 +111,19 @@ export default async function NewsPage({
                 ? stripHtml(article.excerpt)
                 : stripHtml(article.content || "").slice(0, 140);
             const img = article.featured_image || fallbackImg;
+            const cardHeight = cardHeights[index % cardHeights.length];
 
             return (
-              <Reveal key={article.id} delay={index * 0.05}>
+              <Reveal
+                key={article.id}
+                delay={index * 0.04}
+                duration={0.65}
+                offsetY={18}
+                className="mb-4 break-inside-avoid"
+              >
                 <Link
                   href={href}
-                  className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
+                  className={`group relative block overflow-hidden  ${cardHeight} bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300`}
                 >
                   <Image
                     src={img}
@@ -117,16 +134,16 @@ export default async function NewsPage({
                     priority={false}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5">
+                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-[98%]">
                     <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
                       {categoriesText || "News"}
                     </p>
                     <h3 className="news-card-title line-clamp-2 min-h-[2.6rem] font-semibold text-white drop-shadow-sm">
                       {article.title}
                     </h3>
-                    <p className="hidden sm:block min-h-[2.6rem] text-sm text-white/80 leading-relaxed md:line-clamp-3">
+                    {/* <p className="hidden sm:block min-h-[2.6rem] text-sm text-white/80 leading-relaxed md:line-clamp-3">
                       {excerpt}
-                    </p>
+                    </p> */}
                   </div>
                 </Link>
               </Reveal>

@@ -52,7 +52,7 @@ export default function ClientLogos({ logosByCategory }: ClientLogosProps) {
         {activeLogos.map((logo, index) => (
           <div
             key={index}
-            className="group flex min-h-[140px] items-center justify-center rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-transform duration-300 hover:scale-105 hover:shadow-md"
+            className="group flex min-h-[140px] items-center justify-center  border border-gray-200 bg-white p-6 shadow-sm transition-transform duration-300 hover:scale-105 hover:shadow-md"
           >
             <Image
               src={logo.url}

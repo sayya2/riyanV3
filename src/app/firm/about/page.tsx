@@ -13,7 +13,7 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[138px]";
 
 export default async function AboutPage() {
   const clientLogos = await getClientLogos();
@@ -24,7 +24,7 @@ export default async function AboutPage() {
         eyebrow="About"
         description="Founded in 1997, Riyan Pvt. Ltd. is a leading multi-disciplinary consultancy firm based in the Maldives."
         // imageUrl="https://www.riyan.com.mv/wp-content/uploads/2018/05/Riyan-About.gif"
-        imageUrl= "/wp-content/uploads/2024/12/Sonevafushi-e1759852363152-1140x740.jpg"
+        imageUrl="/wp-content/uploads/2024/12/Sonevafushi-e1759852363152-1140x740.jpg"
         heightClass="min-h-[100vh] md:min-h-[100vh]"
         bgColor="bg-[#1a1a2e]"
       />
@@ -38,18 +38,19 @@ export default async function AboutPage() {
               <p className="text-lg leading-relaxed text-gray-800">
                 Founded in 1997, Riyan Pvt. Ltd. is a leading multi-disciplinary
                 consultancy firm based in the Maldives. With expertise spanning
-                design consultancy, engineering, project management, and research
-                & planning, we deliver integrated solutions that shape sustainable
-                and resilient environments.
+                design consultancy, engineering, project management, and
+                research & planning, we deliver integrated solutions that shape
+                sustainable and resilient environments.
               </p>
               <p className="text-lg leading-relaxed text-gray-800">
                 From luxury resorts and landmark buildings to critical
                 infrastructure, urban planning, and socio-economic research, we
                 bring together creativity, technical excellence, and strategic
-                insight. Backed by decades of local knowledge and enriched by our
-                experience working with international clients and delivering
-                projects funded by global donor agencies, we consistently deliver
-                outcomes that meet international standards across diverse sectors.
+                insight. Backed by decades of local knowledge and enriched by
+                our experience working with international clients and delivering
+                projects funded by global donor agencies, we consistently
+                deliver outcomes that meet international standards across
+                diverse sectors.
               </p>
               <p className="text-lg leading-relaxed text-gray-800">
                 At Riyan, we are committed to innovation, sustainability, and
@@ -79,98 +80,159 @@ export default async function AboutPage() {
       </section>
 
       {/* Multidisciplinary Services Section */}
-      <section className={`${contentShell} py-12 md:py-20`}>
+      <section className={`${contentShell} py-12 md:py-20 pb-[2] md:pb-[2]`}>
         <Reveal>
           <div>
             <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
               Multidisciplinary Services
             </h2>
             <p className="text-lg text-gray-700 mb-10">
-              We provide a diverse range of services tailored to meet the specific
-              needs of built environment and socioeconomic research and planning.
-              Our comprehensive portfolio caters to different stages of the project,
-              ensuring thorough and effective support at every step.
+              We provide a diverse range of services tailored to meet the
+              specific needs of built environment and socioeconomic research and
+              planning. Our comprehensive portfolio caters to different stages
+              of the project, ensuring thorough and effective support at every
+              step.
             </p>
           </div>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <div className="bg-[#781213] text-white p-8 md:p-10 rounded-lg">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">
-                  Planning
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Site Investigation</li>
-                  <li>Due Diligence</li>
-                  <li>Hydrographic &amp; Land Surveying</li>
-                  <li>Feasibility Studies</li>
-                  <li>Socioeconomic Assessments</li>
-                  <li>Sustainability Analysis</li>
-                  <li>Urban Planning</li>
-                  <li>Development Planning</li>
-                </ul>
-              </div>
+        <Reveal delay={0.1} className="reveal-stagger">
+          <div className="bg-[#781213] text-white p-8 md:p-10 rounded-2xl border border-white/10 shadow-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {[
+                {
+                  key: "planning",
+                  groups: [
+                    {
+                      title: "Planning",
+                      items: [
+                        "Site Investigation",
+                        "Due Diligence",
+                        "Hydrographic & Land Surveying",
+                        "Feasibility Studies",
+                        "Socioeconomic Assessments",
+                        "Sustainability Analysis",
+                        "Urban Planning",
+                        "Development Planning",
+                      ],
+                    },
+                  ],
+                },
+                {
+                  key: "design",
+                  groups: [
+                    {
+                      title: "Design",
+                      items: [
+                        "Interior Design",
+                        "Architectural Design",
+                        "Civil Engineering",
+                        "Structural Engineering",
+                        "MEP Design",
+                        "Coastal Engineering",
+                        "Quantity Surveying",
+                        "Water & Sanitation Design",
+                        "Ports & Transportation",
+                        "Solid Waste Management",
+                      ],
+                    },
+                  ],
+                },
+                {
+                  key: "delivery",
+                  groups: [
+                    {
+                      title: "Implementation",
+                      items: ["Project Management & Supervision"],
+                    },
+                    {
+                      title: "Operational",
+                      items: ["Management Consultancy", "Valuation"],
+                    },
+                  ],
+                },
+              ].map((column, columnIndex) => (
+                <div key={column.key} className="space-y-8">
+                  {column.groups.map((group, groupIndex) => {
+                    const baseDelay =
+                      0.1 + columnIndex * 0.08 + groupIndex * 0.12;
+                    const lineDuration = Math.max(
+                      0.5,
+                      group.items.length * 0.08 + 0.3
+                    );
 
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">Design</h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Interior Design</li>
-                  <li>Architectural Design</li>
-                  <li>Civil Engineering</li>
-                  <li>Structural Engineering</li>
-                  <li>MEP Design</li>
-                  <li>Coastal Engineering</li>
-                  <li>Quantity Surveying</li>
-                  <li>Water &amp; Sanitation Design</li>
-                  <li>Ports &amp; Transportation</li>
-                  <li>Solid Waste Management</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-4">
-                  Implementation
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Project Management &amp; Supervision</li>
-                </ul>
-
-                <h3 className="text-xl md:text-2xl font-semibold mt-8 mb-4">
-                  Operational
-                </h3>
-                <ul className="space-y-2 text-white/90">
-                  <li>Management Consultancy</li>
-                  <li>Valuation</li>
-                </ul>
-              </div>
+                    return (
+                      <div key={group.title} className="space-y-4">
+                        <h3 className="text-xl md:text-2xl font-semibold">
+                          {group.title}
+                        </h3>
+                        <div className="relative pl-6">
+                          <span
+                            className="absolute left-0 top-1 h-full w-px bg-white/35"
+                            data-reveal-line
+                            style={{
+                              transitionDelay: `${baseDelay}s`,
+                              transitionDuration: `${lineDuration}s`,
+                            }}
+                          />
+                          <ul className="space-y-2 text-white/90">
+                            {group.items.map((item, itemIndex) => (
+                              <li
+                                key={item}
+                                data-reveal-item
+                                style={{
+                                  transitionDelay: `${baseDelay + itemIndex * 0.08}s`,
+                                }}
+                              >
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
         </Reveal>
       </section>
 
       {/* Projects Section */}
-      <section className={`${contentShell} py-12 md:py-20`}>
+      <section className={`${contentShell} py-12 md:py-20 `}>
         <Reveal>
           <div className=" mb-12  mx-auto">
-            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-4">
-              Over 1,000 successful projects spanning diverse sectors.
+            <h2
+              className="
+  !text-4xl 
+  md:!text-7xl 
+  !leading-tight 
+  !font-semibold 
+  text-gray-900 
+  pb-9
+  text-center
+  max-w-5xl
+  mx-auto
+"
+            >
+              Over <span className="text-primary">1,000</span> successful projects spanning diverse sectors.
             </h2>
-            <p className="text-lg text-gray-700">
+
+            <p className="text-lg text-gray-700 text-center max-w-7xl mx-auto">
               Over the past 28 years, we have successfully delivered projects
-              across diverse sectors including Buildings, Resorts, Infrastructure,
-              Water &amp; Sewerage, Urban Planning &amp; Research. Our
-              multi-disciplinary expertise allows us to provide integrated,
-              sustainable solutions tailored to the unique needs of the Maldives
-              and beyond.
+              across diverse sectors including Buildings, Resorts,
+              Infrastructure, Water &amp; Sewerage, Urban Planning &amp;
+              Research. Our multi-disciplinary expertise allows us to provide
+              integrated, sustainable solutions tailored to the unique needs of
+              the Maldives and beyond.
             </p>
           </div>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <Reveal>
-            <div className="relative h-[40vh] overflow-hidden rounded-lg group cursor-pointer">
+            <div className="relative h-[40vh] overflow-hidden  group cursor-pointer">
               <Image
                 src="/wp-content/uploads/2018/12/IAS-FINAL-1024x568-1.jpg"
                 alt="Buildings"
@@ -187,7 +249,7 @@ export default async function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <div className="relative h-[40vh] overflow-hidden rounded-lg group cursor-pointer">
+            <div className="relative h-[40vh] overflow-hidden  group cursor-pointer">
               <Image
                 src="/wp-content/uploads/2009/01/Pic-13-Park-Hyatt-rotated.jpg"
                 alt="Resorts"
@@ -206,7 +268,7 @@ export default async function AboutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Reveal>
-            <div className="relative h-[40vh] overflow-hidden rounded-lg group cursor-pointer">
+            <div className="relative h-[40vh] overflow-hidden  group cursor-pointer">
               <Image
                 src="/wp-content/uploads/2007/02/mpl.jpg"
                 alt="Infrastructure"
@@ -223,7 +285,7 @@ export default async function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <div className="relative h-[40vh] overflow-hidden rounded-lg group cursor-pointer">
+            <div className="relative h-[40vh] overflow-hidden  group cursor-pointer">
               <Image
                 src="/wp-content/uploads/2021/09/bodufolhadhoo-LUP-1.jpg"
                 alt="Urban Planning"
@@ -240,7 +302,7 @@ export default async function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="relative h-[40vh] overflow-hidden rounded-lg group cursor-pointer">
+            <div className="relative h-[40vh] overflow-hidden  group cursor-pointer">
               <Image
                 src="/wp-content/uploads/2022/08/IMG20210407113813-1800x900-1.jpg"
                 alt="Research"
@@ -267,9 +329,9 @@ export default async function AboutPage() {
             </h2>
             <p className="text-lg text-gray-700 mb-10">
               We possess a wealth of experience in forging fruitful partnerships
-              with the Maldivian government, local and international companies, as
-              well as esteemed bilateral and multilateral agencies, resulting in a
-              proven track record of success.
+              with the Maldivian government, local and international companies,
+              as well as esteemed bilateral and multilateral agencies, resulting
+              in a proven track record of success.
             </p>
           </div>
         </Reveal>
@@ -280,7 +342,7 @@ export default async function AboutPage() {
       </section>
 
       {/* Navigation to other Firm pages */}
-      <section className={`${contentShell} pb-12`}>
+      {/* <section className={`${contentShell} pb-12`}>
         <Reveal>
           <div className="flex flex-wrap gap-3 text-sm">
             <Link
@@ -303,7 +365,7 @@ export default async function AboutPage() {
             </Link>
           </div>
         </Reveal>
-      </section>
+      </section> */}
     </main>
   );
 }

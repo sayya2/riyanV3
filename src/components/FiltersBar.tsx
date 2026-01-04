@@ -127,14 +127,14 @@ export default function FiltersBar({
         name="q"
         defaultValue={search}
         placeholder="Search projects"
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        className="border border-gray-300  px-4 py-2 w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-primary/50"
       />
       <select
         name="sector"
         value={localSector}
         onChange={onSectorChange}
         disabled={loadingSectors}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+        className="border border-gray-300  px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
       >
         <option value="">{loadingSectors ? 'Loading...' : 'All Sectors'}</option>
         {sectors.map((sector) => {
@@ -151,7 +151,7 @@ export default function FiltersBar({
         value={localService}
         onChange={onServiceChange}
         disabled={loadingServices}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+        className="border border-gray-300  px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
       >
         <option value="">{loadingServices ? 'Loading...' : 'All Services'}</option>
         {services.map((svc) => {
@@ -166,7 +166,7 @@ export default function FiltersBar({
       <select
         name="perPage"
         defaultValue={perPage}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        className="border border-gray-300  px-3 py-2 w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-primary/50"
         onChange={(e) => updateParams({ perPage: e.target.value })}
       >
         {perPageOptions.map((opt) => (
@@ -177,7 +177,7 @@ export default function FiltersBar({
       </select>
       <button
         type="submit"
-        className="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+        className="inline-flex items-center justify-center px-5 py-2  bg-primary text-white hover:bg-primary/90 transition-colors"
       >
         Filter
       </button>

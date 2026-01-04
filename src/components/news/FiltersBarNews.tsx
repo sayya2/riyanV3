@@ -56,12 +56,12 @@ export default function FiltersBarNews({
         name="q"
         defaultValue={search}
         placeholder="Search news"
-        className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        className="border border-gray-300  px-4 py-2 w-full md:w-72 focus:outline-none focus:ring-2 focus:ring-primary/50"
       />
       <select
         name="category"
         defaultValue={selectedCategory}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        className="border border-gray-300  px-3 py-2 w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50"
       >
         <option value="">All Categories</option>
         {categories.map((cat) => (
@@ -73,7 +73,7 @@ export default function FiltersBarNews({
       <select
         name="perPage"
         defaultValue={perPage}
-        className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-primary/50"
+        className="border border-gray-300  px-3 py-2 w-full md:w-40 focus:outline-none focus:ring-2 focus:ring-primary/50"
         onChange={(e) => updateParams({ perPage: e.target.value })}
       >
         {perPageOptions.map((opt) => (
@@ -84,7 +84,7 @@ export default function FiltersBarNews({
       </select>
       <button
         type="submit"
-        className="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+        className="inline-flex items-center justify-center px-5 py-2  bg-primary text-white hover:bg-primary/90 transition-colors"
       >
         Filter
       </button>

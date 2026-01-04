@@ -6,7 +6,7 @@ import PageHero from "@/components/PageHero";
 import { resolveImageUrl } from "@/lib/media";
 
 const fallbackImg = "/images/about-hero.png";
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[138px]";
 
 export const firmPages = [
   { path: "about", slug: "about", label: "About" },
@@ -76,13 +76,21 @@ export async function FirmPageBySlug({
   return (
     <main className="min-h-screen bg-white">
       {!hideHero ? (
-        <PageHero title={title} eyebrow={eyebrow} description={heroDescription} imageUrl={heroImage} heightClass={heroHeight} />
+        <PageHero
+          title={title}
+          eyebrow={eyebrow}
+          description={heroDescription}
+          imageUrl={heroImage}
+          heightClass={heroHeight}
+        />
       ) : null}
 
       <section className={`${contentShell} py-12 space-y-10`}>
         {showArticle ? (
           <article className="space-y-6 max-w-5xl">
-            {lead && hideHero ? <p className="text-lg text-gray-700 leading-relaxed">{lead}</p> : null}
+            {lead && hideHero ? (
+              <p className="text-lg text-gray-700 leading-relaxed">{lead}</p>
+            ) : null}
             {!hideContent ? (
               <div
                 className="prose prose-lg max-w-none text-gray-800"
@@ -92,7 +100,9 @@ export async function FirmPageBySlug({
           </article>
         ) : null}
 
-        {children ? <div className="pt-10 max-w-6xl w-full">{children}</div> : null}
+        {children ? (
+          <div className="pt-10 max-w-6xl w-full">{children}</div>
+        ) : null}
 
         <div className="flex flex-wrap gap-3 pt-4 text-sm">
           {navLinks.map((link) => (

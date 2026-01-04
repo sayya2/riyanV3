@@ -49,7 +49,7 @@ function SectorCard({ title, image, href }: SectorCardProps) {
   return (
     <Link
       href={href || "#"}
-      className="group relative block overflow-hidden rounded-lg h-72 md:h-[360px] bg-gray-200"
+      className="group relative block overflow-hidden h-72 md:h-[360px] bg-gray-200"
     >
       <Image
         src={resolvedImage}
