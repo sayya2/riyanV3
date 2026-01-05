@@ -6,11 +6,12 @@ import { getAdjacentProjects, getProjectBySlug } from "@/lib/directus";
 import { resolveFileUrl } from "@/lib/media";
 import Reveal from "@/components/Reveal";
 import ProjectGalleryCarousel from "@/components/ProjectGalleryCarousel";
+import ProjectAdjacentNav from "@/components/ProjectAdjacentNav";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
+const contentShell = "w-full  px-[11%] md:px-[138px] lg:px-[138px]";
 
 const stripHtml = (input: string) =>
   input
@@ -146,6 +147,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       ),
     },
   ];
+  const prevImage =
+    (adjacent.previous?.featured_image &&
+      (resolveFileUrl(adjacent.previous.featured_image) ||
+        adjacent.previous.featured_image)) ||
+    "";
+  const nextImage =
+    (adjacent.next?.featured_image &&
+      (resolveFileUrl(adjacent.next.featured_image) ||
+        adjacent.next.featured_image)) ||
+    "";
 
   return (
     <main className="min-h-screen bg-white">
@@ -157,30 +168,30 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
-      <section className={`${contentShell} mt-8 md:mt-10 flex flex-col`}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-          {stats.map((item, index) => (
-            <Reveal key={item.label} delay={index * 0.08}>
-              <div className="group rounded-2xl border border-gray-200/70 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105">
-                  {statIcons[item.label] || <Building2 className="h-4 w-4" />}
-                </span>
-                <div className="mt-3 space-y-1">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
-                    {item.label}
-                  </p>
-                  <p className="text-base font-semibold text-gray-900 leading-snug">
-                    {item.value}
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+      <ProjectAdjacentNav
+        prev={
+          adjacent.previous
+            ? {
+                slug: adjacent.previous.slug,
+                title: adjacent.previous.title,
+                image: prevImage,
+              }
+            : null
+        }
+        next={
+          adjacent.next
+            ? {
+                slug: adjacent.next.slug,
+                title: adjacent.next.title,
+                image: nextImage,
+              }
+            : null
+        }
+        targetId="project-content"
+      />
 
-      <section className={`${contentShell} py-12 space-y-10`}>
-        <div className="grid lg:grid-cols-[2fr,1fr] gap-10">
+      <section id="project-content" className={`${contentShell} py-12 space-y-10`}>
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
             {lead ? (
               <Reveal>
@@ -193,46 +204,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 dangerouslySetInnerHTML={{ __html: project.content || "" }}
               />
             </Reveal>
-            {sectors.length || services.length ? (
-              <Reveal>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {sectors.length ? (
-                    <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Sectors
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {sectors.map((sector) => (
-                          <span
-                            key={`sector-${sector}`}
-                            className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
-                          >
-                            {sector}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                  {services.length ? (
-                    <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Services
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {services.map((svc) => (
-                          <span
-                            key={`svc-${svc}`}
-                            className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
-                          >
-                            {svc}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              </Reveal>
-            ) : null}
             {gallery && gallery.length ? (
               <Reveal>
                 <div className="pt-6">
@@ -245,60 +216,106 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             ) : null}
           </article>
 
-          <Reveal>
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-gray-200  bg-white p-5 shadow-sm space-y-5 ">
-                <div className="md:hidden">
-                  <div className="grid grid-cols-3 items-center gap-3">
-                    {adjacent.previous ? (
-                      <Link
-                        href={`/projects/${adjacent.previous.slug}`}
-                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                      >
-                        &larr; Prev
-                      </Link>
-                    ) : (
-                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
-                        Prev
+          <aside className="space-y-6 w-full lg:max-w-[300px] lg:justify-self-end">
+            <Reveal>
+              <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
+                <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                  Project details
+                </p>
+                <div className="mt-4 space-y-4">
+                  {stats.map((item) => (
+                    <div key={item.label} className="flex items-start gap-4">
+                      <span className="mt-0.5 flex h-9 w-9 items-center justify-center bg-primary/10 text-primary">
+                        {statIcons[item.label] || (
+                          <Building2 className="h-5 w-5" />
+                        )}
                       </span>
-                    )}
+                      <div className="space-y-1">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          {item.label}
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900 leading-snug">
+                          {item.value}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-                    <details className="relative">
-                      <summary className="share-summary flex h-12 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
-                        <Share2 className="h-4 w-4" />
-                        Share
-                      </summary>
-                      <div className="absolute left-1/2 bottom-full mb-3 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-                        <div className="flex items-center gap-2">
-                          {shareLinks.map((link) => (
-                            <a
-                              key={link.label}
-                              href={link.href}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                              aria-label={`Share on ${link.label}`}
+              </div>
+            </Reveal>
+
+            {(sectors.length > 0 || services.length > 0) && (
+              <Reveal>
+                <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
+                  <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                    Sectors &amp; services
+                  </p>
+                  <div className="mt-4 space-y-4">
+                    {sectors.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          Sectors
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {sectors.map((sector) => (
+                            <span
+                              key={`sector-${sector}`}
+                              className="text-[11px] px-2.5 py-1 bg-gray-100 text-gray-800 border border-gray-200"
                             >
-                              {link.icon}
-                            </a>
+                              {sector}
+                            </span>
                           ))}
                         </div>
                       </div>
-                    </details>
+                    )}
 
-                    {adjacent.next ? (
-                      <Link
-                        href={`/projects/${adjacent.next.slug}`}
-                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                      >
-                        Next &rarr;
-                      </Link>
-                    ) : (
-                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
-                        Next
-                      </span>
+                    {services.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          Services
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {services.map((svc) => (
+                            <span
+                              key={`svc-${svc}`}
+                              className="text-[11px] px-2.5 py-1 bg-gray-100 text-gray-800 border border-gray-200"
+                            >
+                              {svc}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
+                </div>
+              </Reveal>
+            )}
+            <Reveal>
+              <div className="border border-gray-200  bg-white p-5 shadow-sm space-y-5 ">
+                <div className="md:hidden">
+                  <details className="relative">
+                    <summary className="share-summary flex h-12 items-center justify-center gap-2 border border-gray-200 bg-white text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
+                      <Share2 className="h-4 w-4" />
+                      Share
+                    </summary>
+                    <div className="absolute left-1/2 bottom-full mb-3 -translate-x-1/2 border border-gray-200 bg-white p-2 shadow-lg">
+                      <div className="flex items-center gap-2">
+                        {shareLinks.map((link) => (
+                          <a
+                            key={link.label}
+                            href={link.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex h-9 w-9 items-center justify-center border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
+                            aria-label={`Share on ${link.label}`}
+                          >
+                            {link.icon}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </details>
                 </div>
 
                 <div className="hidden md:block ">
@@ -312,55 +329,25 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-3 items-center gap-4">
-                      {adjacent.previous ? (
-                        <Link
-                          href={`/projects/${adjacent.previous.slug}`}
-                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-start rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                    <div className="flex items-center gap-2 border border-gray-200 bg-white px-3 py-2">
+                      {shareLinks.map((link) => (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex h-9 w-9 items-center justify-center border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
+                          aria-label={`Share on ${link.label}`}
                         >
-                          <span className="text-base">&larr;</span>
-                          <span className="line-clamp-1">
-                            {adjacent.previous.title}
-                          </span>
-                        </Link>
-                      ) : (
-                        <span />
-                      )}
-
-                      <div className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2">
-                        {shareLinks.map((link) => (
-                          <a
-                            key={link.label}
-                            href={link.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                            aria-label={`Share on ${link.label}`}
-                          >
-                            {link.icon}
-                          </a>
-                        ))}
-                      </div>
-
-                      {adjacent.next ? (
-                        <Link
-                          href={`/projects/${adjacent.next.slug}`}
-                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-end rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                        >
-                          <span className="line-clamp-1">
-                            {adjacent.next.title}
-                          </span>
-                          <span className="text-base">&rarr;</span>
-                        </Link>
-                      ) : (
-                        <span />
-                      )}
+                          {link.icon}
+                        </a>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          </aside>
         </div>
       </section>
     </main>
