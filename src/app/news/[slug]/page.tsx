@@ -1,10 +1,11 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-import { Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { getAdjacentNews, getNewsBySlug } from "@/lib/directus";
 import { resolveFileUrl } from "@/lib/media";
 import Reveal from "@/components/Reveal";
 import ProjectGalleryCarousel from "@/components/ProjectGalleryCarousel";
+import ProjectAdjacentNav from "@/components/ProjectAdjacentNav";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -85,6 +86,16 @@ export default async function NewsDetailPage({ params }: PageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const shareUrl = `${siteUrl}/news/${slug}`;
   const shareText = article.title;
+  const prevImage =
+    (adjacent.previous?.featured_image &&
+      (resolveFileUrl(adjacent.previous.featured_image) ||
+        adjacent.previous.featured_image)) ||
+    "";
+  const nextImage =
+    (adjacent.next?.featured_image &&
+      (resolveFileUrl(adjacent.next.featured_image) ||
+        adjacent.next.featured_image)) ||
+    "";
   const shareLinks = [
     {
       label: "X",
@@ -140,8 +151,33 @@ export default async function NewsDetailPage({ params }: PageProps) {
         heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
 
-      <section className={`${contentShell} py-12 space-y-10`}>
-        <div className="grid lg:grid-cols-[2fr,1fr] gap-10">
+      <ProjectAdjacentNav
+        prev={
+          adjacent.previous
+            ? {
+                slug: adjacent.previous.slug,
+                title: adjacent.previous.title,
+                image: prevImage,
+                eyebrow: "News",
+              }
+            : null
+        }
+        next={
+          adjacent.next
+            ? {
+                slug: adjacent.next.slug,
+                title: adjacent.next.title,
+                image: nextImage,
+                eyebrow: "News",
+              }
+            : null
+        }
+        targetId="news-content"
+        basePath="news"
+      />
+
+      <section id="news-content" className={`${contentShell} py-12 space-y-10`}>
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
             {lead ? (
               <Reveal>
@@ -181,9 +217,9 @@ export default async function NewsDetailPage({ params }: PageProps) {
             ) : null}
           </article>
 
-          <div className="space-y-6">
+          <aside className="space-y-6 w-full lg:max-w-[300px] lg:justify-self-end">
             <Reveal>
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
+              <div className="bg-white shadow-md p-5 space-y-3">
                 <h3 className="text-lg font-semibold text-gray-900">Details</h3>
                 <div className="space-y-2 text-sm text-gray-700">
                   <div>
@@ -210,114 +246,95 @@ export default async function NewsDetailPage({ params }: PageProps) {
             </Reveal>
 
             <Reveal>
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
-                <div className="md:hidden">
-                  <div className="grid grid-cols-3 items-center gap-3">
+              <div className="bg-white p-5 shadow-md space-y-5">
+                <div className="space-y-3">
+                  <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                    Share this article
+                  </p>
+                  <p className="text-[0.8rem] text-gray-600">
+                    Send the story to your team.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4 bg-white py-2">
+                  {shareLinks.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-9 w-9 items-center justify-center shadow-sm text-gray-800 hover:bg-gray-100 transition-colors"
+                      aria-label={`Share on ${link.label}`}
+                    >
+                      {link.icon}
+                    </a>
+                  ))}
+                </div>
+
+                {(adjacent.previous || adjacent.next) && (
+                  <div className="space-y-6 pt-1 md:hidden -mb-5">
                     {adjacent.previous ? (
                       <Link
                         href={`/news/${adjacent.previous.slug}`}
-                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                        className="block w-[calc(100%+2.5rem)] -mx-5 bg-white shadow-sm overflow-hidden"
                       >
-                        &larr; Prev
-                      </Link>
-                    ) : (
-                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
-                        Prev
-                      </span>
-                    )}
-
-                    <details className="relative">
-                      <summary className="share-summary flex h-12 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
-                        <Share2 className="h-4 w-4" />
-                        Share
-                      </summary>
-                      <div className="absolute left-1/2 bottom-full mb-3 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-                        <div className="flex items-center gap-2">
-                          {shareLinks.map((link) => (
-                            <a
-                              key={link.label}
-                              href={link.href}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                              aria-label={`Share on ${link.label}`}
-                            >
-                              {link.icon}
-                            </a>
-                          ))}
+                        <div className="relative w-full aspect-[16/9] bg-gray-100">
+                          {prevImage ? (
+                            <img
+                              src={prevImage}
+                              alt={adjacent.previous.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-3 text-white">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
+                                Previous
+                              </p>
+                              <p className="text-sm font-semibold leading-snug line-clamp-2">
+                                {adjacent.previous.title}
+                              </p>
+                            </div>
+                            <ChevronLeft className="h-4 w-4 text-white/80" />
+                          </div>
                         </div>
-                      </div>
-                    </details>
+                      </Link>
+                    ) : null}
 
                     {adjacent.next ? (
                       <Link
                         href={`/news/${adjacent.next.slug}`}
-                        className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
+                        className="block w-[calc(100%+2.5rem)] -mx-5 bg-white shadow-sm overflow-hidden"
                       >
-                        Next &rarr;
+                        <div className="relative w-full aspect-[16/9] bg-gray-100">
+                          {nextImage ? (
+                            <img
+                              src={nextImage}
+                              alt={adjacent.next.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-3 text-white">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
+                                Next
+                              </p>
+                              <p className="text-sm font-semibold leading-snug line-clamp-2">
+                                {adjacent.next.title}
+                              </p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-white/80" />
+                          </div>
+                        </div>
                       </Link>
-                    ) : (
-                      <span className="flex h-12 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400">
-                        Next
-                      </span>
-                    )}
+                    ) : null}
                   </div>
-                </div>
-
-                <div className="hidden md:block">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
-                        Share this article
-                      </p>
-                      <p className="text-sm text-gray-600">Send the story to your team.</p>
-                    </div>
-
-                    <div className="grid grid-cols-3 items-center gap-4">
-                      {adjacent.previous ? (
-                        <Link
-                          href={`/news/${adjacent.previous.slug}`}
-                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-start rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                        >
-                          <span className="text-base">&larr;</span>
-                          <span className="line-clamp-1">{adjacent.previous.title}</span>
-                        </Link>
-                      ) : (
-                        <span />
-                      )}
-
-                      <div className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2">
-                        {shareLinks.map((link) => (
-                          <a
-                            key={link.label}
-                            href={link.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                            aria-label={`Share on ${link.label}`}
-                          >
-                            {link.icon}
-                          </a>
-                        ))}
-                      </div>
-
-                      {adjacent.next ? (
-                        <Link
-                          href={`/news/${adjacent.next.slug}`}
-                          className="group flex h-11 w-full max-w-[220px] items-center justify-between justify-self-end rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                        >
-                          <span className="line-clamp-1">{adjacent.next.title}</span>
-                          <span className="text-base">&rarr;</span>
-                        </Link>
-                      ) : (
-                        <span />
-                      )}
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </Reveal>
-          </div>
+          </aside>
         </div>
       </section>
     </main>

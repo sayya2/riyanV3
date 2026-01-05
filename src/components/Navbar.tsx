@@ -89,8 +89,8 @@ export default function Navbar() {
         isSticky ? "bg-white shadow-md" : baseBg
       }`}
     >
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between h-20 mx-4 md:mx-12 lg:-mx-[2vw] lg:-ml-[2vw]">
+      <div className="mx-auto w-full px-[6%] md:px-[4%]">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex ">
             <Link href="/" className="flex items-center">

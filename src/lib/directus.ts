@@ -359,8 +359,8 @@ export async function getNewsBySlug(slug: string): Promise<DirectusNewsPost | nu
 
 // Get adjacent news posts (previous and next)
 export async function getAdjacentNews(slug: string): Promise<{
-  previous: { slug: string; title: string } | null;
-  next: { slug: string; title: string } | null;
+  previous: { slug: string; title: string; featured_image?: string | null } | null;
+  next: { slug: string; title: string; featured_image?: string | null } | null;
 }> {
   try {
     // Get current post's published_at date
@@ -395,7 +395,7 @@ export async function getAdjacentNews(slug: string): Promise<{
     // Get previous (older) post
     const prevPosts = await directus.request(
       readItems('news', {
-        fields: ['slug', 'title'],
+        fields: ['slug', 'title', 'featured_image'],
         filter: {
           status: { _eq: 'published' },
           published_at: { _lt: currentDate },
@@ -408,7 +408,7 @@ export async function getAdjacentNews(slug: string): Promise<{
     // Get next (newer) post
     const nextPosts = await directus.request(
       readItems('news', {
-        fields: ['slug', 'title'],
+        fields: ['slug', 'title', 'featured_image'],
         filter: {
           status: { _eq: 'published' },
           published_at: { _gt: currentDate },
@@ -1022,8 +1022,8 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
 
 // Get adjacent projects (previous and next)
 export async function getAdjacentProjects(slug: string): Promise<{
-  previous: { slug: string; title: string } | null;
-  next: { slug: string; title: string } | null;
+  previous: { slug: string; title: string; featured_image?: string | null } | null;
+  next: { slug: string; title: string; featured_image?: string | null } | null;
 }> {
   try {
     // Get current project's published_at date
@@ -1058,7 +1058,7 @@ export async function getAdjacentProjects(slug: string): Promise<{
     // Get previous (older) project
     const prevProjects = await directus.request(
       readItems('projects', {
-        fields: ['slug', 'title'],
+        fields: ['slug', 'title', 'featured_image'],
         filter: {
           status: { _eq: 'published' },
           published_at: { _lt: currentDate },
@@ -1071,7 +1071,7 @@ export async function getAdjacentProjects(slug: string): Promise<{
     // Get next (newer) project
     const nextProjects = await directus.request(
       readItems('projects', {
-        fields: ['slug', 'title'],
+        fields: ['slug', 'title', 'featured_image'],
         filter: {
           status: { _eq: 'published' },
           published_at: { _gt: currentDate },

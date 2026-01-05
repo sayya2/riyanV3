@@ -9,7 +9,7 @@ type PageHeroProps = {
   bgColor?: string;
 };
 
-const contentShell = "w-full mx-auto px-[6%] md:px-[4%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[7.6%] md:mb-10";
 
 export default function PageHero({
   title,
