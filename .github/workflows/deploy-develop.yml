@@ -53,6 +53,7 @@ jobs:
           fi
           git -C "$REPO_DIR" fetch origin develop
           git -C "$REPO_DIR" checkout develop
+          rm -rf "$REPO_DIR/directus/extensions/interfaces/slug-generator"  
           git -C "$REPO_DIR" reset --hard origin/develop
           if command -v npm >/dev/null 2>&1; then
             bash "$REPO_DIR/scripts/install-directus-slug-generator.sh" \

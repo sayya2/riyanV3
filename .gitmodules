@@ -1,3 +1,0 @@
-[submodule "directus/extensions/interfaces/slug-generator/directus-slug-generator"]
-	path = directus/extensions/interfaces/slug-generator/directus-slug-generator
-	url = https://github.com/markosiilak/directus-slug-generator.git
