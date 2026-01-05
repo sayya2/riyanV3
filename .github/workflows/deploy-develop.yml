@@ -53,6 +53,11 @@ jobs:
           fi
           git -C "$REPO_DIR" fetch origin develop
           git -C "$REPO_DIR" checkout develop
+          # Fix ownership from previous root-owned container writes
+          if command -v sudo >/dev/null 2>&1; then
+            sudo chown -R "$(id -u):$(id -g)" "$REPO_DIR/directus/extensions/interfaces/slug-generator" || true
+          fi
+          rm -rf "$REPO_DIR/directus/extensions/interfaces/slug-generator"
           rm -rf "$REPO_DIR/directus/extensions/interfaces/slug-generator"  
           git -C "$REPO_DIR" reset --hard origin/develop
           if command -v npm >/dev/null 2>&1; then
@@ -60,6 +65,7 @@ jobs:
               "$REPO_DIR/directus/extensions/interfaces/slug-generator"
           else
             docker run --rm \
+              -u "$(id -u):$(id -g)" \
               -v "$REPO_DIR:/repo" \
               -w /repo \
               node:22-bookworm-slim \
