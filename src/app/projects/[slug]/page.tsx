@@ -212,14 +212,9 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       <section id="project-content" className={`${contentShell} py-12 space-y-10`}>
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
-            {lead ? (
-              <Reveal>
-                <p className="text-lg text-gray-700 leading-relaxed">{lead}</p>
-              </Reveal>
-            ) : null}
             <Reveal>
               <div
-                className="prose prose-lg max-w-none text-gray-800"
+                className="rich-content text-gray-800 space-y-4"
                 dangerouslySetInnerHTML={{ __html: project.content || "" }}
               />
             </Reveal>

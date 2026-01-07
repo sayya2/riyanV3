@@ -204,13 +204,13 @@ export default async function CareerPage() {
                       </div>
                     </div>
 
-                    <Link
-                      href={href}
-                      className="mt-6 inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2  transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
-                    >
-                      View details
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+                      <Link
+                        href={href}
+                        className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2 transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
+                      >
+                        View details
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
                   </div>
                 </Reveal>
               );
