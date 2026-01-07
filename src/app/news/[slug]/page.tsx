@@ -20,7 +20,7 @@ type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
 
-const contentShell = "w-full mx-auto px-[11%] md:px-[10%] ";
+const contentShell = "w-full mx-auto px-[var(--gutter-phi-2)]";
 
 export default async function NewsDetailPage({ params }: PageProps) {
   const resolvedParams =
@@ -181,7 +181,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
           <article className="space-y-6">
             {lead ? (
               <Reveal>
-                <p className="text-lg text-gray-700 leading-relaxed">{lead}</p>
+                <p className="text-lg text-gray-700 leading-relaxed w-full text-ellipsis ">{lead}</p>
               </Reveal>
             ) : null}
             <Reveal>

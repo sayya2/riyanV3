@@ -441,6 +441,7 @@ export interface DirectusProject {
   featured_image: string | null;
   client: string | null;
   year: string | null;
+  completed_year: string | null;
   location: string | null;
   status: 'draft' | 'published' | 'archived';
   published_at: string;
@@ -926,6 +927,7 @@ export async function getProjects({
           'featured_image',
           'client',
           'year',
+          'completed_year',
           'location',
           'status',
           'published_at',
@@ -960,6 +962,7 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
           'featured_image',
           'client',
           'year',
+          'completed_year',
           'location',
           'status',
           'published_at',
@@ -991,6 +994,7 @@ export async function getProjectBySlug(slug: string): Promise<DirectusProject | 
               'featured_image',
               'client',
               'year',
+              'completed_year',
               'location',
               'status',
               'published_at',
@@ -1101,6 +1105,13 @@ export interface DirectusCareer {
   title: string;
   excerpt: string | null;
   content: string | null;
+  document: {
+    id?: string | number | null;
+    title?: string | null;
+    filename_download?: string | null;
+    type?: string | null;
+    filesize?: number | null;
+  } | string | null;
   location: string | null;
   employment_type: string | null;
   department: string | null;
@@ -1150,6 +1161,7 @@ export async function getCareerPosts({
           'title',
           'excerpt',
           'content',
+          'document',
           'location',
           'employment_type',
           'department',
@@ -1188,6 +1200,7 @@ export async function getCareerBySlug(slug: string): Promise<DirectusCareer | nu
           'title',
           'excerpt',
           'content',
+          'document',
           'location',
           'employment_type',
           'department',
@@ -1220,6 +1233,7 @@ export async function getCareerBySlug(slug: string): Promise<DirectusCareer | nu
               'title',
               'excerpt',
               'content',
+              'document',
               'location',
               'employment_type',
               'department',

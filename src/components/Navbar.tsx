@@ -89,7 +89,7 @@ export default function Navbar() {
         isSticky ? "bg-white shadow-md" : baseBg
       }`}
     >
-      <div className="mx-auto w-full px-[6%] md:px-[4%]">
+      <div className="mx-auto w-full px-[var(--gutter-phi-0)]">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex ">
@@ -239,8 +239,14 @@ export default function Navbar() {
           }`}
         >
           <div className="flex items-start justify-between px-6 py-10 border-b border-gray-200">
-            <div>
-              <p className="text-3xl uppercase tracking-[0.35em] text-primary mb-8">
+            <div
+              className={`flex flex-col items-start gap-4 transition-all duration-500 ease-out ${
+                isPanelOpen
+                  ? "translate-x-0 opacity-100 delay-[300ms]"
+                  : "translate-x-6 opacity-0"
+              }`}
+            >
+              <p className="text-3xl uppercase tracking-[0.35em] text-primary">
                 Contact Us
               </p>
               <p className="text-md font-semibold text-gray-900">
@@ -250,25 +256,76 @@ export default function Navbar() {
             <button
               onClick={() => setIsPanelOpen(false)}
               aria-label="Close contact panel"
-              className="p-2 rounded-full text-gray-500 hover:text-primary hover:bg-gray-100 transition"
+              className={`flex items-center justify-center h-[1.75rem] w-[2.75rem] text-primary transition-all duration-200 ease-out hover:scale-110 hover:text-primary-dark active:scale-95 ${
+                isPanelOpen
+                  ? "translate-x-0 opacity-100 delay-[100ms]"
+                  : "translate-x-4 opacity-0"
+              }`}
             >
-              ×
+              <span className="text-4xl leading-none mb- ml-4">X</span>
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto panel-scroll">
             <div className="px-6 py-6 space-y-6 max-w-xl pb-24">
-              <p className="text-gray-700 leading-relaxed">
+              <div
+                className={`space-y-2 md:hidden transition-all duration-500 ease-out ${
+                  isPanelOpen
+                    ? "translate-x-0 opacity-100 delay-[500ms]"
+                    : "translate-x-6 opacity-0"
+                }`}
+              >
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Navigation
+                </p>
+                <div className="flex flex-col gap-2">
+                  {panelItems.map((item, idx) => (
+                    <Link
+                      key={item.id}
+                      href={item.url}
+                      className={`text-gray-900 hover:text-primary font-medium block py-1 transition-all duration-500 ease-out ${
+                        isPanelOpen
+                          ? "translate-x-0 opacity-100"
+                          : "translate-x-4 opacity-0"
+                      }`}
+                      style={{ transitionDelay: `${540 + idx * 50}ms` }}
+                      onClick={() => setIsPanelOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <p
+                className={`text-gray-700 leading-relaxed transition-all duration-500 ease-out ${
+                  isPanelOpen
+                    ? "translate-x-0 opacity-100 delay-[600ms]"
+                    : "translate-x-6 opacity-0"
+                }`}
+              >
                 Reach out to us, let&apos;s discuss about how we can help you.
               </p>
 
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
+              <div
+                className={`space-y-2 transition-all duration-500 ease-out ${
+                  isPanelOpen
+                    ? "translate-x-0 opacity-100 delay-[700ms]"
+                    : "translate-x-6 opacity-0"
+                }`}
+              >
+                <h3 className="text-3xl font-semibold text-gray-600 uppercase tracking-wide">
                   Need Help?
                 </h3>
               </div>
 
-              <div className="space-y-4">
+              <div
+                className={`space-y-4 transition-all duration-500 ease-out ${
+                  isPanelOpen
+                    ? "translate-x-0 opacity-100 delay-[800ms]"
+                    : "translate-x-6 opacity-0"
+                }`}
+              >
                 <div>
                   <p className="text-xs uppercase tracking-wide text-gray-500">
                     Email us directly
@@ -312,23 +369,7 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-200 space-y-2">
-                <p className="text-xs uppercase tracking-wide text-gray-500">
-                  Navigation
-                </p>
-                <div className="flex flex-col gap-2">
-                  {panelItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.url}
-                      className="text-gray-900 hover:text-primary font-medium block py-1"
-                      onClick={() => setIsPanelOpen(false)}
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              
             </div>
           </div>
           <div className="border-t border-gray-200 px-6 py-5">

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getNewsPosts } from "@/lib/directus";
+import { getProjects } from "@/lib/directus";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -14,51 +14,74 @@ function stripHtml(input: string) {
 
 function truncate(text: string, length: number) {
   if (text.length <= length) return text;
-  return text.slice(0, length).trimEnd() + "…";
+  return text.slice(0, length).trimEnd() + "...";
 }
 
-export default async function LatestNewsSection() {
-  const posts = await getNewsPosts({ limit: 4 });
+function formatProjectStatus(project: {
+  year?: string | null;
+  completed_year?: string | null;
+}) {
+  const rawStatus = (project.year || "").trim().toLowerCase();
+  const completedYear = project.completed_year?.trim();
+  const yearIsNumeric = /^\d{4}$/.test(project.year?.trim() || "");
+
+  if (rawStatus === "ongoing") return "Ongoing";
+  if (rawStatus === "completed") {
+    return completedYear ? `Completed ${completedYear}` : "Completed";
+  }
+  if (yearIsNumeric) return `Completed ${project.year}`;
+  return project.year ? project.year : "Ongoing";
+}
+
+export default async function LatestProjectsSection() {
+  const projects = await getProjects({ limit: 4 });
 
   return (
     <section className="pb-24 bg-white">
       <div className="container mx-auto px-4 space-y-10">
         <div className="max-w-4xl space-y-3">
           <h2 className="text-4xl md:text-5xl font-semibold text-gray-900">
-            Latest News
+            Latest Projects
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed max-w-3xl">
-            We hope to remain as a key contributor in the development of
-            Maldives in bringing positive change in the future.
+            Explore recent work across our sectors, highlighting the outcomes
+            and impact we deliver.
           </p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-8">
-          {posts.map((post, idx) => {
-            const slug = post.slug || String(post.id);
-            const href = typeof slug === "string" ? `/news/${slug}` : "#";
+          {projects.map((project, idx) => {
+            const slug = project.slug || String(project.id);
+            const href = typeof slug === "string" ? `/projects/${slug}` : "#";
             const excerpt =
-              post.excerpt && post.excerpt.trim().length > 0
-                ? stripHtml(post.excerpt)
-                : truncate(stripHtml(post.content || ""), 140);
-            const date = new Date(
-              post.published_at || post.created_at
-            ).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            });
-            const thumb = post.featured_image || fallbackImg;
+              project.excerpt && project.excerpt.trim().length > 0
+                ? stripHtml(project.excerpt)
+                : truncate(stripHtml(project.content || ""), 140);
+            const sectorsText = (project.sectors || [])
+              .map((c) => c.sector_id?.name)
+              .filter(Boolean)
+              .join(", ");
+            const servicesText = (project.services || [])
+              .map((s) => s.service_id?.name)
+              .filter(Boolean)
+              .join(", ");
+            const statusText = formatProjectStatus(project);
+            const clientText = project.client || "Client";
+            const categoryText = sectorsText || servicesText || "Project";
+            const metaLine = [clientText, statusText]
+              .filter(Boolean)
+              .join(" • ");
+            const thumb = project.featured_image || fallbackImg;
 
             return (
               <article
-                key={post.id ?? idx}
+                key={project.id ?? idx}
                 className="group border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white flex flex-col"
               >
                 <div className="relative w-full overflow-hidden min-h-40 md:min-h-48 flex-1">
                   <Image
                     src={thumb}
-                    alt={post.title}
+                    alt={project.title}
                     fill
                     sizes="(min-width:1024px) 33vw, 100vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -66,14 +89,15 @@ export default async function LatestNewsSection() {
                   />
                 </div>
                 <div className="p-6 space-y-3 flex-shrink-0">
-                  <h6 className="text-xs uppercase tracking-widest text-primary font-semibold">
-                    {date}
+                  <h6 className="text-xs tracking-widest text-primary font-semibold">
+                    {metaLine}
                   </h6>
                   <Link href={href} className="block">
                     <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
-                      {post.title}
+                      {project.title}
                     </h3>
                   </Link>
+                  <p className="text-xs italic text-gray-600">{categoryText}</p>
                   <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
                     {excerpt}
                   </p>

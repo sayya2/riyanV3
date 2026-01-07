@@ -32,6 +32,7 @@ export async function FirmPageBySlug({
   heroDescriptionOverride,
   heroHeightClass,
   heroEyebrow,
+  childrenWrapperClassName,
 }: {
   slug: string;
   currentPath: string;
@@ -43,6 +44,7 @@ export async function FirmPageBySlug({
   heroDescriptionOverride?: string;
   heroHeightClass?: string;
   heroEyebrow?: string;
+  childrenWrapperClassName?: string;
 }) {
   const page = await getPageBySlug(slug);
 
@@ -101,7 +103,9 @@ export async function FirmPageBySlug({
         ) : null}
 
         {children ? (
-          <div className="pt-10 max-w-6xl w-full">{children}</div>
+          <div className={`pt-10 max-w-6xl w-full ${childrenWrapperClassName || ""}`}>
+            {children}
+          </div>
         ) : null}
 
         <div className="flex flex-wrap gap-3 pt-4 text-sm">

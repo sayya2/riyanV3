@@ -19,6 +19,22 @@ const stripHtml = (input: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+const formatProjectStatus = (project: {
+  year?: string | null;
+  completed_year?: string | null;
+}) => {
+  const rawStatus = (project.year || "").trim().toLowerCase();
+  const completedYear = project.completed_year?.trim();
+  const yearIsNumeric = /^\d{4}$/.test(project.year?.trim() || "");
+
+  if (rawStatus === "ongoing") return "Ongoing";
+  if (rawStatus === "completed") {
+    return completedYear ? `Completed ${completedYear}` : "Completed";
+  }
+  if (yearIsNumeric) return `Completed ${project.year}`;
+  return project.year ? project.year : "Ongoing";
+};
+
 type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
 };
@@ -64,9 +80,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const sectorsText = sectors.join(", ");
   const servicesText = services.join(", ");
   const img = project.featured_image || fallbackImg;
+  const statusText = formatProjectStatus(project);
   const stats = [
     { label: "Client", value: project.client || "Not specified" },
-    { label: "Year", value: project.year || "Not specified" },
+    { label: "Status", value: statusText || "Not specified" },
     { label: "Location", value: project.location || "Not specified" },
   ];
   const lead =
@@ -78,7 +95,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const shareText = project.title;
   const statIcons: Record<string, React.ReactElement> = {
     Client: <Building2 className="h-5 w-5" />,
-    Year: <CalendarClock className="h-5 w-5" />,
+    Status: <CalendarClock className="h-5 w-5" />,
     Location: <MapPin className="h-5 w-5" />,
   };
   const shareLinks = [

@@ -13,6 +13,9 @@
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
+  --gutter-phi-0: clamp(1rem, 4vw, 4.8rem);
+  --gutter-phi-1: calc(var(--gutter-phi-0) * 1.618);
+  --gutter-phi-2: calc(var(--gutter-phi-1) * 1.618);
 }
 
 body {
@@ -20,6 +23,12 @@ body {
   color: #1f2937;
   font-family: var(--font-roboto), "Roboto", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
+}
+
+p {
+  font-family: var(--font-roboto), "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  /* font-size: 1.188rem */
 }
 
 /* .content-gutter {
@@ -73,6 +82,8 @@ h6 {
   letter-spacing: 0.05em;
 }
 
+
+
 @media (max-width: 639px) {
   .project-card-title {
     font-size: 1.125rem;
@@ -100,6 +111,50 @@ h6 {
 
 .share-summary::-webkit-details-marker {
   display: none;
+}
+
+.hero-gutter {
+  padding-left: var(--gutter-phi-0);
+  padding-right: var(--gutter-phi-0);
+}
+
+@media (min-width: 768px) {
+  .hero-gutter {
+    padding-left: var(--gutter-phi-1);
+    padding-right: var(--gutter-phi-1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-gutter {
+    padding-left: var(--gutter-phi-2);
+    padding-right: var(--gutter-phi-2);
+  }
+}
+
+.rich-content ul,
+.rich-content ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.rich-content ul {
+  list-style: disc;
+}
+
+.rich-content ol {
+  list-style: decimal;
+}
+
+.rich-content li {
+  margin: 0 0 0.35rem;
+}
+
+.rich-content ul ul,
+.rich-content ol ol,
+.rich-content ul ol,
+.rich-content ol ul {
+  margin-top: 0.35rem;
 }
  
 @keyframes wiggle {

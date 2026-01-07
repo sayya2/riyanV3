@@ -30,6 +30,19 @@ function stripHtml(input: string) {
     .trim();
 }
 
+function formatProjectStatus(project: { year?: string | null; completed_year?: string | null }) {
+  const rawStatus = (project.year || "").trim().toLowerCase();
+  const completedYear = project.completed_year?.trim();
+  const yearIsNumeric = /^\d{4}$/.test(project.year?.trim() || "");
+
+  if (rawStatus === "ongoing") return "Ongoing";
+  if (rawStatus === "completed") {
+    return completedYear ? `Completed ${completedYear}` : "Completed";
+  }
+  if (yearIsNumeric) return `Completed ${project.year}`;
+  return project.year ? project.year : "Ongoing";
+}
+
 export default async function ProjectsPage({
   searchParams,
 }: {
@@ -125,6 +138,12 @@ export default async function ProjectsPage({
               .map((s) => s.service_id?.name)
               .filter(Boolean)
               .join(", ");
+            const statusText = formatProjectStatus(project);
+            const clientText = project.client || "Client";
+            const categoryText = sectorsText || servicesText || "Project";
+            const metaLine = [clientText, statusText]
+              .filter(Boolean)
+              .join(" • ");
             const excerpt =
               project.excerpt && project.excerpt.trim().length > 0
                 ? stripHtml(project.excerpt)
@@ -156,12 +175,15 @@ export default async function ProjectsPage({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-[98%]">
-                    <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
-                      {sectorsText || servicesText || "Project"}
+                    <p className="text-xs tracking-widest text-white/80 font-semibold">
+                      {metaLine}
                     </p>
                     <h3 className="project-card-title font-semibold text-white drop-shadow-sm">
                       {project.title}
                     </h3>
+                    <p className="text-[11px] italic text-white/80">
+                      {categoryText}
+                    </p>
                     {/* <p className="hidden sm:block text-sm text-white/80 leading-relaxed md:line-clamp-2">
                       {excerpt}
                     </p> */}

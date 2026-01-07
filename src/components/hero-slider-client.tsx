@@ -102,8 +102,8 @@ const HeroSliderClient = ({ slides }: Props) => {
       </div>
 
       <div className="relative z-10 h-full flex items-end">
-        <div className="container mx-auto px-6 sm:px-10 md:px-2 lg:-px-12 pb-12 md:pb-20">
-          <div className="max-w-4xl space-y-4 md:space-y-6 drop-shadow-xl">
+        <div className="mx-auto w-full hero-gutter pb-12 md:pb-20">
+          <div className="max-w-4xl space-y-4 md:space-y-6 drop-shadow-xl   ">
             <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
               Riyan Pvt Ltd
             </p>

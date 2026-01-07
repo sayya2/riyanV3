@@ -9,7 +9,7 @@ type PageHeroProps = {
   bgColor?: string;
 };
 
-const contentShell = "w-full mx-auto px-[6%] md:px-[7.6%] md:mb-10";
+const contentShell = "w-full mx-auto px-[var(--gutter-phi-1)] md:mb-10";
 
 export default function PageHero({
   title,
@@ -45,7 +45,7 @@ export default function PageHero({
             {title}
           </h1>
           {description ? (
-            <p className="text-lg text-white/80 max-w-3xl leading-relaxed">
+            <p className="text-lg text-white/80 md:max-w-6xl lg:max-w-7xl leading-relaxed">
               {description}
             </p>
           ) : null}

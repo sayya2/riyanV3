@@ -11,7 +11,7 @@ const KeySectors = () => {
   return (
     <section className="pb-24 md:pb-28">
       <div className="container mx-auto px-4 space-y-12">
-        <div className="max-w-4xl space-y-4">
+        <div className="max-w-8xl space-y-4">
           <h2 className="text-4xl md:text-5xl font-semibold text-gray-900">
             Key Sectors
           </h2>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -25,6 +25,9 @@ export default function ProjectAdjacentNav({
   basePath = "projects",
 }: ProjectAdjacentNavProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [activePress, setActivePress] = useState<"prev" | "next" | null>(null);
+  const pressTimerRef = useRef<number | null>(null);
+  const longPressTriggeredRef = useRef(false);
 
   useEffect(() => {
     const target = document.getElementById(targetId);
@@ -42,10 +45,34 @@ export default function ProjectAdjacentNav({
 
   if (!prev && !next) return null;
 
+  const startPress = (side: "prev" | "next") => (e: React.PointerEvent) => {
+    if (e.pointerType !== "touch") return;
+    longPressTriggeredRef.current = false;
+    pressTimerRef.current = window.setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      setActivePress(side);
+    }, 350);
+  };
+
+  const endPress = () => {
+    if (pressTimerRef.current) {
+      window.clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+    setActivePress(null);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (longPressTriggeredRef.current) {
+      e.preventDefault();
+      longPressTriggeredRef.current = false;
+    }
+  };
+
   return (
     <>
       <div
-        className={`hidden lg:block fixed top-1/2 left-0 right-0 z-40 -translate-y-1/2 transition-opacity duration-300 ${
+        className={`hidden md:block fixed top-1/2 left-0 right-0 z-40 -translate-y-1/2 transition-opacity duration-300 ${
           isVisible
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -57,14 +84,21 @@ export default function ProjectAdjacentNav({
             href={`/${basePath}/${prev.slug}`}
             className="flex h-10 w-10 items-center justify-center border border-transparent text-gray-600 hover:text-gray-900 transition-colors"
             aria-label={`Previous ${(prev.eyebrow || "Project").toLowerCase()}: ${prev.title}`}
+            onPointerDown={startPress("prev")}
+            onPointerUp={endPress}
+            onPointerCancel={endPress}
+            onPointerLeave={endPress}
+            onClick={handleClick}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5 animate-pulse" />
           </Link>
-            {prev.image ? (
-              <div
-                className="pointer-events-none fixed top-1/2 left-[10%] -translate-y-1/2 z-40 w-[30vw] max-w-[380px] h-[52vh] bg-gray-100 bg-cover bg-center shadow-lg opacity-0 transition-transform duration-300 -translate-x-full group-hover:translate-x-0 group-hover:opacity-100 will-change-transform"
-                style={{ backgroundImage: `url(${prev.image})` }}
-              >
+          {prev.image ? (
+            <div
+              className={`pointer-events-none fixed top-1/2 left-[10%] -translate-y-1/2 z-40 w-[30vw] max-w-[380px] h-[52vh] bg-gray-100 bg-cover bg-center shadow-lg opacity-0 transition-transform duration-300 -translate-x-full group-hover:translate-x-0 group-hover:opacity-100 will-change-transform ${
+                activePress === "prev" ? "translate-x-0 opacity-100" : ""
+              }`}
+              style={{ backgroundImage: `url(${prev.image})` }}
+            >
                 <div className="absolute inset-0 bg-gradient-to-r from-black/35 to-black/0" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -86,14 +120,21 @@ export default function ProjectAdjacentNav({
             href={`/${basePath}/${next.slug}`}
             className="flex h-10 w-10 items-center justify-center border border-transparent text-gray-600 hover:text-gray-900 transition-colors"
             aria-label={`Next ${(next.eyebrow || "Project").toLowerCase()}: ${next.title}`}
+            onPointerDown={startPress("next")}
+            onPointerUp={endPress}
+            onPointerCancel={endPress}
+            onPointerLeave={endPress}
+            onClick={handleClick}
           >
             <ChevronRight className="h-5 w-5" />
           </Link>
-            {next.image ? (
-              <div
-                className="pointer-events-none fixed top-1/2 right-[10%] -translate-y-1/2 z-40 w-[30vw] max-w-[380px] h-[52vh] bg-gray-100 bg-cover bg-center shadow-lg opacity-0 transition-transform duration-300 translate-x-full group-hover:translate-x-0 group-hover:opacity-100 will-change-transform"
-                style={{ backgroundImage: `url(${next.image})` }}
-              >
+          {next.image ? (
+            <div
+              className={`pointer-events-none fixed top-1/2 right-[10%] -translate-y-1/2 z-40 w-[30vw] max-w-[380px] h-[52vh] bg-gray-100 bg-cover bg-center shadow-lg opacity-0 transition-transform duration-300 translate-x-full group-hover:translate-x-0 group-hover:opacity-100 will-change-transform ${
+                activePress === "next" ? "translate-x-0 opacity-100" : ""
+              }`}
+              style={{ backgroundImage: `url(${next.image})` }}
+            >
                 <div className="absolute inset-0 bg-gradient-to-l from-black/35 to-black/0" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -110,7 +151,7 @@ export default function ProjectAdjacentNav({
         )}
       </div>
 
-      <div className="lg:hidden" />
+      <div className="md:hidden" />
     </>
   );
 }
