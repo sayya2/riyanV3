@@ -179,11 +179,11 @@ export default async function NewsDetailPage({ params }: PageProps) {
       <section id="news-content" className={`${contentShell} py-12 space-y-10`}>
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
-            {lead ? (
+            {/* {lead ? (
               <Reveal>
                 <p className="text-lg text-gray-700 leading-relaxed w-full text-ellipsis ">{lead}</p>
               </Reveal>
-            ) : null}
+            ) : null} */}
             <Reveal>
               <div
                 className="prose prose-lg max-w-none text-gray-800"

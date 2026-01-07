@@ -60,7 +60,16 @@
       "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" show b911e36 --stat)",
       "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" log --oneline --grep=\"Pi\\\\|pi\\\\|deploy\" -10)",
       "Bash(git -C \"D:\\\\VIPERTIK\\\\Riayn PVT LTD\\\\RiyanSite\\\\riyan\" show b911e36:docker-compose.pi.yml)",
-      "Bash(git check-ignore:*)"
+      "Bash(git check-ignore:*)",
+      "Bash(npm run export:projects:published:*)",
+      "Bash(DB_HOST=127.0.0.1 DB_PORT=3310 DB_USER=user DB_PASSWORD=\"Riyanitaccess@26+\" DB_NAME=riyan_nextjs DIRECTUS_URL=http://127.0.0.1:8055 npm run export:projects:published:*)",
+      "WebSearch",
+      "Bash(DB_HOST=127.0.0.1 DB_PORT=3310 DB_USER=user DB_PASSWORD=\"Riyanitaccess@26+\" DB_NAME=riyan_nextjs node -e \"const mysql = require\\(''mysql2/promise''\\); const csv = require\\(''csv-parser''\\); const fs = require\\(''fs''\\); \\(async \\(\\) => { const rows = []; fs.createReadStream\\(''exports/projects-export-2026-01-07-15-31-08.csv''\\).pipe\\(csv\\(\\)\\).on\\(''data'', \\(row\\) => { if \\(rows.length < 1 && row.content_editable && row.content_editable.length > 100\\) rows.push\\(row\\); }\\).on\\(''end'', \\(\\) => { if \\(rows.length > 0\\) { console.log\\(''=== Sample Project ===''\\); console.log\\(''Title:'', rows[0].title\\); console.log\\(''\\\\n=== Content \\(HTML\\) ===''\\); console.log\\(rows[0].content.substring\\(0, 300\\)\\); console.log\\(''\\\\n=== Content Editable \\(Markdown\\) ===''\\); console.log\\(rows[0].content_editable.substring\\(0, 500\\)\\); } }\\); }\\)\\(\\)\")",
+      "Bash(DB_HOST=127.0.0.1 DB_PORT=3310 DB_USER=user DB_PASSWORD=\"Riyanitaccess@26+\" DB_NAME=riyan_nextjs DIRECTUS_URL=http://127.0.0.1:8055 npm run import:projects:dry:*)",
+      "Bash(DB_HOST=127.0.0.1 DB_PORT=3310 DB_USER=user DB_PASSWORD=\"Riyanitaccess@26+\" DB_NAME=riyan_nextjs node:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File export-projects.ps1)",
+      "Bash(powershell -ExecutionPolicy Bypass -File export-news.ps1)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

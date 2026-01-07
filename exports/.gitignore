@@ -1,0 +1,5 @@
+# Ignore all CSV export files
+*.csv
+
+# Allow specific template files if needed
+!template-*.csv
