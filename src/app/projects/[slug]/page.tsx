@@ -1,7 +1,14 @@
 ﻿import React from "react";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-import { Building2, CalendarClock, MapPin, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Building2,
+  CalendarClock,
+  MapPin,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { getAdjacentProjects, getProjectBySlug } from "@/lib/directus";
 import { resolveFileUrl } from "@/lib/media";
 import Reveal from "@/components/Reveal";
@@ -180,7 +187,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       <PageHero
         title={project.title}
         eyebrow={sectorsText || servicesText || "Project"}
-        description={lead}
+        // description={lead}
         imageUrl={img}
         heightClass="min-h-[100vh] md:min-h-[100vh]"
       />
@@ -209,7 +216,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         targetId="project-content"
       />
 
-      <section id="project-content" className={`${contentShell} py-12 space-y-10`}>
+      <section
+        id="project-content"
+        className={`${contentShell} py-12 space-y-10`}
+      >
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
             <Reveal>
@@ -255,7 +265,6 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     </div>
                   ))}
                 </div>
-
               </div>
             </Reveal>
 

@@ -78,3 +78,4 @@ scripts/tailscale/
 
 # Directus extensions (installed via npm in deploy workflow)
 directus/extensions/interfaces/slug-generator/
+directus/extensions/
