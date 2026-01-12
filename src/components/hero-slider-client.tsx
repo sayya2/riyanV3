@@ -102,7 +102,7 @@ const HeroSliderClient = ({ slides }: Props) => {
       </div>
 
       <div className="relative z-10 h-full flex items-end">
-        <div className="mx-auto w-full hero-gutter pb-12 md:pb-20">
+        <div className="mx-auto w-full hero-gutter pb-12 md:pb-10 items-center">
           <div className="max-w-4xl space-y-4 md:space-y-6 drop-shadow-xl   ">
             <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
               Riyan Pvt Ltd
@@ -112,13 +112,13 @@ const HeroSliderClient = ({ slides }: Props) => {
             </h1>
             {currentSlide?.description && (
               <p className="hidden sm:block text-base sm:text-lg md:text-xl text-white/80 leading-relaxed max-w-3xl">
-                {currentSlide.description}
+                {/* {currentSlide.description} */}
               </p>
             )}
           </div>
 
-          <div className="mt-6 grid w-full grid-cols-3 items-center gap-3 md:mt-10 md:flex md:w-full md:items-center md:gap-4">
-            <button
+          <div className="mt-6 grid w-full grid-cols-3 items-center gap-3 md:mt-0 md:flex md:w-full md:items-center md:gap-4">
+            {/* <button
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
@@ -128,7 +128,7 @@ const HeroSliderClient = ({ slides }: Props) => {
               aria-label="Previous slide"
             >
               {"<"}
-            </button>
+            </button> */}
 
             <div
               className="flex items-center justify-center gap-2 md:order-3 md:ml-auto"
@@ -153,7 +153,7 @@ const HeroSliderClient = ({ slides }: Props) => {
               ))}
             </div>
 
-            <button
+            {/* <button
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
@@ -163,7 +163,7 @@ const HeroSliderClient = ({ slides }: Props) => {
               aria-label="Next slide"
             >
               {">"}
-            </button>
+            </button> */}
           </div>
           {/* Scroll indicator */}
           <motion.div
