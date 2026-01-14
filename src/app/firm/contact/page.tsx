@@ -32,6 +32,8 @@ export const metadata = {
     "Connect with Riyan's design, engineering, and research teams in Male. Share your project vision or schedule a consultation with our specialists.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function ContactPage() {
   const contentShell = "w-full mx-auto px-[4%] md:px-[138px]";
   const heroSectionClassName =
