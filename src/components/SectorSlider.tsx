@@ -17,7 +17,7 @@ export default function SectorSlider({ sectors, speed = 50 }: Props) {
   const [isPaused, setIsPaused] = useState(false);
   const [offset, setOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   // Duplicate sectors for seamless infinite loop
   const duplicatedSectors = [...sectors, ...sectors, ...sectors];
@@ -51,7 +51,7 @@ export default function SectorSlider({ sectors, speed = 50 }: Props) {
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (animationRef.current) {
+      if (animationRef.current !== null) {
         cancelAnimationFrame(animationRef.current);
       }
     };
