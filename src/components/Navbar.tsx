@@ -61,7 +61,10 @@ export default function Navbar() {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isProjectSlug = pathname?.startsWith("/projects/");
+  const isNewsSlug = pathname?.startsWith("/news/");
   const isFirm = pathname?.startsWith("/firm");
+  const isTransparentHero = isHome || isProjectSlug || isNewsSlug;
   const isStaticNavbar = isFirm;
   const isLightNavbar = isSticky && !isStaticNavbar;
   const panelItems = menuItems.flatMap((item) =>
@@ -113,13 +116,20 @@ export default function Navbar() {
   const borderColor = isLightNavbar ? "border-white" : "border-red-700/0";
   const textColor = isLightNavbar ? "text-gray-900" : "text-white";
   const baseBg =
-    isStaticNavbar
-      ? "bg-primary"
-      : isHome && !isLightNavbar
+    isTransparentHero && !isLightNavbar
       ? "bg-white/10 w-full bg-clip-padding backdrop-filter backdrop-blur-sm border border-white/15"
       : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
   const headerBg = isLightNavbar ? "bg-white shadow-md" : baseBg;
-
+  const overlayBg =
+    isTransparentHero && !isLightNavbar
+      ? "bg-gradient-to-b from-white/15 via-white/5 to-black/30 backdrop-blur-xl"
+      : "bg-black/60";
+  const firmMenuBg =
+    isTransparentHero && !isLightNavbar
+      ? "bg-white/85 backdrop-blur-md border-white/30"
+      : "bg-white border-gray-200";
+  const firmUnderline =
+    "relative inline-flex items-center after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-[calc(100%+4%)] after:bg-current after:scale-x-0 after:origin-left after:opacity-0 after:transition-transform after:duration-300 group-hover:after:scale-x-[1.12] group-hover:after:opacity-100";
   return (
     <header
       className={`${isStaticNavbar ? "relative" : "fixed top-0 left-0 right-0"} z-50 border-b ${borderColor} ${
@@ -204,7 +214,9 @@ export default function Navbar() {
               onMouseEnter={openFirmMenu}
               onMouseLeave={scheduleCloseFirmMenu}
             >
-              <div className="w-64  border border-gray-200 bg-white shadow-lg overflow-hidden">
+              <div
+                className={`w-64 border ${firmMenuBg} shadow-lg overflow-hidden`}
+              >
                 <div className="flex flex-col divide-y divide-gray-100">
                   {menuItems
                     .find((m) => m.children)
@@ -212,9 +224,11 @@ export default function Navbar() {
                       <Link
                         key={child.id}
                         href={child.url}
-                        className="px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                        className="group px-4 py-3 transition-colors text-left"
                       >
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p
+                          className={`text-sm font-semibold text-gray-900 ${firmUnderline}`}
+                        >
                           {child.title}
                         </p>
                         {/* <p className="text-xs text-gray-600">
@@ -270,7 +284,7 @@ export default function Navbar() {
         aria-hidden={!isPanelOpen}
       >
         <div
-          className={`absolute inset-0 top-20 bg-black/60 transition-opacity duration-300 ${
+          className={`absolute inset-0 top-20 ${overlayBg} transition-opacity duration-300 ${
             isPanelOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setIsPanelOpen(false)}

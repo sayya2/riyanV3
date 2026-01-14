@@ -190,6 +190,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         // description={lead}
         imageUrl={img}
         heightClass="min-h-[100vh] md:min-h-[100vh]"
+        contentAlignment="bottom"
+        contentClassName={contentShell}
       />
 
       <ProjectAdjacentNav

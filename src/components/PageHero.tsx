@@ -8,6 +8,8 @@ type PageHeroProps = {
   heightClass?: string;
   bgColor?: string;
   sectionClassName?: string;
+  contentAlignment?: "center" | "bottom";
+  contentClassName?: string;
 };
 
 const contentShell = "w-full mx-auto px-[var(--gutter-phi-1)] md:mb-10";
@@ -20,15 +22,20 @@ export default function PageHero({
   heightClass,
   bgColor = "bg-primary",
   sectionClassName,
+  contentAlignment = "center",
+  contentClassName,
 }: PageHeroProps) {
   const resolvedHeight = heightClass || "h-40";
+  const contentAlignClass =
+    contentAlignment === "bottom" ? "items-end" : "items-center";
+  const contentShellClassName = contentClassName || contentShell;
   return (
     <section
       className={`relative isolate w-screen max-w-none left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden ${resolvedHeight} ${bgColor} ${
         sectionClassName || ""
       }`}
     >
-      {/* <Image
+      <Image
         src={imageUrl}
         alt={title}
         fill
@@ -37,10 +44,10 @@ export default function PageHero({
         sizes="100vw"
         unoptimized={imageUrl.endsWith(".gif")}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" /> */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
 
-      <div className="absolute inset-0 flex items-center">
-        <div className={`${contentShell} pb-10 space-y-3`}>
+      <div className={`absolute inset-0 flex ${contentAlignClass} z-10`}>
+        <div className={`${contentShellClassName} pb-10 space-y-3`}>
           {eyebrow ? (
             <p className="text-xs uppercase tracking-[0.35em] text-white/70">
               {eyebrow}

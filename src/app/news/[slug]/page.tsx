@@ -149,6 +149,8 @@ export default async function NewsDetailPage({ params }: PageProps) {
         description={lead || published}
         imageUrl={img}
         heightClass="min-h-[100vh] md:min-h-[100vh]"
+        contentAlignment="bottom"
+        contentClassName={contentShell}
       />
 
       <ProjectAdjacentNav
@@ -207,7 +209,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
             {gallery && gallery.length ? (
               <Reveal>
-                <div className="pt-6">
+                <div className="pt-6 ">
                   <ProjectGalleryCarousel
                     images={gallery}
                     title={article.title}
