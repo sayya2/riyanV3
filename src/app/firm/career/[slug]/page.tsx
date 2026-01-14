@@ -419,6 +419,30 @@ export default async function CareerDetailPage({ params }: PageProps) {
           </aside>
         </div>
       </section>
+      <section className="container mx-auto px-4 pb-12">
+        <Reveal>
+          <div className="flex flex-wrap gap-3 text-sm">
+            <Link
+              href="/firm/about"
+              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              href="/firm/career/internships"
+              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Internships
+            </Link>
+            <Link
+              href="/firm/contact"
+              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Contact
+            </Link>
+          </div>
+        </Reveal>
+      </section>
     </main>
   );
 }

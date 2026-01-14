@@ -9,30 +9,28 @@ const KeySectors = () => {
   const secondRow = keySectors.slice(2);
 
   return (
-    <section className="pb-24 md:pb-28">
-      <div className="container mx-auto px-4 space-y-12">
-        <div className="max-w-8xl space-y-4">
-          <h2 className="text-4xl md:text-5xl font-semibold text-gray-900">
+    <section className="container mx-auto px-4 py-12 md:py-16">
+        <div className="max-w-8xl space-y-3 md:space-y-4 mb-6 md:mb-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900">
             Key Sectors
           </h2>
-          <p className="text-lg text-gray-700">
+          <p className="text-base md:text-lg text-gray-700 max-w-5xl">
             {keySectorsIntro}
           </p>
         </div>
 
-        <div className="grid gap-6 md:gap-8">
-          <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-4 md:gap-5 lg:gap-6">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-5 lg:gap-6">
             {firstRow.map((sector) => (
               <SectorCard key={sector.title} {...sector} />
             ))}
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
             {secondRow.map((sector) => (
               <SectorCard key={sector.title} {...sector} />
             ))}
           </div>
         </div>
-      </div>
     </section>
   );
 };
@@ -49,7 +47,7 @@ function SectorCard({ title, image, href }: SectorCardProps) {
   return (
     <Link
       href={href || "#"}
-      className="group relative block overflow-hidden h-72 md:h-[360px] bg-gray-200"
+      className="group relative block overflow-hidden h-48 md:h-52 lg:h-56 bg-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
     >
       <Image
         src={resolvedImage}
@@ -59,9 +57,9 @@ function SectorCard({ title, image, href }: SectorCardProps) {
         className="object-cover transition-transform duration-500 group-hover:scale-105"
         priority={false}
       />
-      {/* <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/20 to-transparent" /> */}
-      <div className="absolute inset-0 flex items-end p-6">
-        <h3 className="text-2xl font-semibold text-white">{title}</h3>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      <div className="absolute inset-0 flex items-end p-4 md:p-5 lg:p-6">
+        <h3 className="text-xl md:text-2xl font-semibold text-white">{title}</h3>
       </div>
     </Link>
   );

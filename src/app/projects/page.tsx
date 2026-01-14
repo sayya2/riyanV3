@@ -175,13 +175,13 @@ export default async function ProjectsPage({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-[98%]">
-                    <p className="text-xs tracking-widest text-white/80 font-semibold">
+                    <p className="text-[0.7rem] tracking-widest text-white/80 font-semibold">
                       {metaLine}
                     </p>
                     <h3 className="project-card-title font-semibold text-white drop-shadow-sm">
                       {project.title}
                     </h3>
-                    <p className="text-[11px] italic text-white/80">
+                    <p className="text-[0.65rem] italic text-white/80">
                       {categoryText}
                     </p>
                     {/* <p className="hidden sm:block text-sm text-white/80 leading-relaxed md:line-clamp-2">

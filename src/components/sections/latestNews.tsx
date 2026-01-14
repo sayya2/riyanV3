@@ -21,19 +21,19 @@ export default async function LatestNewsSection() {
   const posts = await getNewsPosts({ limit: 4 });
 
   return (
-    <section className="pb-24 bg-white">
-      <div className="container mx-auto px-4 space-y-10">
-        <div className="max-w-4xl space-y-3">
-          <h2 className="text-4xl md:text-5xl font-semibold text-gray-900">
-            Latest News
-          </h2>
-          <p className="text-lg text-gray-700 leading-relaxed max-w-3xl">
-            We hope to remain as a key contributor in the development of
-            Maldives in bringing positive change in the future.
-          </p>
-        </div>
+    <section className="container mx-auto px-4 py-12 md:py-16 bg-white">
+        <div className="space-y-5 md:space-y-6">
+          <div className="max-w-4xl space-y-2">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 font-roboto">
+              Latest News
+            </h2>
+            <p className="text-sm md:text-base text-gray-700 leading-relaxed max-w-3xl font-roboto">
+              We hope to remain as a key contributor in the development of
+              Maldives in bringing positive change in the future.
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-4">
           {posts.map((post, idx) => {
             const slug = post.slug || String(post.id);
             const href = typeof slug === "string" ? `/news/${slug}` : "#";
@@ -53,9 +53,9 @@ export default async function LatestNewsSection() {
             return (
               <article
                 key={post.id ?? idx}
-                className="group border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white flex flex-col"
+                className="widget-card group border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white flex flex-col"
               >
-                <div className="relative w-full overflow-hidden min-h-40 md:min-h-48 flex-1">
+                <div className="relative w-full overflow-hidden h-[6.6rem] md:h-[7.7rem]">
                   <Image
                     src={thumb}
                     alt={post.title}
@@ -65,20 +65,20 @@ export default async function LatestNewsSection() {
                     priority
                   />
                 </div>
-                <div className="p-6 space-y-3 flex-shrink-0">
-                  <h6 className="text-xs uppercase tracking-widest text-primary font-semibold">
+                <div className="p-3 space-y-1.5 flex-shrink-0">
+                  <h6 className="widget-meta uppercase tracking-widest text-primary">
                     {date}
                   </h6>
                   <Link href={href} className="block">
-                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
                       {post.title}
                     </h3>
                   </Link>
-                  <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
+                  <p className="text-gray-700 line-clamp-2">
                     {excerpt}
                   </p>
                 </div>
-                <div className="px-6 pb-6 flex-shrink-0">
+                <div className="px-3 pb-3 flex-shrink-0">
                   <Link
                     href={href}
                     className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors"
@@ -89,8 +89,8 @@ export default async function LatestNewsSection() {
               </article>
             );
           })}
+          </div>
         </div>
-      </div>
     </section>
   );
 }

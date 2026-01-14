@@ -7,7 +7,7 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -58,38 +58,75 @@ export default function Navbar() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isFirmOpen, setIsFirmOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isFirm = pathname?.startsWith("/firm");
+  const isStaticNavbar = isFirm;
+  const isLightNavbar = isSticky && !isStaticNavbar;
   const panelItems = menuItems.flatMap((item) =>
     item.children && item.children.length > 0 ? item.children : [item]
   );
 
   useEffect(() => {
+    if (isStaticNavbar) {
+      setIsSticky(false);
+      return;
+    }
     const handleScroll = () => setIsSticky(window.scrollY > 100);
     handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isStaticNavbar]);
 
   useEffect(() => {
     setIsFirmOpen(false);
   }, [pathname]);
 
-  const borderColor = isSticky ? "border-white" : "border-red-700/0";
-  const textColor = isSticky ? "text-gray-900" : "text-white";
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearFirmCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const openFirmMenu = () => {
+    clearFirmCloseTimer();
+    setIsFirmOpen(true);
+  };
+
+  const scheduleCloseFirmMenu = () => {
+    clearFirmCloseTimer();
+    closeTimerRef.current = setTimeout(() => {
+      setIsFirmOpen(false);
+    }, 150);
+  };
+
+  const borderColor = isLightNavbar ? "border-white" : "border-red-700/0";
+  const textColor = isLightNavbar ? "text-gray-900" : "text-white";
   const baseBg =
-    (isHome || isFirm) && !isSticky
+    isStaticNavbar
+      ? "bg-primary"
+      : isHome && !isLightNavbar
       ? "bg-white/10 w-full bg-clip-padding backdrop-filter backdrop-blur-sm border border-white/15"
       : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
+  const headerBg = isLightNavbar ? "bg-white shadow-md" : baseBg;
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 border-b ${borderColor} transition-all duration-300 ${
-        isSticky ? "bg-white shadow-md" : baseBg
-      }`}
+      className={`${isStaticNavbar ? "relative" : "fixed top-0 left-0 right-0"} z-50 border-b ${borderColor} ${
+        isStaticNavbar ? "" : "transition-all duration-300"
+      } ${headerBg}`}
     >
-      <div className="mx-auto w-full px-[var(--gutter-phi-0)]">
+      <div className="mx-auto w-full px-[var(--gutter-phi-0)] lg:px-[124px]">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex ">
@@ -97,7 +134,7 @@ export default function Navbar() {
               <div className="relative w-36 h-22">
                 <Image
                   src={
-                    isSticky
+                    isLightNavbar
                       ? "/wp-content/uploads/2021/06/lg60n.png"
                       : "/wp-content/uploads/2021/06/lg60wn.png"
                   }
@@ -113,7 +150,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div
             className="hidden lg:block relative"
-            onMouseLeave={() => setIsFirmOpen(false)}
+            onMouseLeave={scheduleCloseFirmMenu}
           >
             <nav className="flex items-center space-x-12 md:pr-23">
               {menuItems.map((item) =>
@@ -121,11 +158,14 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setIsFirmOpen((prev) => !prev)}
-                    onMouseEnter={() => setIsFirmOpen(true)}
-                    onFocus={() => setIsFirmOpen(true)}
+                    onClick={() => {
+                      clearFirmCloseTimer();
+                      setIsFirmOpen((prev) => !prev);
+                    }}
+                    onMouseEnter={openFirmMenu}
+                    onFocus={openFirmMenu}
                     className={`group inline-flex items-center text-sm font-medium transition-colors ${
-                      isSticky
+                      isLightNavbar
                         ? "text-gray-900 hover:text-primary"
                         : "text-white hover:text-white/80"
                     }`}
@@ -143,7 +183,7 @@ export default function Navbar() {
                     key={item.id}
                     href={item.url}
                     className={`text-sm font-medium transition-colors ${
-                      isSticky
+                      isLightNavbar
                         ? "text-gray-900 hover:text-primary"
                         : "text-white hover:text-white/80"
                     }`}
@@ -157,12 +197,14 @@ export default function Navbar() {
             <div
               className={`absolute left-20 top-full pt-3 transition-all duration-200 ${
                 isFirmOpen
-                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  ? "opacity-100 translate-y-4.5 pointer-events-auto"
                   : "opacity-0 -translate-y-2 pointer-events-none"
               }`}
               style={{ zIndex: 60 }}
+              onMouseEnter={openFirmMenu}
+              onMouseLeave={scheduleCloseFirmMenu}
             >
-              <div className="w-64 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+              <div className="w-64  border border-gray-200 bg-white shadow-lg overflow-hidden">
                 <div className="flex flex-col divide-y divide-gray-100">
                   {menuItems
                     .find((m) => m.children)
@@ -175,9 +217,9 @@ export default function Navbar() {
                         <p className="text-sm font-semibold text-gray-900">
                           {child.title}
                         </p>
-                        <p className="text-xs text-gray-600">
+                        {/* <p className="text-xs text-gray-600">
                           Learn more about {child.title.toLowerCase()} at Riyan.
-                        </p>
+                        </p> */}
                       </Link>
                     ))}
                 </div>
@@ -195,24 +237,24 @@ export default function Navbar() {
             <div className="flex gap-2 items-center justify-center">
               <span
                 className={`block w-1.5 h-1.5 rounded transition-all ${
-                  isSticky ? "bg-gray-900" : "bg-white"
+                  isLightNavbar ? "bg-gray-900" : "bg-white"
                 }`}
               />
               <span
                 className={`block w-1.5 h-1.5 rounded transition-all ${
-                  isSticky ? "bg-gray-900" : "bg-white"
+                  isLightNavbar ? "bg-gray-900" : "bg-white"
                 }`}
               />
             </div>
             <div className="flex gap-2 items-center justify-center">
               <span
                 className={`block w-1.5 h-1.5 rounded transition-all ${
-                  isSticky ? "bg-gray-900" : "bg-white"
+                  isLightNavbar ? "bg-gray-900" : "bg-white"
                 }`}
               />
               <span
                 className={`block w-1.5 h-1.5 rounded transition-all ${
-                  isSticky ? "bg-gray-900" : "bg-white"
+                  isLightNavbar ? "bg-gray-900" : "bg-white"
                 }`}
               />
             </div>

@@ -80,7 +80,7 @@ export default async function NewsPage({
     <main className="min-h-screen bg-white">
       <div className={`${contentShell} py-16 space-y-10 mt-17`}>
         <Reveal>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
             <div>
               <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
                 News &amp; Announcements
@@ -135,7 +135,7 @@ export default async function NewsPage({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-[98%]">
-                    <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
+                    <p className="text-[0.7rem] uppercase tracking-widest text-white/80 font-semibold">
                       {categoriesText || "News"}
                     </p>
                     <h3 className="news-card-title line-clamp-2 min-h-[2.6rem] font-semibold text-white drop-shadow-sm">
