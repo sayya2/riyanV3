@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/db-new";
-import PageHero from "@/components/PageHero";
-import { resolveImageUrl } from "@/lib/media";
 import Reveal from "@/components/Reveal";
+import { FirmPageBySlug } from "../../_components/FirmPage";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +67,8 @@ function parseInternshipContent(html: string) {
 const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 const sectionY = "py-[2.5rem] md:py-[4rem]";
 const sectionBottom = "pb-[2.5rem] md:pb-[4rem]";
+const heroSectionClassName =
+  "pt-12 pb-6 mt-0 flex items-center bg-gray-50 bg-primary/5 min-h-[40vh]";
 
 export default async function InternshipsPage() {
   const page = await getPageBySlug("internships");
@@ -82,22 +83,22 @@ export default async function InternshipsPage() {
     sections.description ||
     stripHtml(page.excerpt || "") ||
     "Join our internship program and gain hands-on experience in a dynamic professional environment.";
-  const heroImage =
-    resolveImageUrl(page.featured_image) ||
-    "/wp-content/uploads/2025/05/5h-floor-Multipurpose-room_1.png";
 
   return (
-    <main className="min-h-screen bg-white">
-      <PageHero
-        title={title}
-        eyebrow="Career Opportunities"
-        description={description}
-        imageUrl={heroImage}
-        heightClass="min-h-[100vh] md:min-h-[100vh]"
-      />
-
+    <FirmPageBySlug
+      slug="internships"
+      currentPath="career/internships"
+      titleOverride={title}
+      heroEyebrow="Career Opportunities"
+      heroDescriptionOverride={description}
+      heroSectionClassName={heroSectionClassName}
+      textOnlyHero
+      hideContent
+      contentShellClassName={contentShell}
+      childrenWrapperClassName="max-w-none"
+    >
       {/* Introduction Section */}
-      <section className={`${contentShell} ${sectionY}`}>
+      <section className={sectionY}>
         <Reveal>
           <div className="space-y-[1rem]">
             <div className="prose prose-lg max-w-none text-gray-800">
@@ -105,107 +106,11 @@ export default async function InternshipsPage() {
               <p className="text-lg leading-relaxed">
                 At Riyan, we believe in nurturing the next generation of
                 architects, engineers, planners, and consultants. Our internship
-                program offers students and recent graduates a unique opportunity
-                to work alongside experienced professionals on real-world projects
-                that shape the built environment of the Maldives and beyond.
+                program offers students and recent graduates a unique
+                opportunity to work alongside experienced professionals on
+                real-world projects that shape the built environment of the
+                Maldives and beyond.
               </p>
-              <p className="text-lg leading-relaxed">
-                Through hands-on experience across our multi-disciplinary teams,
-                interns gain valuable insights into the consulting industry while
-                contributing meaningfully to projects spanning architecture,
-                engineering, urban planning, and research.
-              </p>
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* What We Offer Section */}
-      <section className={`${contentShell} ${sectionY}`}>
-        <Reveal>
-          <div>
-            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
-              What We Offer
-            </h2>
-            <p className="text-lg text-gray-700 mb-[1.5rem]">
-              Our internship program is designed to provide comprehensive learning
-              experiences that bridge academic knowledge with professional practice.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.1} className="reveal-stagger">
-          <div className="bg-[#781213] text-white p-8 md:p-10 rounded-2xl border border-white/10 shadow-xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {[
-                {
-                  title: "Professional Development",
-                  items: [
-                    "Real project experience",
-                    "Mentorship from senior professionals",
-                    "Skill development workshops",
-                    "Industry networking opportunities",
-                    "Career guidance and support",
-                  ],
-                },
-                {
-                  title: "Work Experience",
-                  items: [
-                    "Multi-disciplinary exposure",
-                    "Client interaction experience",
-                    "Technical software training",
-                    "Site visits and field work",
-                    "Team collaboration",
-                  ],
-                },
-                {
-                  title: "Benefits",
-                  items: [
-                    "Competitive stipend",
-                    "Flexible working arrangements",
-                    "Modern office environment",
-                    "Professional references",
-                    "Potential for full-time opportunities",
-                  ],
-                },
-              ].map((group, groupIndex) => {
-                const baseDelay = 0.1 + groupIndex * 0.12;
-                const lineDuration = Math.max(
-                  0.5,
-                  group.items.length * 0.08 + 0.3
-                );
-
-                return (
-                  <div key={group.title} className="space-y-4">
-                    <h3 className="text-xl md:text-2xl font-semibold">
-                      {group.title}
-                    </h3>
-                    <div className="relative pl-6">
-                      <span
-                        className="absolute left-0 top-1 h-full w-px bg-white/35"
-                        data-reveal-line
-                        style={{
-                          transitionDelay: `${baseDelay}s`,
-                          transitionDuration: `${lineDuration}s`,
-                        }}
-                      />
-                      <ul className="space-y-2 text-white/90">
-                        {group.items.map((item, itemIndex) => (
-                          <li
-                            key={item}
-                            data-reveal-item
-                            style={{
-                              transitionDelay: `${baseDelay + itemIndex * 0.08}s`,
-                            }}
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </Reveal>
@@ -213,7 +118,7 @@ export default async function InternshipsPage() {
 
       {/* Eligibility Criteria Section */}
       {sections.criteria && sections.criteria.length > 0 ? (
-        <section className={`${contentShell} ${sectionY}`}>
+        <section className={sectionY}>
           <Reveal>
             <div>
               <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
@@ -242,7 +147,7 @@ export default async function InternshipsPage() {
           </div>
         </section>
       ) : (
-        <section className={`${contentShell} ${sectionY}`}>
+        <section className={sectionY}>
           <Reveal>
             <div>
               <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
@@ -279,7 +184,7 @@ export default async function InternshipsPage() {
 
       {/* Key Details Section */}
       {sections.keyDetails && sections.keyDetails.length > 0 && (
-        <section className={`${contentShell} ${sectionY}`}>
+        <section className={sectionY}>
           <Reveal>
             <div>
               <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-[1rem]">
@@ -304,20 +209,8 @@ export default async function InternshipsPage() {
         </section>
       )}
 
-      {/* Full Content Fallback (if parsing didn't work well) */}
-      {/* {(!sections.keyDetails || sections.keyDetails.length === 0) &&
-        (!sections.criteria || sections.criteria.length === 0) &&
-        page.post_content && (
-          <section className={`${contentShell} py-12 md:py-20`}>
-            <div
-              className="prose prose-lg max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: page.post_content }}
-            />
-          </section>
-        )} */}
-
       {/* How to Apply Section - Prominent CTA */}
-      <section className={`${contentShell} ${sectionY}`}>
+      <section className={sectionY}>
         <Reveal>
           <div className="bg-gradient-to-br from-gray-900 to-[#781213] text-white rounded-lg p-8 md:p-12 text-center">
             <h2 className="text-3xl md:text-5xl font-semibold mb-[1rem]">
@@ -325,8 +218,8 @@ export default async function InternshipsPage() {
             </h2>
             <p className="text-lg md:text-xl text-white/90 mb-[1.5rem] max-w-3xl mx-auto leading-relaxed">
               We welcome applications throughout the year. Submit your CV, cover
-              letter, and portfolio (if applicable) to join our team of passionate
-              professionals shaping the future of the Maldives.
+              letter, and portfolio (if applicable) to join our team of
+              passionate professionals shaping the future of the Maldives.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
@@ -346,31 +239,7 @@ export default async function InternshipsPage() {
         </Reveal>
       </section>
 
-      {/* Navigation Links */}
-      <section className={`${contentShell} ${sectionBottom}`}>
-        <Reveal>
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Link
-              href="/firm/about"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/firm/career"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Career
-            </Link>
-            <Link
-              href="/firm/contact"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Contact
-            </Link>
-          </div>
-        </Reveal>
-      </section>
-    </main>
+     
+    </FirmPageBySlug>
   );
 }

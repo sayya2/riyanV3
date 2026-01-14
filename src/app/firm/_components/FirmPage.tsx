@@ -32,7 +32,11 @@ export async function FirmPageBySlug({
   heroDescriptionOverride,
   heroHeightClass,
   heroEyebrow,
+  heroSectionClassName,
+  contentShellClassName,
+  contentSectionClassName,
   childrenWrapperClassName,
+  textOnlyHero = false,
 }: {
   slug: string;
   currentPath: string;
@@ -44,7 +48,11 @@ export async function FirmPageBySlug({
   heroDescriptionOverride?: string;
   heroHeightClass?: string;
   heroEyebrow?: string;
+  heroSectionClassName?: string;
+  contentShellClassName?: string;
+  contentSectionClassName?: string;
   childrenWrapperClassName?: string;
+  textOnlyHero?: boolean;
 }) {
   const page = await getPageBySlug(slug);
 
@@ -72,22 +80,62 @@ export async function FirmPageBySlug({
   const heroDescription = heroDescriptionOverride || lead;
   const eyebrow = heroEyebrow || "Firm";
   const heroHeight = heroHeightClass || "min-h-[60vh] md:min-h-[80vh]";
+  const heroSectionBase = "pt-8 pb-6 md:pt-12 md:pb-8 lg:pt-16 lg:pb-10";
+  const shellClassName = contentShellClassName || contentShell;
 
   const showArticle = !hideContent || (lead && hideHero);
 
   return (
     <main className="min-h-screen bg-white">
-      {!hideHero ? (
+      <div className="firm-sub-nav flex flex-wrap gap-10 justify-end   px-[20px] sm:px-[20px] md:px-[30px] lg:px-[134px] items-center text-[0.85rem]  h-[10vh] ">
+        {navLinks.map((link) => (
+          <Link
+            key={link.path}
+            href={`/firm/${link.path}`}
+            className="inline-flex  text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+      {textOnlyHero ? (
+        <section
+          className={`${shellClassName} ${heroSectionBase} ${
+            heroSectionClassName || ""
+          }`}
+        >
+          <div className="space-y-3">
+            {eyebrow ? (
+              <p className="text-xs uppercase tracking-[0.35em] text-primary font-semibold">
+                {eyebrow}
+              </p>
+            ) : null}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-900 max-w-4xl leading-tight">
+              {title}
+            </h1>
+            {heroDescription ? (
+              <p className="text-lg text-gray-700 md:max-w-3xl leading-relaxed">
+                {heroDescription}
+              </p>
+            ) : null}
+          </div>
+        </section>
+      ) : !hideHero ? (
         <PageHero
           title={title}
           eyebrow={eyebrow}
           description={heroDescription}
           imageUrl={heroImage}
           heightClass={heroHeight}
+          sectionClassName={heroSectionClassName}
         />
       ) : null}
 
-      <section className={`${contentShell} py-12 space-y-10`}>
+      <section
+        className={`${shellClassName} py-12 space-y-10 ${
+          contentSectionClassName || ""
+        }`}
+      >
         {showArticle ? (
           <article className="space-y-6 max-w-5xl">
             {lead && hideHero ? (
@@ -103,22 +151,14 @@ export async function FirmPageBySlug({
         ) : null}
 
         {children ? (
-          <div className={`pt-10 max-w-6xl w-full ${childrenWrapperClassName || ""}`}>
+          <div
+            className={`pt-0 max-w-6xl w-full ${
+              childrenWrapperClassName || ""
+            }`}
+          >
             {children}
           </div>
         ) : null}
-
-        <div className="flex flex-wrap gap-3 pt-4 text-sm">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              href={`/firm/${link.path}`}
-              className="inline-flex items-center object-contain rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
       </section>
     </main>
   );

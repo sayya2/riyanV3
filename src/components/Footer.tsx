@@ -36,7 +36,7 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer className="bg-primary text-white">
-      <div className="container mx-auto px-[var(--gutter-phi-1)] py-12 grid gap-10 grid-cols-1 place-items-center text-center sm:grid-cols-1 sm:place-items-center sm:text-center md:grid-cols-4 md:items-center md:place-items-center md:text-center">
+      <div className="max-w-[1536px] mx-auto px-[6%] md:px-[138px] py-12 grid gap-10 grid-cols-1 place-items-center text-center sm:grid-cols-1 sm:place-items-center sm:text-center md:grid-cols-4 md:items-center md:place-items-center md:text-center">
         {/* Column 1 — Brand */}
         <div className="space-y-4 text-center sm:text-center md:text-center">
           <Link href="/" aria-label="Riyan Home">
@@ -112,7 +112,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/70">
+      <div className="border-t border-white/10 py-4 max-w-[1536px] mx-auto px-[6%] md:px-[138px] text-center text-xs text-white/70">
         © {new Date().getFullYear()} Riyan Pvt Ltd. All rights reserved.
       </div>
     </footer>

@@ -28,7 +28,8 @@ body {
 p {
   font-family: var(--font-roboto), "Roboto", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  /* font-size: 1.188rem */
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* .content-gutter {
@@ -50,59 +51,120 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: 2.986rem;
   line-height: 1.2;
   font-weight:500;
 }
 
 h2 {
-  font-size: 2.8rem;
+  font-size: 2.488rem;
   line-height: 1.2;
   font-weight:500;
 }
 
 h3 {
-  font-size: 1.875rem;
-  line-height: 1.2;
+  font-size: 2.074rem;
+  line-height: 1.3;
   font-weight: 400;
 }
 
 h4 {
-  font-size: 1.5rem;
+  font-size: 1.728rem;
   line-height: 1.3;
   font-weight: 600;
 }
 
 h5 {
-  font-size: 1.25rem;
+  font-size: 1.44rem;
+  line-height: 1.4;
 }
 
 h6 {
-  font-size: 0.875rem;
+  font-size: 1.2rem;
+  line-height: 1.4;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
+small {
+  font-size: 0.833rem;
+  line-height: 1.5;
+}
+
+.text-smallest {
+  font-size: 0.694rem;
+  line-height: 1.5;
+}
 
 
-@media (max-width: 639px) {
-  .project-card-title {
-    font-size: 1.125rem;
-    line-height: 1.35;
+
+/* Card title styles */
+.project-card-title {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.news-card-title {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+  .project-card-title,
+  .news-card-title {
+    font-size: 1.25rem;
+    line-height: 1.4;
   }
+}
+
+.firm-sub-nav a {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
+  font-family: var(--font-roboto)
+}
+
+
+/* Widget card styles - override global heading/text styles */
+.widget-card h6 {
+  font-size: 0.792rem !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  font-family: var(--font-roboto), sans-serif !important;
+}
+
+.widget-card h3 {
+  font-size: 1.152rem !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  font-family: var(--font-roboto), sans-serif !important;
+}
+
+.widget-card p {
+  font-size: 0.936rem !important;
+  line-height: 1.4 !important;
+  font-family: var(--font-roboto), sans-serif !important;
+}
+
+.widget-card a {
+  font-size: 0.936rem !important;
+  font-family: var(--font-roboto), sans-serif !important;
+}
+
+.widget-card .widget-meta {
+  font-size: 0.792rem !important;
+  line-height: 1.3 !important;
+}
+
+.widget-card .widget-category {
+  font-size: 0.792rem !important;
+  line-height: 1.3 !important;
 }
 
 @media (max-width: 639px) {
   .hero-slide-title {
     font-size: 2.8rem;
     line-height: 1.2;
-  }
-}
-
-@media (max-width: 639px) {
-  .news-card-title {
-    font-size: 1.125rem;
-    line-height: 1.35;
   }
 }
 
