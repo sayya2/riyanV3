@@ -97,7 +97,7 @@ export default function SectorSlider({ sectors, speed = 50 }: Props) {
           {duplicatedSectors.map((sector, index) => (
             <div
               key={`${sector.name}-${index}`}
-              className="relative h-[40vh] overflow-hidden rounded-lg group shadow-lg flex-shrink-0 w-[calc(33.333%-16px)] md:w-[calc(33.333%-16px)]"
+              className="relative md:h-[40vh] h-[30vh] overflow-hidden rounded-lg group shadow-lg flex-shrink-0 w-[calc(83.333%-16px)] md:w-[calc(33.333%-16px)]"
             >
               <Image
                 src={sector.image}
@@ -107,9 +107,9 @@ export default function SectorSlider({ sectors, speed = 50 }: Props) {
                 sizes="33vw"
                 draggable={false}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-2xl md:text-3xl font-semibold text-white">
+                <h3 className="text-3xl!  font-semibold text-white">
                   {sector.name}
                 </h3>
               </div>

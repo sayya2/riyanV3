@@ -182,7 +182,9 @@ export default async function AboutPage() {
                                 key={item}
                                 data-reveal-item
                                 style={{
-                                  transitionDelay: `${baseDelay + itemIndex * 0.08}s`,
+                                  transitionDelay: `${
+                                    baseDelay + itemIndex * 0.08
+                                  }s`,
                                 }}
                               >
                                 {item}
@@ -206,7 +208,7 @@ export default async function AboutPage() {
           <div className="mb-8 md:mb-12 mx-auto">
             <h2
               className="
-      !text-3xl
+      !text-4xl
       md:!text-5xl
       lg:!text-6xl
       !leading-tight
@@ -218,10 +220,11 @@ export default async function AboutPage() {
       mx-auto
     "
             >
-              Over <span className="text-primary">1,000</span> successful projects spanning diverse sectors.
+              Over <span className="text-primary  ">1,000</span> successful
+              projects spanning diverse sectors.
             </h2>
 
-            <p className="text-base md:text-lg text-gray-700 text-center max-w-4xl mx-auto">
+            <p className="text-base   md:text-lg text-gray-700 text-center max-w-4xl mx-auto">
               Over the past 28 years, we have successfully delivered projects
               across diverse sectors including Buildings, Resorts,
               Infrastructure, Water & Sewerage, Urban Planning & Research. Our
@@ -240,7 +243,8 @@ export default async function AboutPage() {
             },
             {
               name: "Resorts",
-              image: "/wp-content/uploads/2009/01/Pic-13-Park-Hyatt-rotated.jpg",
+              image:
+                "/wp-content/uploads/2009/01/Pic-13-Park-Hyatt-rotated.jpg",
             },
             {
               name: "Infrastructure",
@@ -252,7 +256,8 @@ export default async function AboutPage() {
             },
             {
               name: "Research",
-              image: "/wp-content/uploads/2022/08/IMG20210407113813-1800x900-1.jpg",
+              image:
+                "/wp-content/uploads/2022/08/IMG20210407113813-1800x900-1.jpg",
             },
           ]}
           speed={50}
