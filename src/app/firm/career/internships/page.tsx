@@ -68,7 +68,7 @@ const contentShell = "w-full mx-auto px-[11%] md:px-[10%]";
 const sectionY = "py-[2.5rem] md:py-[4rem]";
 const sectionBottom = "pb-[2.5rem] md:pb-[4rem]";
 const heroSectionClassName =
-  "pt-12 pb-6 mt-0 flex items-center bg-gray-50 bg-primary/5 min-h-[40vh]";
+  "mt-0 flex items-center bg-gray-50 bg-primary/5 min-h-[40vh]";
 
 export default async function InternshipsPage() {
   const page = await getPageBySlug("internships");

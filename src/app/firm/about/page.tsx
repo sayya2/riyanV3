@@ -14,7 +14,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 const heroSectionClassName =
-  "pt-12 pb-6 mt-0 flex items-center bg-gray-50 bg-primary/5 min-h-[40vh]";
+  "mt-0 flex items-center bg-gray-50 bg-primary/5 min-h-[40vh]";
 
 export default async function AboutPage() {
   const clientLogos = await getClientLogos();
