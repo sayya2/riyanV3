@@ -184,12 +184,12 @@ export default function ContactPage() {
                     <Building2 className="h-4 w-4" />
                   </span>
                   <div>
-                    <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-500">
+                    {/* <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-500">
                       HQ
-                    </p>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    </p> */}
+                    <h4 className="text-2xl! font-semibold text-gray-800">
                       Head Office
-                    </h3>
+                    </h4>
                   </div>
                 </div>
                 <p className="text-sm text-gray-700 mt-2">
