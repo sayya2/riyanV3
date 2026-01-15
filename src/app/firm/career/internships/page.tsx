@@ -100,18 +100,26 @@ export default async function InternshipsPage() {
       {/* Introduction Section */}
       <section className={sectionY}>
         <Reveal>
-          <div className="space-y-[1rem]">
-            <div className="prose prose-lg max-w-none text-gray-800">
-              <p className="text-lg leading-relaxed">{description}</p>
-              <p className="text-lg leading-relaxed">
-                At Riyan, we believe in nurturing the next generation of
-                architects, engineers, planners, and consultants. Our internship
-                program offers students and recent graduates a unique
-                opportunity to work alongside experienced professionals on
-                real-world projects that shape the built environment of the
-                Maldives and beyond.
-              </p>
-            </div>
+          <div className="prose prose-lg max-w-none text-gray-800 space-y-4">
+            {/* <p className="text-lg leading-relaxed">{description}</p> */}
+            <p className="text-lg leading-relaxed">
+              At Riyan, we believe in nurturing the next generation of
+              architects, engineers, planners, and consultants. Our internship
+              program offers students and recent graduates a unique opportunity
+              to work alongside experienced professionals on real-world projects
+              that shape the built environment of the Maldives and beyond.
+            </p>
+            <p className="text-lg leading-relaxed">
+              Riyan Internship program is an excellent opportunity for new
+              graduates and students pursuing graduate programs to gain valuable
+              work experience in the field of built environment at one of the
+              leading consultancy firms in the country. Interns will be given
+              opportunity to earn as they receive their on-the-job training.
+              Successful completion of the program promises a level of
+              proficiency that will greatly benefit their career prospects,
+              with priority consideration for permanent positions upon
+              graduation.
+            </p>
           </div>
         </Reveal>
       </section>
@@ -238,8 +246,6 @@ export default async function InternshipsPage() {
           </div>
         </Reveal>
       </section>
-
-     
     </FirmPageBySlug>
   );
 }
