@@ -98,9 +98,9 @@ export default async function LatestProjectsSection() {
                     </h3>
                   </Link>
                   <p className="widget-category italic text-gray-600">{categoryText}</p>
-                  <p className="text-gray-700 line-clamp-2">
+                  {/* <p className="text-gray-700 line-clamp-2">
                     {excerpt}
-                  </p>
+                  </p> */}
                 </div>
                 <div className="px-3 pb-3 flex-shrink-0">
                   <Link

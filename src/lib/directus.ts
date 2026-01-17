@@ -871,11 +871,13 @@ export async function getProjects({
   serviceSlug,
   search,
   limit = 24,
+  offset = 0,
 }: {
   sectorSlug?: string;
   serviceSlug?: string;
   search?: string;
   limit?: number;
+  offset?: number;
 } = {}): Promise<DirectusProject[]> {
   try {
     const filter: any = {
@@ -916,29 +918,33 @@ export async function getProjects({
       ];
     }
 
-    const projects = await directus.request(
-      readItems('projects', {
-        fields: [
-          'id',
-          'slug',
-          'title',
-          'excerpt',
-          'content',
-          'featured_image',
-          'client',
-          'year',
-          'completed_year',
-          'location',
-          'status',
-          'published_at',
-          'created_at',
-          'updated_at',
-        ],
-        filter,
-        sort: ['-published_at'],
-        limit,
-      })
-    );
+    const query: Record<string, any> = {
+      fields: [
+        'id',
+        'slug',
+        'title',
+        'excerpt',
+        'content',
+        'featured_image',
+        'client',
+        'year',
+        'completed_year',
+        'location',
+        'status',
+        'published_at',
+        'created_at',
+        'updated_at',
+      ],
+      filter,
+      sort: ['-published_at'],
+      limit,
+    };
+
+    if (offset) {
+      query.offset = offset;
+    }
+
+    const projects = await directus.request(readItems('projects', query));
 
     const withRelations = await attachProjectRelations(projects as DirectusProject[]);
     return withRelations.map(normalizeProject);

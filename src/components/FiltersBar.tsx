@@ -148,6 +148,7 @@ export default function FiltersBar({
         onChange={onSearchChange}
         placeholder="Search projects..."
         className="border border-gray-300 rounded px-4 py-2.5 w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+        suppressHydrationWarning
       />
 
       {/* Prompt-style filter */}

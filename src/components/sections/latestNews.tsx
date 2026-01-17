@@ -74,9 +74,9 @@ export default async function LatestNewsSection() {
                       {post.title}
                     </h3>
                   </Link>
-                  <p className="text-gray-700 line-clamp-2">
+                  {/* <p className="text-gray-700 line-clamp-2">
                     {excerpt}
-                  </p>
+                  </p> */}
                 </div>
                 <div className="px-3 pb-3 flex-shrink-0">
                   <Link
