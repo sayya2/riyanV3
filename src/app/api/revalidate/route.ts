@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 const NEWS_TAG = "directus:news";
+const PROJECTS_TAG = "directus:projects";
 
 function isValidSecret(request: NextRequest): boolean {
   const expected = process.env.REVALIDATE_SECRET;
@@ -15,7 +16,10 @@ function isValidSecret(request: NextRequest): boolean {
   return provided === expected;
 }
 
-async function tryResolveNewsSlug(key: unknown): Promise<string | null> {
+async function tryResolveSlug(
+  collection: string,
+  key: unknown
+): Promise<string | null> {
   if (key === null || key === undefined) return null;
 
   const keyString = String(key).trim();
@@ -29,7 +33,7 @@ async function tryResolveNewsSlug(key: unknown): Promise<string | null> {
 
   try {
     const response = await fetch(
-      `${directusUrl}/items/news/${encodeURIComponent(
+      `${directusUrl}/items/${collection}/${encodeURIComponent(
         keyString
       )}?fields=slug,status`,
       { cache: "no-store" }
@@ -44,6 +48,14 @@ async function tryResolveNewsSlug(key: unknown): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+async function tryResolveNewsSlug(key: unknown): Promise<string | null> {
+  return tryResolveSlug("news", key);
+}
+
+async function tryResolveProjectSlug(key: unknown): Promise<string | null> {
+  return tryResolveSlug("projects", key);
 }
 
 type DirectusWebhookPayload = {
@@ -67,29 +79,40 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => ({}))) as DirectusWebhookPayload;
+  const collection = body?.collection;
 
-  // Always invalidate the Directus news data cache
+  // Always invalidate Directus caches
   revalidateTag(NEWS_TAG, "default");
+  revalidateTag(PROJECTS_TAG, "default");
 
-  // Revalidate main surfaces that show news
-  revalidatePath("/news");
+  // Revalidate main surfaces
   revalidatePath("/");
+  revalidatePath("/news");
+  revalidatePath("/projects");
+
+  const keys = Array.isArray(body?.keys)
+    ? body.keys
+    : body?.key !== undefined
+      ? [body.key]
+      : [];
 
   // If this came from a Directus news change, also revalidate the detail page
-  if (body?.collection === "news") {
-    const keys = Array.isArray(body?.keys)
-      ? body.keys
-      : body?.key !== undefined
-        ? [body.key]
-        : [];
-
+  if (collection === "news") {
     for (const key of keys) {
       const slug = await tryResolveNewsSlug(key);
       if (slug) revalidatePath(`/news/${slug}`);
     }
   }
 
-  return NextResponse.json({ ok: true });
+  // If this came from a Directus projects change, also revalidate the detail page
+  if (collection === "projects") {
+    for (const key of keys) {
+      const slug = await tryResolveProjectSlug(key);
+      if (slug) revalidatePath(`/projects/${slug}`);
+    }
+  }
+
+  return NextResponse.json({ ok: true, collection, revalidated: keys.length });
 }
 
 export async function GET(request: NextRequest) {
@@ -100,8 +123,10 @@ export async function GET(request: NextRequest) {
   const path = request.nextUrl.searchParams.get("path");
 
   revalidateTag(NEWS_TAG, "default");
-  revalidatePath("/news");
+  revalidateTag(PROJECTS_TAG, "default");
   revalidatePath("/");
+  revalidatePath("/news");
+  revalidatePath("/projects");
   if (path) revalidatePath(path);
 
   return NextResponse.json({ ok: true });

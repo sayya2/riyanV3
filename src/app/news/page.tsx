@@ -134,8 +134,8 @@ export default async function NewsPage({
                     priority={false}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 text-[98%]">
-                    <p className="text-[0.7rem] uppercase tracking-widest text-white/80 font-semibold">
+                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 !text-[98%]">
+                    <p className="!text-[0.7rem] uppercase tracking-widest text-white/80 font-semibold">
                       {categoriesText || "News"}
                     </p>
                     <h3 className="news-card-title line-clamp-2 min-h-[2.6rem] font-semibold text-white drop-shadow-sm">

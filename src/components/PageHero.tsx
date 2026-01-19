@@ -56,11 +56,11 @@ export default function PageHero({
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white max-w-4xl leading-tight">
             {title}
           </h1>
-          {description ? (
+          {/* {description ? (
             <p className="text-lg text-white/80 md:max-w-6xl lg:max-w-7xl leading-relaxed">
               {description}
             </p>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
     </section>

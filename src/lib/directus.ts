@@ -6,6 +6,7 @@ const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://localhost:8055';
 const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN;
 
 const DIRECTUS_NEWS_TAG = 'directus:news';
+const DIRECTUS_PROJECTS_TAG = 'directus:projects';
 
 const taggedFetch: typeof fetch = (input: any, init?: any) => {
   const nextInit = {
@@ -13,7 +14,11 @@ const taggedFetch: typeof fetch = (input: any, init?: any) => {
     next: {
       ...(init?.next || {}),
       tags: Array.from(
-        new Set([...(init?.next?.tags || []), DIRECTUS_NEWS_TAG])
+        new Set([
+          ...(init?.next?.tags || []),
+          DIRECTUS_NEWS_TAG,
+          DIRECTUS_PROJECTS_TAG,
+        ])
       ),
     },
   };
