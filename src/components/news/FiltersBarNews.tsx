@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
@@ -36,12 +36,15 @@ export default function FiltersBarNews({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
         setShowCategoryDropdown(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const updateParams = (updates: Record<string, string | undefined>) => {
@@ -70,20 +73,11 @@ export default function FiltersBarNews({
     updateParams({ category: localCategory, q: value });
   };
 
-  const selectedCategoryName = categories.find(c => c.slug === localCategory)?.name || 'All Categories';
+  const selectedCategoryName =
+    categories.find((c) => c.slug === localCategory)?.name || "All Categories";
 
   return (
     <div className="flex flex-col gap-4 w-full mt-6">
-      {/* Search bar */}
-      <input
-        type="text"
-        name="q"
-        defaultValue={search}
-        onChange={onSearchChange}
-        placeholder="Search news..."
-        className="border border-gray-300 rounded px-4 py-2.5 w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-      />
-
       {/* Prompt-style filter */}
       <div className="flex flex-wrap items-center gap-2 text-base md:text-lg text-gray-700">
         <span>Show news in</span>
@@ -102,7 +96,12 @@ export default function FiltersBarNews({
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -110,7 +109,7 @@ export default function FiltersBarNews({
             <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded shadow-lg z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
               <button
                 type="button"
-                onClick={() => onCategoryChange('')}
+                onClick={() => onCategoryChange("")}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
               >
                 All Categories
@@ -127,6 +126,16 @@ export default function FiltersBarNews({
               ))}
             </div>
           )}
+          <span> or </span>
+          {/* Search bar */}
+          <input
+            type="text"
+            name="q"
+            defaultValue={search}
+            onChange={onSearchChange}
+            placeholder="Search news..."
+            className="px-1 py-2.5 w-full md:w-96 focus:outline-none placeholder-accent text-md"
+          />
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getNewsCategories, getNewsPosts } from "@/lib/directus";
 import FiltersBarNews from "@/components/news/FiltersBarNews";
 import Reveal from "@/components/Reveal";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
@@ -99,7 +100,7 @@ export default async function NewsPage({
           </div>
         </Reveal>
 
-        <div className="columns-1 md:columns-2 xl:columns-3 gap-x-4">
+        <div className="columns-1 md:columns-2 xl:columns-3  gap-x-6">
           {articles.map((article, index) => {
             const href = article.slug ? `/news/${article.slug}` : "#";
             const categoriesText = (article.categories || [])
@@ -119,11 +120,11 @@ export default async function NewsPage({
                 delay={index * 0.04}
                 duration={0.65}
                 offsetY={18}
-                className="mb-4 break-inside-avoid"
+                className="mb-4 break-inside-avoid "
               >
                 <Link
                   href={href}
-                  className={`group relative block overflow-hidden  ${cardHeight} bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300`}
+                  className={`group relative block overflow-hidden mb-6 ${cardHeight} bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300`}
                 >
                   <Image
                     src={img}
@@ -151,6 +152,7 @@ export default async function NewsPage({
           })}
         </div>
       </div>
+      <ScrollToTopButton />
     </main>
   );
 }

@@ -39,7 +39,7 @@ const Footer = () => {
       <div className="max-w-[1536px] mx-auto px-[6%] md:px-[138px] py-12 grid gap-10 grid-cols-1 place-items-center text-center sm:grid-cols-1 sm:place-items-center sm:text-center md:grid-cols-4 md:items-center md:place-items-center md:text-center">
         {/* Column 1 — Brand */}
         <div className="space-y-4 text-center sm:text-center md:text-center">
-          <Link href="/" aria-label="Riyan Home">
+          <Link href="/" aria-label="Riyan Home" className="block w-full">
             <div className="relative md:h-24 w-full my-8 h-28 mx-auto sm:mx-auto md:mx-auto">
               <Image
                 src="/wp-content/uploads/2021/06/logoWhite.png"
@@ -51,16 +51,12 @@ const Footer = () => {
             </div>
           </Link>
 
-          <p className="text-sm text-white/80 leading-relaxed max-w-lg mx-auto md:ml-0 sm:mx-auto md:mx-auto">
-            Integrated solutions in design, engineering, project management, and
-            research tailored for the Maldives and beyond.
-          </p>
         </div>
 
         {/* Column 2 — Quick Links */}
         <div className="text-center sm:text-center md:text-center">
-          <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-          <ul className="grid grid-cols-2 gap-x-7 gap-y-2 text-sm max-w-xs mx-auto sm:mx-auto md:mx-auto justify-items-center sm:justify-items-center md:justify-items-center">
+          {/* <h4 className="text-lg font-semibold mb-4">Quick Links</h4> */}
+          <ul className="grid grid-cols-1 gap-x-7 gap-y-4 text-lg max-w-xs mx-auto sm:mx-auto md:mx-auto justify-items-center sm:justify-items-center md:justify-items-center">
             {navLinks.map((item) => (
               <li key={item.href}>
                 <Link
@@ -76,8 +72,8 @@ const Footer = () => {
 
         {/* Column 3 — Social */}
         <div className="text-center sm:text-center md:text-center">
-          <h4 className="text-lg font-semibold mb-4">Connect With Us</h4>
-          <div className="flex flex-col gap-3 text-sm items-center sm:items-center md:items-center">
+          {/* <h4 className="text-lg font-semibold mb-4">Connect With Us</h4> */}
+          <div className="flex flex-col gap-3 text-lg items-center sm:items-center md:items-center">
             {socialLinks.map(({ label, href, icon: Icon }) => (
               <Link
                 key={label}

@@ -1,13 +1,5 @@
 "use client";
-import {
-  ChevronDown,
-  ChevronRightCircle,
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -19,7 +11,14 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-const menuItems: MenuItem[] = [
+const firmLinks: MenuItem[] = [
+  { id: 41, title: "About", url: "/firm/about" },
+  { id: 42, title: "Career", url: "/firm/career" },
+  { id: 43, title: "Internships", url: "/firm/career/internships" },
+  { id: 44, title: "Contact", url: "/firm/contact" },
+];
+
+const desktopMenuItems: MenuItem[] = [
   { id: 1, title: "Home", url: "/" },
   { id: 2, title: "Projects", url: "/projects" },
   { id: 3, title: "News", url: "/news" },
@@ -27,38 +26,42 @@ const menuItems: MenuItem[] = [
     id: 4,
     title: "Firm",
     url: "/firm",
-    children: [
-      { id: 41, title: "About", url: "/firm/about" },
-      { id: 42, title: "Career", url: "/firm/career" },
-      { id: 43, title: "Internships", url: "/firm/career/internships" },
-      { id: 44, title: "Contact", url: "/firm/contact" },
-    ],
+    children: firmLinks,
   },
 ];
 
-const socialLinks = [
-  {
-    label: "LinkedIn",
-    href: "https://mv.linkedin.com/company/riyan-pvt-ltd",
-    icon: Linkedin,
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/riyanprivatelimited",
-    icon: Instagram,
-  },
-  {
-    label: "Facebook",
-    href: "https://www.facebook.com/RiyanPvtLtd/",
-    icon: Facebook,
-  },
+const mobileMenuItems: MenuItem[] = [
+  { id: 1, title: "Home", url: "/" },
+  { id: 2, title: "Projects", url: "/projects" },
+  { id: 3, title: "News", url: "/news" },
+  ...firmLinks,
 ];
+
+// Contact panel social links (disabled with side panel)
+// const socialLinks = [
+//   {
+//     label: "LinkedIn",
+//     href: "https://mv.linkedin.com/company/riyan-pvt-ltd",
+//     icon: Linkedin,
+//   },
+//   {
+//     label: "Instagram",
+//     href: "https://www.instagram.com/riyanprivatelimited",
+//     icon: Instagram,
+//   },
+//   {
+//     label: "Facebook",
+//     href: "https://www.facebook.com/RiyanPvtLtd/",
+//     icon: Facebook,
+//   },
+// ];
 
 export default function Navbar() {
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFirmOpen, setIsFirmOpen] = useState(false);
+  // const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isProjectSlug = pathname?.startsWith("/projects/");
@@ -67,9 +70,9 @@ export default function Navbar() {
   const isTransparentHero = isHome || isProjectSlug || isNewsSlug;
   const isStaticNavbar = isFirm;
   const isLightNavbar = isSticky && !isStaticNavbar;
-  const panelItems = menuItems.flatMap((item) =>
-    item.children && item.children.length > 0 ? item.children : [item]
-  );
+  // const panelItems = menuItems.flatMap((item) =>
+  //   item.children && item.children.length > 0 ? item.children : [item]
+  // );
 
   useEffect(() => {
     if (isStaticNavbar) {
@@ -83,63 +86,80 @@ export default function Navbar() {
   }, [isStaticNavbar]);
 
   useEffect(() => {
+    setIsMobileMenuOpen(false);
     setIsFirmOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    return () => {
-      if (closeTimerRef.current) {
-        clearTimeout(closeTimerRef.current);
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   setIsFirmOpen(false);
+  // }, [pathname]);
 
-  const clearFirmCloseTimer = () => {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-  };
+  // useEffect(() => {
+  //   return () => {
+  //     if (closeTimerRef.current) {
+  //       clearTimeout(closeTimerRef.current);
+  //     }
+  //   };
+  // }, []);
 
-  const openFirmMenu = () => {
-    clearFirmCloseTimer();
-    setIsFirmOpen(true);
-  };
+  // const clearFirmCloseTimer = () => {
+  //   if (closeTimerRef.current) {
+  //     clearTimeout(closeTimerRef.current);
+  //     closeTimerRef.current = null;
+  //   }
+  // };
 
-  const scheduleCloseFirmMenu = () => {
-    clearFirmCloseTimer();
-    closeTimerRef.current = setTimeout(() => {
-      setIsFirmOpen(false);
-    }, 150);
-  };
+  // const openFirmMenu = () => {
+  //   clearFirmCloseTimer();
+  //   setIsFirmOpen(true);
+  // };
+
+  // const scheduleCloseFirmMenu = () => {
+  //   clearFirmCloseTimer();
+  //   closeTimerRef.current = setTimeout(() => {
+  //     setIsFirmOpen(false);
+  //   }, 150);
+  // };
 
   const borderColor = isLightNavbar ? "border-white" : "border-red-700/0";
   const textColor = isLightNavbar ? "text-gray-900" : "text-white";
+  const glassBg = "bg-white/10 backdrop-blur-sm";
   const baseBg =
     isTransparentHero && !isLightNavbar
-      ? "bg-white/10 w-full bg-clip-padding backdrop-filter backdrop-blur-sm border border-white/15"
+      ? glassBg
       : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
   const headerBg = isLightNavbar ? "bg-white shadow-md" : baseBg;
-  const overlayBg =
-    isTransparentHero && !isLightNavbar
-      ? "bg-gradient-to-b from-white/15 via-white/5 to-black/30 backdrop-blur-xl"
-      : "bg-black/60";
-  const firmMenuBg =
-    isTransparentHero && !isLightNavbar
-      ? "bg-white/85 backdrop-blur-md border-white/30"
-      : "bg-white border-gray-200";
-  const firmUnderline =
-    "relative inline-flex items-center after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-[calc(100%+4%)] after:bg-current after:scale-x-0 after:origin-left after:opacity-0 after:transition-transform after:duration-300 group-hover:after:scale-x-[1.12] group-hover:after:opacity-100";
+  const firmPanelBorder = isLightNavbar
+    ? "border-t border-gray-200"
+    : isTransparentHero
+      ? ""
+      : "border-t border-white/20";
+  const firmPanelLinkColor = isLightNavbar
+    ? "text-gray-900 hover:text-primary"
+    : "text-white hover:text-white/80";
+  const mobileMenuBg = isLightNavbar
+    ? "bg-white"
+    : isTransparentHero
+      ? glassBg
+      : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
+  // const overlayBg =
+  //   isTransparentHero && !isLightNavbar
+  //     ? "bg-gradient-to-b from-white/15 via-white/5 to-black/30 backdrop-blur-xl"
+  //     : "bg-black/60";
+  // const firmUnderline =
+  //   "relative inline-flex items-center after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-[calc(100%+4%)] after:bg-current after:scale-x-0 after:origin-left after:opacity-0 after:transition-transform after:duration-300 group-hover:after:scale-x-[1.12] group-hover:after:opacity-100";
+  const headerExpandClass = isFirmOpen ? "lg:max-h-40" : "lg:max-h-20";
+
   return (
     <header
       className={`${isStaticNavbar ? "relative" : "fixed top-0 left-0 right-0"} z-50 border-b ${borderColor} ${
         isStaticNavbar ? "" : "transition-all duration-300"
-      } ${headerBg}`}
+      } ${headerBg} lg:overflow-hidden lg:transition-[max-height] lg:duration-300 ${headerExpandClass}`}
     >
-      <div className="mx-auto w-full px-[var(--gutter-phi-0)] lg:px-[124px]">
-        <div className="flex items-center justify-between h-20">
+      <div className="mx-auto w-full px-[var(--gutter-phi-1)] lg:px-[124px]">
+        <div className="relative flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex ">
+          <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <div className="relative w-36 h-22">
                 <Image
@@ -158,35 +178,38 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <div
-            className="hidden lg:block relative"
-            onMouseLeave={scheduleCloseFirmMenu}
-          >
-            <nav className="flex items-center space-x-12 md:pr-23">
-              {menuItems.map((item) =>
-                item.children ? (
+          <div className="hidden lg:block relative">
+            <nav className="flex items-center space-x-12 md:pr-0">
+              {desktopMenuItems.map((item) =>
+                item.children && item.children.length > 0 ? (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => {
-                      clearFirmCloseTimer();
-                      setIsFirmOpen((prev) => !prev);
-                    }}
-                    onMouseEnter={openFirmMenu}
-                    onFocus={openFirmMenu}
-                    className={`group inline-flex items-center text-sm font-medium transition-colors ${
+                    onClick={() => setIsFirmOpen((prev) => !prev)}
+                    className={`text-sm font-medium transition-colors ${
                       isLightNavbar
                         ? "text-gray-900 hover:text-primary"
                         : "text-white hover:text-white/80"
                     }`}
                     aria-expanded={isFirmOpen}
                   >
-                    {item.title}
-                    <ChevronDown
-                      className={`ml-1 h-4 w-4 transition-transform ${
-                        isFirmOpen ? "rotate-180" : ""
-                      }`}
-                    />
+                    <span className="inline-flex items-center gap-2">
+                      {item.title}
+                      <svg
+                        className={`h-3 w-3 transition-transform duration-200 ${
+                          isFirmOpen ? "rotate-180" : "rotate-0"
+                        }`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.25a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </button>
                 ) : (
                   <Link
@@ -197,52 +220,43 @@ export default function Navbar() {
                         ? "text-gray-900 hover:text-primary"
                         : "text-white hover:text-white/80"
                     }`}
+                    onClick={() => setIsFirmOpen(false)}
                   >
                     {item.title}
                   </Link>
                 )
               )}
             </nav>
-
-            <div
-              className={`absolute left-20 top-full pt-3 transition-all duration-200 ${
-                isFirmOpen
-                  ? "opacity-100 translate-y-4.5 pointer-events-auto"
-                  : "opacity-0 -translate-y-2 pointer-events-none"
-              }`}
-              style={{ zIndex: 60 }}
-              onMouseEnter={openFirmMenu}
-              onMouseLeave={scheduleCloseFirmMenu}
-            >
-              <div
-                className={`w-64 border ${firmMenuBg} shadow-lg overflow-hidden`}
-              >
-                <div className="flex flex-col divide-y divide-gray-100">
-                  {menuItems
-                    .find((m) => m.children)
-                    ?.children?.map((child) => (
-                      <Link
-                        key={child.id}
-                        href={child.url}
-                        className="group px-4 py-3 transition-colors text-left"
-                      >
-                        <p
-                          className={`text-sm font-semibold text-gray-900 ${firmUnderline}`}
-                        >
-                          {child.title}
-                        </p>
-                        {/* <p className="text-xs text-gray-600">
-                          Learn more about {child.title.toLowerCase()} at Riyan.
-                        </p> */}
-                      </Link>
-                    ))}
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Contact Panel Toggle */}
+          {/* Mobile hamburger */}
           <button
+            type="button"
+            className="relative z-10 flex h-10 w-10 items-center justify-center lg:hidden"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            <span
+              className={`absolute h-0.5 w-6 rounded-full transition-all duration-300 ${
+                isLightNavbar ? "bg-gray-900" : "bg-white"
+              } ${isMobileMenuOpen ? "translate-y-0 rotate-45" : "-translate-y-2"}`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 rounded-full transition-all duration-300 ${
+                isLightNavbar ? "bg-gray-900" : "bg-white"
+              } ${isMobileMenuOpen ? "opacity-0" : "opacity-100"}`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 rounded-full transition-all duration-300 ${
+                isLightNavbar ? "bg-gray-900" : "bg-white"
+              } ${isMobileMenuOpen ? "translate-y-0 -rotate-45" : "translate-y-2"}`}
+            />
+          </button>
+
+          {/* Contact Panel Toggle */}
+          {/* Contact panel toggle disabled (side overlay hidden) */}
+          {/* <button
             onClick={() => setIsPanelOpen(true)}
             className="flex flex-col items-center justify-center w-10 h-10 space-y-1.5 rounded-full border border-transparent hover:border-white/40 hover:bg-white/10 transition-colors"
             aria-label="Open contact panel"
@@ -272,12 +286,58 @@ export default function Navbar() {
                 }`}
               />
             </div>
-          </button>
+          </button> */}
+        </div>
+      </div>
+
+      {/* Mobile Navigation Panel */}
+      <div
+        className={`lg:hidden absolute left-0 right-0 top-full overflow-hidden transition-all duration-300 ${
+          isMobileMenuOpen
+            ? "max-h-40 opacity-100 pointer-events-auto"
+            : "max-h-0 opacity-0 pointer-events-none"
+        } ${mobileMenuBg}`}
+      >
+        <nav className="flex flex-wrap items-center justify-center gap-6 px-6 py-5">
+          {mobileMenuItems.map((item) => (
+            <Link
+              key={item.id}
+              href={item.url}
+              className={`text-sm font-semibold uppercase tracking-wide transition-colors ${
+                isLightNavbar ? "text-gray-900" : "text-white"
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {item.title}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      {/* Desktop Firm Panel */}
+      <div
+        className={`hidden lg:block overflow-hidden transition-all duration-300 ${
+          isFirmOpen ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+        } ${firmPanelBorder}`}
+      >
+        <div className="mx-auto w-full px-[var(--gutter-phi-2)] lg:px-[124px]">
+          <div className="flex items-center justify-end gap-10 py-4">
+            {firmLinks.map((link) => (
+              <Link
+                key={link.id}
+                href={link.url}
+                className={`text-sm font-semibold uppercase tracking-wide transition-colors ${firmPanelLinkColor}`}
+                onClick={() => setIsFirmOpen(false)}
+              >
+                {link.title}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Contact Slide Panel */}
-      <div
+      {/* <div
         className={`fixed inset-0 z-50 transition duration-300 ease-in-out ${
           isPanelOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
@@ -439,7 +499,7 @@ export default function Navbar() {
             </Link>
           </div>
         </aside>
-      </div>
+      </div> */}
     </header>
   );
 }

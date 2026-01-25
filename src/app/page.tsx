@@ -23,9 +23,9 @@ export default function Home() {
         <Reveal>
           <KeySectors />
         </Reveal>
-        <Reveal>
+        {/* <Reveal>
           <LatestProjectsSection />
-        </Reveal>
+        </Reveal> */}
         <Reveal>
           <LatestNewsSection />
         </Reveal>

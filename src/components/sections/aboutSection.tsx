@@ -45,14 +45,14 @@ const AboutSection = async () => {
             </div>
           </div>
 
-          <div className="relative h-80 md:h-96 lg:h-[28rem] overflow-hidden rounded-lg shadow-xl">
+          <div className="relative h-80 md:h-96 lg:h-[28rem] overflow-hidden  shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10 pointer-events-none z-10" />
             <div className="absolute inset-0 grid grid-cols-2 gap-2 md:gap-3">
               <div className="flex flex-col gap-2 md:gap-3 animate-vertical-up">
                 {leftImages.map((src, idx) => (
                   <div
                     key={`left-${src}-${idx}`}
-                    className="relative aspect-square overflow-hidden rounded-md"
+                    className="relative aspect-square overflow-hidden "
                   >
                     <img
                       src={src}
@@ -67,7 +67,7 @@ const AboutSection = async () => {
                 {rightImages.map((src, idx) => (
                   <div
                     key={`right-${src}-${idx}`}
-                    className="relative aspect-square overflow-hidden rounded-md"
+                    className="relative aspect-auto overflow-hidden "
                   >
                     <img
                       src={src}

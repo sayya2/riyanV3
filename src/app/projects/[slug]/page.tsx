@@ -130,7 +130,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       icon: (
         <svg
           viewBox="0 0 24 24"
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="currentColor"
           aria-hidden="true"
         >
@@ -138,22 +138,22 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </svg>
       ),
     },
-    {
-      label: "Pinterest",
-      href: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(
-        shareUrl
-      )}&description=${encodeURIComponent(shareText)}`,
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M12.2 3C7.4 3 5 6.2 5 9.4c0 1.6.9 3.6 2.5 4.2.2.1.3 0 .3-.2l.5-1.9c0-.1 0-.2-.1-.3-.6-.8-.3-2.4.9-2.4 1.5 0 1.4 2.1.3 2.8-.2.1-.3.3-.2.5.2.8.5 2.2.6 2.5.1.5.4.6.6.4.3-.4.9-1.2 1.1-1.8.1-.3.5-1.7.5-1.7.3.6 1.2 1 2.1 1 2.8 0 4.7-2.4 4.7-5.3C18.8 6 16 3 12.2 3Z" />
-        </svg>
-      ),
-    },
+    // {
+    //   label: "Pinterest",
+    //   href: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(
+    //     shareUrl
+    //   )}&description=${encodeURIComponent(shareText)}`,
+    //   icon: (
+    //     <svg
+    //       viewBox="0 0 24 24"
+    //       className="h-4 w-4"
+    //       fill="currentColor"
+    //       aria-hidden="true"
+    //     >
+    //       <path d="M12.2 3C7.4 3 5 6.2 5 9.4c0 1.6.9 3.6 2.5 4.2.2.1.3 0 .3-.2l.5-1.9c0-.1 0-.2-.1-.3-.6-.8-.3-2.4.9-2.4 1.5 0 1.4 2.1.3 2.8-.2.1-.3.3-.2.5.2.8.5 2.2.6 2.5.1.5.4.6.6.4.3-.4.9-1.2 1.1-1.8.1-.3.5-1.7.5-1.7.3.6 1.2 1 2.1 1 2.8 0 4.7-2.4 4.7-5.3C18.8 6 16 3 12.2 3Z" />
+    //     </svg>
+    //   ),
+    // },
     {
       label: "LinkedIn",
       href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
@@ -245,10 +245,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           <aside className="space-y-6 w-full lg:max-w-[300px] lg:justify-self-end">
             <Reveal>
               <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
-                <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                {/* <p className="!text-md uppercase tracking-[0.25em] text-gray-500 font-semibold">
                   Project details
-                </p>
-                <div className="mt-4 space-y-4">
+                </p> */}
+                <div className="space-y-4">
                   {stats.map((item) => (
                     <div key={item.label} className="flex items-start gap-4">
                       <span className="mt-0.5 flex h-9 w-9 items-center justify-center bg-primary/10 text-primary">
@@ -256,11 +256,11 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                           <Building2 className="h-5 w-5" />
                         )}
                       </span>
-                      <div className="space-y-1">
-                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                      <div className="space-y-0">
+                        <p className="!text-sm uppercase tracking-[0.2em] text-gray-500 font-semibold">
                           {item.label}
                         </p>
-                        <p className="text-sm font-semibold text-gray-900 leading-snug">
+                        <p className="!text-[0.688rem] font-semibold text-gray-900 leading-snug">
                           {item.value}
                         </p>
                       </div>
@@ -273,10 +273,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             {(sectors.length > 0 || services.length > 0) && (
               <Reveal>
                 <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                  {/* <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
                     Sectors &amp; services
-                  </p>
-                  <div className="mt-4 space-y-4">
+                  </p> */}
+                  <div className=" space-y-4">
                     {sectors.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
@@ -317,8 +317,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               </Reveal>
             )}
             <Reveal>
-              <div className="border border-gray-200  bg-white p-5 shadow-sm space-y-5 ">
-                <div className="space-y-4">
+              <div className=""> {/*border border-gray-200  bg-white p-5 shadow-sm space-y-5 */}
+                {/* <div className="space-y-4">
                   <div className="space-y-3">
                     <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
                       Share this project
@@ -335,14 +335,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                         href={link.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex h-9 w-9 items-center justify-center border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
+                        className="inline-flex h-9 w-9 items-center justify-center4 text-gray-800 hover:bg-gray-100 transition-colors"
                         aria-label={`Share on ${link.label}`}
                       >
                         {link.icon}
                       </a>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
                 {(adjacent.previous || adjacent.next) && (
                   <div className="space-y-6 pt-1 md:hidden -mb-5">

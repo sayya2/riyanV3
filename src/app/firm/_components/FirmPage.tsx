@@ -87,7 +87,7 @@ export async function FirmPageBySlug({
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="firm-sub-nav flex flex-wrap gap-10 justify-end   px-[20px] sm:px-[20px] md:px-[30px] lg:px-[134px] items-center text-[0.85rem]  h-[10vh] ">
+      {/* <div className="firm-sub-nav flex flex-wrap gap-10 justify-end   px-[20px] sm:px-[20px] md:px-[30px] lg:px-[134px] items-center text-[0.85rem]  h-[10vh] ">
         {navLinks.map((link) => (
           <Link
             key={link.path}
@@ -97,7 +97,7 @@ export async function FirmPageBySlug({
             {link.label}
           </Link>
         ))}
-      </div>
+      </div> */}
       {textOnlyHero ? (
         <section
           className={`${shellClassName} ${heroSectionBase} ${
@@ -106,15 +106,15 @@ export async function FirmPageBySlug({
         >
           <div className="space-y-3">
             {eyebrow ? (
-              <p className="text-xs uppercase tracking-[0.35em] text-primary font-semibold">
+              <p className="text-xs uppercase tracking-[0.35em] text-primary font-semibold ">
                 {eyebrow}
               </p>
             ) : null}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-900 max-w-4xl leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-900 max-w-4xl -ml-1 leading-tight">
               {title}
             </h1>
             {heroDescription ? (
-              <p className="text-lg text-gray-700 md:max-w-3xl leading-relaxed">
+              <p className="text-lg text-gray-700 md:max-w-3xl leading-relaxed -ml-1">
                 {heroDescription}
               </p>
             ) : null}

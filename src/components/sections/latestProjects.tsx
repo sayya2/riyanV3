@@ -5,18 +5,6 @@ import { getProjects } from "@/lib/directus";
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-function stripHtml(input: string) {
-  return input
-    .replace(/<[^>]*>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function truncate(text: string, length: number) {
-  if (text.length <= length) return text;
-  return text.slice(0, length).trimEnd() + "...";
-}
-
 function formatProjectStatus(project: {
   year?: string | null;
   completed_year?: string | null;
@@ -38,47 +26,35 @@ export default async function LatestProjectsSection() {
 
   return (
     <section className="container mx-auto px-4 py-12 md:py-16 bg-white">
-        <div className="space-y-5 md:space-y-6">
-          <div className="max-w-4xl space-y-2">
+        <div className="space-y-8 md:space-y-10">
+          <div className="max-w-4xl">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 font-roboto">
               Latest Projects
             </h2>
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed max-w-3xl font-roboto">
-              Explore recent work across our sectors, highlighting the outcomes
-              and impact we deliver.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {projects.map((project, idx) => {
             const slug = project.slug || String(project.id);
             const href = typeof slug === "string" ? `/projects/${slug}` : "#";
-            const excerpt =
-              project.excerpt && project.excerpt.trim().length > 0
-                ? stripHtml(project.excerpt)
-                : truncate(stripHtml(project.content || ""), 140);
             const sectorsText = (project.sectors || [])
               .map((c) => c.sector_id?.name)
-              .filter(Boolean)
-              .join(", ");
+              .filter(Boolean)[0];
             const servicesText = (project.services || [])
               .map((s) => s.service_id?.name)
-              .filter(Boolean)
-              .join(", ");
-            const statusText = formatProjectStatus(project);
-            const clientText = project.client || "Client";
+              .filter(Boolean)[0];
             const categoryText = sectorsText || servicesText || "Project";
-            const metaLine = [clientText, statusText]
-              .filter(Boolean)
-              .join(" • ");
+            const clientText = project.client || "";
+            const statusText = formatProjectStatus(project);
             const thumb = project.featured_image || fallbackImg;
 
             return (
-              <article
+              <Link
                 key={project.id ?? idx}
-                className="widget-card group border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white flex flex-col"
+                href={href}
+                className="group flex flex-col "
               >
-                <div className="relative w-full overflow-hidden h-[6.6rem] md:h-[7.7rem]">
+                <div className="relative w-full overflow-hidden aspect-[4/3]">
                   <Image
                     src={thumb}
                     alt={project.title}
@@ -88,29 +64,25 @@ export default async function LatestProjectsSection() {
                     priority
                   />
                 </div>
-                <div className="p-3 space-y-1.5 flex-shrink-0">
-                  <h6 className="widget-meta tracking-widest text-primary uppercase">
-                    {metaLine}
-                  </h6>
-                  <Link href={href} className="block">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
-                      {project.title}
-                    </h3>
-                  </Link>
-                  <p className="widget-category italic text-gray-600">{categoryText}</p>
-                  {/* <p className="text-gray-700 line-clamp-2">
-                    {excerpt}
-                  </p> */}
+                <div className="pt-5 space-y-2.5 px-2">
+                  <h3 className="text-lg! md:text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                    {project.title}
+                  </h3>
+                  <div className="space-y-1">
+                    {clientText && (
+                      <p className="text-xs md:text-sm font-medium text-gray-800">
+                        {clientText}
+                      </p>
+                    )}
+                    <p className="text-xs md:text-sm text-primary font-medium">
+                      {statusText}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500 italic">
+                      {categoryText}
+                    </p>
+                  </div>
                 </div>
-                <div className="px-3 pb-3 flex-shrink-0">
-                  <Link
-                    href={href}
-                    className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors"
-                  >
-                    Read More
-                  </Link>
-                </div>
-              </article>
+              </Link>
             );
           })}
           </div>

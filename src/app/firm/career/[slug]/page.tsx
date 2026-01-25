@@ -226,7 +226,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
               )}
 
               <div className="flex flex-wrap items-center gap-3">
-                {role.location && (
+                {/* {role.location && (
                   <span className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-800">
                     <span className="h-2 w-2 rounded-full bg-red-800" />
                     {role.location}
@@ -238,7 +238,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
                     <span className="h-2 w-2 rounded-full bg-gray-700" />
                     {role.employment_type}
                   </span>
-                )}
+                )} */}
 
                 <span className="text-xs font-semibold text-gray-600">
                   Posted: {posted} -{" "}

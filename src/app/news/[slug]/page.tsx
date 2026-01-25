@@ -222,20 +222,20 @@ export default async function NewsDetailPage({ params }: PageProps) {
           <aside className="space-y-6 w-full lg:max-w-[300px] lg:justify-self-end">
             <Reveal>
               <div className="bg-white shadow-md p-5 space-y-3">
-                <h3 className="text-lg font-semibold text-gray-900">Details</h3>
-                <div className="space-y-2 text-sm text-gray-700">
+                {/* <h3 className="!text-xl font-semibold text-gray-900">Details</h3> */}
+                <div className="space-y-4 text-sm text-gray-700">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Published</p>
-                    <p className="text-base font-semibold text-gray-900">{published}</p>
+                    <p className="!text-md uppercase tracking-[0.2em] text-gray-500">Published</p>
+                    <p className="!text-sm font-semibold text-gray-900">{published}</p>
                   </div>
                   {categories.length ? (
                     <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Categories</p>
+                      <p className="!text-md uppercase tracking-[0.2em] text-gray-500">Categories</p>
                       <div className="flex flex-wrap gap-2 pt-1">
                         {categories.map((cat) => (
                           <span
                             key={`cat-${cat}`}
-                            className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
+                            className="!text-sm px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
                           >
                             {cat}
                           </span>
@@ -250,10 +250,10 @@ export default async function NewsDetailPage({ params }: PageProps) {
             <Reveal>
               <div className="bg-white p-5 shadow-md space-y-5">
                 <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                  <p className="!text-md uppercase tracking-[0.25em] text-gray-500 font-semibold">
                     Share this article
                   </p>
-                  <p className="text-[0.8rem] text-gray-600">
+                  <p className="!text-[1.0rem] text-gray-600">
                     Send the story to your team.
                   </p>
                 </div>
@@ -280,7 +280,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
                         href={`/news/${adjacent.previous.slug}`}
                         className="block w-[calc(100%+2.5rem)] -mx-5 bg-white shadow-sm overflow-hidden"
                       >
-                        <div className="relative w-full aspect-[16/9] bg-gray-100">
+                        <div className="relative w-full aspect-auto bg-gray-100">
                           {prevImage ? (
                             <img
                               src={prevImage}

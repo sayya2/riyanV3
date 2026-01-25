@@ -22,40 +22,33 @@ export default async function LatestNewsSection() {
 
   return (
     <section className="container mx-auto px-4 py-12 md:py-16 bg-white">
-        <div className="space-y-5 md:space-y-6">
-          <div className="max-w-4xl space-y-2">
+        <div className="space-y-8 md:space-y-10">
+          <div className="max-w-4xl">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 font-roboto">
               Latest News
             </h2>
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed max-w-3xl font-roboto">
-              We hope to remain as a key contributor in the development of
-              Maldives in bringing positive change in the future.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {posts.map((post, idx) => {
             const slug = post.slug || String(post.id);
             const href = typeof slug === "string" ? `/news/${slug}` : "#";
             const excerpt =
               post.excerpt && post.excerpt.trim().length > 0
                 ? stripHtml(post.excerpt)
-                : truncate(stripHtml(post.content || ""), 140);
-            const date = new Date(
-              post.published_at || post.created_at
-            ).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            });
+                : truncate(stripHtml(post.content || ""), 160);
             const thumb = post.featured_image || fallbackImg;
+            const categoryName = (post.categories || [])
+              .map((c: any) => c.category_id?.name)
+              .filter(Boolean)[0] || "News";
 
             return (
-              <article
+              <Link
                 key={post.id ?? idx}
-                className="widget-card group border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white flex flex-col"
+                href={href}
+                className="group flex flex-col bg-white  "
               >
-                <div className="relative w-full overflow-hidden h-[6.6rem] md:h-[7.7rem]">
+                <div className="relative w-full overflow-hidden aspect-[4/3]">
                   <Image
                     src={thumb}
                     alt={post.title}
@@ -64,29 +57,19 @@ export default async function LatestNewsSection() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     priority
                   />
+                  <span className="absolute top-4 left-4 bg-[#722F37] text-white text-[0.65rem]! md:text-xs! font-semibold uppercase tracking-wider px-3 py-1.5">
+                    {categoryName}
+                  </span>
                 </div>
-                <div className="p-3 space-y-1.5 flex-shrink-0">
-                  <h6 className="widget-meta uppercase tracking-widest text-primary">
-                    {date}
-                  </h6>
-                  <Link href={href} className="block">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-                  </Link>
-                  {/* <p className="text-gray-700 line-clamp-2">
+                <div className="pt-5 space-y-2.5 px-2">
+                  <h3 className="text-lg! md:text-xl font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm md:text-[0.9rem] text-gray-600 leading-relaxed line-clamp-3">
                     {excerpt}
-                  </p> */}
+                  </p>
                 </div>
-                <div className="px-3 pb-3 flex-shrink-0">
-                  <Link
-                    href={href}
-                    className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors"
-                  >
-                    Read More
-                  </Link>
-                </div>
-              </article>
+              </Link>
             );
           })}
           </div>

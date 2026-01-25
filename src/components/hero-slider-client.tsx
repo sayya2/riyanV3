@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import type { KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent, TouchEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/db-new";
 import { motion } from "framer-motion";
@@ -24,11 +24,13 @@ const fallbackSlide: HeroSlide = {
 const HeroSliderClient = ({ slides }: Props) => {
   const preparedSlides = useMemo<HeroSlide[]>(
     () => (slides && slides.length > 0 ? slides : [fallbackSlide]),
-    [slides]
+    [slides],
   );
 
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const swipeHandledRef = useRef(false);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -50,10 +52,14 @@ const HeroSliderClient = ({ slides }: Props) => {
   const goTo = (index: number) => setActiveIndex(index);
   const step = (delta: number) =>
     setActiveIndex(
-      (prev) => (prev + delta + preparedSlides.length) % preparedSlides.length
+      (prev) => (prev + delta + preparedSlides.length) % preparedSlides.length,
     );
 
   const handleSlideClick = () => {
+    if (swipeHandledRef.current) {
+      swipeHandledRef.current = false;
+      return;
+    }
     if (!canNavigate || !currentSlide?.link_url) return;
     router.push(currentSlide.link_url);
   };
@@ -66,9 +72,31 @@ const HeroSliderClient = ({ slides }: Props) => {
     }
   };
 
+  const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
+    if (preparedSlides.length < 2) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    swipeHandledRef.current = false;
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLElement>) => {
+    if (preparedSlides.length < 2 || !touchStartRef.current) return;
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+    swipeHandledRef.current = true;
+    step(deltaX < 0 ? 1 : -1);
+  };
+
   return (
     <section
-      className={`full-bleed relative isolate h-[100vh] md:h-screen overflow-hidden bg-secondary text-white ${
+      className={`full-bleed relative isolate h-[94vh]  md:h-[100vh] overflow-hidden bg-secondary text-white ${
         canNavigate ? "cursor-pointer" : ""
       }`}
       role={canNavigate ? "link" : undefined}
@@ -78,6 +106,8 @@ const HeroSliderClient = ({ slides }: Props) => {
       }
       onClick={handleSlideClick}
       onKeyDown={handleSlideKeyDown}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="absolute inset-0">
         {preparedSlides.map((slide, idx) => (
@@ -96,9 +126,60 @@ const HeroSliderClient = ({ slides }: Props) => {
               className="object-cover"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/60" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/30 to-black/60" />
           </div>
         ))}
+      </div>
+
+      <div className="absolute inset-y-0 left-0 right-0 z-20 hidden md:block">
+        <div className="group absolute inset-y-0 left-0 w-[40%]">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              step(-1);
+            }}
+            className="absolute left-6 top-1/2 flex h-11 w-11 -translate-y-1/2 -translate-x-full items-center justify-center rounded-full border border-white/50 bg-white/10 text-white opacity-0 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 group-hover:translate-x-0 group-hover:opacity-100"
+            aria-label="Previous slide"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        </div>
+        <div className="group absolute inset-y-0 right-0 w-[40%]">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              step(1);
+            }}
+            className="absolute right-6 top-1/2 flex h-11 w-11 -translate-y-1/2 translate-x-full items-center justify-center rounded-full border border-white/50 bg-white/10 text-white opacity-0 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 group-hover:translate-x-0 group-hover:opacity-100"
+            aria-label="Next slide"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="relative z-10 h-full flex items-end">

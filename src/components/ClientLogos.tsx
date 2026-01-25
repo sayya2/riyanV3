@@ -25,6 +25,7 @@ const categories: Category[] = [
 export default function ClientLogos({ logosByCategory }: ClientLogosProps) {
   const [activeTab, setActiveTab] = useState<Category>("Government of Maldives");
   const activeLogos = logosByCategory[activeTab] || [];
+  const isSingleLogo = activeLogos.length === 1;
 
   return (
     <div className="border-t border-gray-300 pt-8">
@@ -48,11 +49,17 @@ export default function ClientLogos({ logosByCategory }: ClientLogosProps) {
       </div>
 
       {/* Logos Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 min-h-[200px]">
+      <div
+        className={
+          isSingleLogo
+            ? "flex min-h-[200px] items-center justify-center"
+            : "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 min-h-[200px]"
+        }
+      >
         {activeLogos.map((logo, index) => (
           <div
             key={index}
-            className="group flex min-h-[140px] items-center justify-center  border border-gray-200 bg-white p-6 shadow-sm transition-transform duration-300 hover:scale-105 hover:shadow-md"
+            className="group flex min-h-[120px] items-center justify-center p-2 transition-transform duration-300 hover:scale-105"
           >
             <Image
               src={logo.url}

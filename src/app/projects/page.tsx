@@ -6,6 +6,7 @@
 import FiltersBar from "@/components/FiltersBar";
 import Reveal from "@/components/Reveal";
 import ProjectsInfiniteGrid from "@/components/ProjectsInfiniteGrid";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const contentShell = "w-full mx-auto px-[6%] md:px-[138px]";
 
@@ -101,6 +102,7 @@ export default async function ProjectsPage({
           search={search || undefined}
         />
       </div>
+      <ScrollToTopButton />
     </main>
   );
 }

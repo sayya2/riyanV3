@@ -118,7 +118,7 @@ export default function ProjectsInfiniteGrid({
 
   return (
     <>
-      <div className="columns-1 md:columns-2 xl:columns-3 gap-x-4">
+      <div className="columns-1 md:columns-2 xl:columns-3 gap-x-6 ">
         {projects.map((project, index) => {
           const href = project.slug ? `/projects/${project.slug}` : "#";
           const sectorsText = (project.sectors || [])
@@ -141,7 +141,7 @@ export default function ProjectsInfiniteGrid({
           const cardHeight = cardHeights[Math.abs(heightIndex)];
 
           return (
-            <div key={project.id} className="mb-4 break-inside-avoid">
+            <div key={project.id} className="mb-6 break-inside-avoid">
               <Link
                 href={href}
                 className={`group relative block overflow-hidden ${cardHeight} bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300`}

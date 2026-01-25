@@ -97,7 +97,7 @@ export default function SectorSlider({ sectors, speed = 50 }: Props) {
           {duplicatedSectors.map((sector, index) => (
             <div
               key={`${sector.name}-${index}`}
-              className="relative md:h-[40vh] h-[30vh] overflow-hidden rounded-lg group shadow-lg flex-shrink-0 w-[calc(83.333%-16px)] md:w-[calc(33.333%-16px)]"
+              className="relative md:h-[40vh] h-[30vh] overflow-hidden group shadow-lg flex-shrink-0 w-[calc(83.333%-16px)] md:w-[calc(33.333%-16px)]"
             >
               <Image
                 src={sector.image}

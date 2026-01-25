@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
@@ -28,7 +28,9 @@ export default function FiltersBar({
   const searchParams = useSearchParams();
 
   const [sectorCounts, setSectorCounts] = useState<Record<string, number>>({});
-  const [serviceCounts, setServiceCounts] = useState<Record<string, number>>({});
+  const [serviceCounts, setServiceCounts] = useState<Record<string, number>>(
+    {},
+  );
   const [localSector, setLocalSector] = useState(selectedSector);
   const [localService, setLocalService] = useState(selectedService);
   const [loadingServices, setLoadingServices] = useState(true);
@@ -51,15 +53,21 @@ export default function FiltersBar({
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (sectorDropdownRef.current && !sectorDropdownRef.current.contains(event.target as Node)) {
+      if (
+        sectorDropdownRef.current &&
+        !sectorDropdownRef.current.contains(event.target as Node)
+      ) {
         setShowSectorDropdown(false);
       }
-      if (serviceDropdownRef.current && !serviceDropdownRef.current.contains(event.target as Node)) {
+      if (
+        serviceDropdownRef.current &&
+        !serviceDropdownRef.current.contains(event.target as Node)
+      ) {
         setShowServiceDropdown(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Fetch sector counts when service changes
@@ -69,13 +77,13 @@ export default function FiltersBar({
       try {
         const url = localService
           ? `/api/project-counts/sectors?service=${localService}`
-          : '/api/project-counts/sectors';
+          : "/api/project-counts/sectors";
         const response = await fetch(url);
         const data = await response.json();
         setSectorCounts(data);
         setLoadingSectors(false);
       } catch (error) {
-        console.error('Failed to fetch sector counts:', error);
+        console.error("Failed to fetch sector counts:", error);
         setLoadingSectors(false);
       }
     }
@@ -89,13 +97,13 @@ export default function FiltersBar({
       try {
         const url = localSector
           ? `/api/project-counts/services?sector=${localSector}`
-          : '/api/project-counts/services';
+          : "/api/project-counts/services";
         const response = await fetch(url);
         const data = await response.json();
         setServiceCounts(data);
         setLoadingServices(false);
       } catch (error) {
-        console.error('Failed to fetch service counts:', error);
+        console.error("Failed to fetch service counts:", error);
         setLoadingServices(false);
       }
     }
@@ -135,22 +143,13 @@ export default function FiltersBar({
     updateParams({ sector: localSector, service: localService, q: value });
   };
 
-  const selectedSectorName = sectors.find(s => s.slug === localSector)?.name || 'All Sectors';
-  const selectedServiceName = services.find(s => s.slug === localService)?.name || 'All Services';
+  const selectedSectorName =
+    sectors.find((s) => s.slug === localSector)?.name || "All Sectors";
+  const selectedServiceName =
+    services.find((s) => s.slug === localService)?.name || "All Services";
 
   return (
     <div className="flex flex-col gap-4 w-full mt-6">
-      {/* Search bar */}
-      <input
-        type="text"
-        name="q"
-        defaultValue={search}
-        onChange={onSearchChange}
-        placeholder="Search projects..."
-        className="border border-gray-300 rounded px-4 py-2.5 w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-        suppressHydrationWarning
-      />
-
       {/* Prompt-style filter */}
       <div className="flex flex-wrap items-center gap-2 text-base md:text-lg text-gray-700">
         <span>Show projects in</span>
@@ -163,14 +162,19 @@ export default function FiltersBar({
             disabled={loadingSectors}
             className="inline-flex items-center gap-1 text-primary font-semibold hover:text-primary/80 transition-colors underline decoration-dotted underline-offset-4 disabled:opacity-50"
           >
-            {loadingSectors ? 'Loading...' : selectedSectorName}
+            {loadingSectors ? "Loading..." : selectedSectorName}
             <svg
               className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -178,7 +182,7 @@ export default function FiltersBar({
             <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded shadow-lg z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
               <button
                 type="button"
-                onClick={() => onSectorChange('')}
+                onClick={() => onSectorChange("")}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
               >
                 All Sectors
@@ -192,7 +196,8 @@ export default function FiltersBar({
                     onClick={() => onSectorChange(sector.slug)}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                   >
-                    {sector.name}{count !== undefined ? ` (${count})` : ''}
+                    {sector.name}
+                    {count !== undefined ? ` (${count})` : ""}
                   </button>
                 );
               })}
@@ -210,14 +215,19 @@ export default function FiltersBar({
             disabled={loadingServices}
             className="inline-flex items-center gap-1 text-primary font-semibold hover:text-primary/80 transition-colors underline decoration-dotted underline-offset-4 disabled:opacity-50"
           >
-            {loadingServices ? 'Loading...' : selectedServiceName}
+            {loadingServices ? "Loading..." : selectedServiceName}
             <svg
               className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
 
@@ -225,7 +235,7 @@ export default function FiltersBar({
             <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded shadow-lg z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
               <button
                 type="button"
-                onClick={() => onServiceChange('')}
+                onClick={() => onServiceChange("")}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
               >
                 All Services
@@ -239,13 +249,25 @@ export default function FiltersBar({
                     onClick={() => onServiceChange(svc.slug)}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                   >
-                    {svc.name}{count !== undefined ? ` (${count})` : ''}
+                    {svc.name}
+                    {count !== undefined ? ` (${count})` : ""}
                   </button>
                 );
               })}
             </div>
           )}
         </div>
+        {/* Search bar */}
+        <span>or</span>
+        <input
+          type="text"
+          name="q"
+          defaultValue={search}
+          onChange={onSearchChange}
+          placeholder="Search projects..."
+          className=" px-1 py-2.5 w-full md:w-96 focus:outline-none placeholder-accent text-md"
+          suppressHydrationWarning
+        />
       </div>
 
       {/* Commented out perPage selector */}
