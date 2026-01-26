@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { SVGProps } from "react";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 import { getAdjacentCareers, getCareerBySlug } from "@/lib/directus";
 import { parseCareerSections } from "@/lib/parseCareerSections";
 import { resolveFileUrl } from "@/lib/media";
@@ -67,6 +69,15 @@ const formatDate = (
   }
   return value;
 };
+
+const XIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+    <path
+      fill="currentColor"
+      d="M18.244 2H21.1l-6.25 7.142L22.5 22h-6.463l-4.597-6.18L5.95 22H3.09l6.71-7.67L2.5 2H9.12l4.154 5.56L18.244 2Zm-1.02 18.2h1.583L7.95 3.7H6.28l10.944 16.5Z"
+    />
+  </svg>
+);
 
 type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
@@ -168,24 +179,26 @@ export default async function CareerDetailPage({ params }: PageProps) {
       href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
         shareUrl
       )}&text=${encodeURIComponent(shareText)}`,
+      icon: XIcon,
     },
     {
       label: "Facebook",
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
         shareUrl
       )}`,
+      icon: Facebook,
     },
     {
-      label: "Pinterest",
-      href: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(
-        shareUrl
-      )}&description=${encodeURIComponent(shareText)}`,
+      label: "Instagram",
+      href: "https://www.instagram.com/riyanprivatelimited",
+      icon: Instagram,
     },
     {
       label: "LinkedIn",
       href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
         shareUrl
       )}&title=${encodeURIComponent(shareText)}`,
+      icon: Linkedin,
     },
   ];
 
@@ -274,7 +287,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
             {hasMetaFields ? (
               structuredSections.map((section, index) => (
                 <Reveal key={section.key} delay={index * 0.08}>
-                  <div className="border border-gray-100 bg-white shadow-sm p-6 md:p-8 text-gray-800 space-y-4">
+                  <div className="bg-white p-6 md:p-8 text-gray-800 space-y-4">
                     <h2 className="text-2xl font-semibold text-gray-900">
                       {section.heading}
                     </h2>
@@ -288,7 +301,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
               ))
             ) : (
               <Reveal>
-                <div className="border border-gray-100 bg-white shadow-sm p-6 md:p-8 text-gray-800">
+                <div className="bg-white p-6 md:p-8 text-gray-800">
                   <div
                     dangerouslySetInnerHTML={{ __html: safeContent }}
                     className="rich-content text-gray-700 space-y-4"
@@ -302,11 +315,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
           <aside className="space-y-6 lg:pl-4 w-full lg:max-w-[300px] lg:justify-self-end lg:col-start-2">
             {/* Role Details */}
             <Reveal>
-              <div className="border border-gray-200 bg-gray-50 shadow-sm p-5 space-y-3">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Role Details
-                </h3>
-
+              <div className="border border-gray-100 bg-white shadow-sm p-6 md:p-7 space-y-4">
                 <div className="space-y-3 text-sm text-gray-700">
                   {metaItems.map((item) => (
                     <div
@@ -375,17 +384,21 @@ export default async function CareerDetailPage({ params }: PageProps) {
                 <span className="text-sm font-semibold text-gray-800">Share</span>
 
                 <div className="flex flex-wrap items-center gap-3">
-                  {shareLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100"
-                    >
-                      {link.label[0]}
-                    </a>
-                  ))}
+                  {shareLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100"
+                        aria-label={link.label}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </Reveal>
@@ -420,28 +433,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
         </div>
       </section>
       <section className="container mx-auto px-4 pb-12">
-        <Reveal>
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Link
-              href="/firm/about"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/firm/career/internships"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Internships
-            </Link>
-            <Link
-              href="/firm/contact"
-              className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-gray-800 font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Contact
-            </Link>
-          </div>
-        </Reveal>
+       
       </section>
     </main>
   );
