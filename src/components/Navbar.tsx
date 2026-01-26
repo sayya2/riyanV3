@@ -131,7 +131,7 @@ export default function Navbar() {
   const headerBg = isLightNavbar ? "bg-white shadow-md" : baseBg;
   const firmPanelBorder = isLightNavbar
     ? "border-t border-gray-200"
-    : isTransparentHero
+    : isTransparentHero 
       ? ""
       : "border-t border-white/20";
   const firmPanelLinkColor = isLightNavbar
