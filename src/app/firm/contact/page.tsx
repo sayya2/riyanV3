@@ -1,4 +1,4 @@
-import { Building2, Clock, Mail, MapPin, Phone, Send } from "lucide-react";
+import { Building2, Clock, Mail, MapPin, Phone, Send, Contact, Route } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import { FirmPageBySlug } from "../_components/FirmPage";
 
@@ -56,7 +56,7 @@ export default function ContactPage() {
       <section className="mt-4">
         <Reveal>
           <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
             style={{ fontFamily: "var(--font-roboto-condensed)" }}
           >
             {contactChannels.map((channel) => {
@@ -70,14 +70,14 @@ export default function ContactPage() {
                   rel={isExternal ? "noreferrer" : undefined}
                   className="group relative overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 flex items-stretch"
                 >
-                  <div className="flex w-14 shrink-0 items-center justify-center bg-primary/10 text-primary self-stretch">
-                    <Icon className="h-4 w-4" />
+                  <div className="flex w-12 shrink-0 items-center justify-center bg-primary/10 text-primary self-stretch">
+                    <Icon className="h-3.5 w-3.5" />
                   </div>
-                  <div className="flex flex-1 min-w-0 flex-col justify-center p-3 space-y-1">
-                    <p className="!text-[0.75rem] uppercase tracking-wide text-gray-500 font-semibold">
+                  <div className="flex flex-1 min-w-0 flex-col justify-center p-2.5 space-y-1">
+                    <p className="!text-[0.7rem] uppercase tracking-wide text-gray-500 font-semibold">
                       {channel.label}
                     </p>
-                    <h3 className="!text-[1.35rem] md:text-base font-semibold text-gray-900 break-words">
+                    <h3 className="!text-[1.1rem] md:text-[1.05rem] font-semibold text-gray-900 break-words">
                       {channel.value}
                     </h3>
                   </div>
@@ -89,8 +89,8 @@ export default function ContactPage() {
       </section>
 
       <section id="contact-form" className="py-8 space-y-8">
-        <div className="grid lg:grid-cols-2 gap-8 items-start lg:items-stretch">
-          <Reveal className="lg:h-full">
+        <div className="grid lg:grid-cols-3 gap-8 items-start lg:items-start">
+          {/* <Reveal className="lg:h-full">
             <div className="bg-white border border-gray-200 shadow-md p-5 space-y-6 lg:h-full">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -174,30 +174,54 @@ export default function ContactPage() {
                 </div>
               </form>
             </div>
+          </Reveal> */}
+
+          <Reveal delay={0.05} className="lg:col-span-2 md:h-[380px]">
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm h-full">
+              <iframe
+                title="Riyan office location"
+                src="https://www.google.com/maps?q=4.170965613755108,73.5159096621892&z=17&output=embed"
+                allowFullScreen
+                loading="lazy"
+                className="w-full h-[240px] md:h-full"
+              />
+            </div>
           </Reveal>
 
-          <div className="space-y-4 lg:flex lg:flex-col lg:h-full lg:space-y-0 lg:gap-4">
-            <Reveal delay={0.05} className="lg:shrink-0">
-              <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9)_0,_rgba(255,255,255,0)_60%),linear-gradient(135deg,#ffffff,#fffcee_55%,rgba(120,18,19,0.15))] p-5 text-gray-900 shadow-md lg:shrink-0">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Building2 className="h-4 w-4" />
-                  </span>
-                  <div>
-                    {/* <p className="text-[0.65rem] uppercase tracking-[0.3em] text-gray-500">
-                      HQ
-                    </p> */}
-                    <h4 className="text-2xl! font-semibold text-gray-800">
-                      Head Office
-                    </h4>
-                  </div>
+          <Reveal delay={0.05}>
+            <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9)_0,_rgba(255,255,255,0)_60%),linear-gradient(135deg,#ffffff,#fffcee_55%,rgba(120,18,19,0.15))] p-4 text-gray-900 shadow-md md:h-[380px] md:flex md:flex-col">
+              <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Building2 className="h-4 w-4" />
+                </span>
+                <h4 className="text-2xl! font-semibold text-gray-800">
+                  Head Office
+                </h4>
+              </div>
+
+              <div className="mt-5 ml-10 space-y-4 text-base text-gray-700 md:text-[15.75px]">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-primary mt-0.5" />
+                  <p className="font-medium">
+                    H. Azim, 3rd Floor, Ameenee Magu, Male 20054
+                  </p>
                 </div>
-                <p className="text-sm text-gray-700 mt-2">
-                  H. Azim, 3rd Floor, Ameenee Magu, Male 20054
-                </p>
-                <div className="grid sm:grid-cols-2 gap-3 text-xs text-gray-700 mt-4">
+                <a
+                  href="https://www.google.com/maps?q=4.170965613755108,73.5159096621892&z=17"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"
+                >
+                  <Route className="h-3.5 w-3.5" />
+                  Get directions
+                </a>
+              </div>
+
+              <div className="mt-7 ml-10 space-y-6 text-base text-gray-700 md:text-[15.75px] md:mt-8">
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 text-primary mt-0.5" />
                   <div>
-                    <p className="text-[0.65rem] uppercase tracking-wide text-gray-500 font-semibold">
+                    <p className="text-[0.7rem] uppercase tracking-wide text-gray-500 font-semibold">
                       Hours
                     </p>
                     <p className="font-semibold text-gray-900">
@@ -205,11 +229,14 @@ export default function ContactPage() {
                     </p>
                     <p className="text-gray-600">9:00 AM - 5:00 PM</p>
                   </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Contact className="h-4 w-4 text-primary mt-0.5" />
                   <div>
-                    <p className="text-[0.65rem] uppercase tracking-wide text-gray-500 font-semibold">
+                    <p className="text-[0.7rem] uppercase tracking-wide text-gray-500 font-semibold">
                       Quick contact
                     </p>
-                    <div className="space-y-1 mt-1">
+                    <div className="mt-2 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-6">
                       <a
                         href="tel:+9603315049"
                         className="flex items-center gap-2 font-semibold text-primary hover:text-primary/80"
@@ -228,19 +255,8 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-            </Reveal>
-            <Reveal delay={0.05} className="lg:flex-1 lg:min-h-0">
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm h-full">
-                <iframe
-                  title="Riyan office location"
-                  src="https://www.google.com/maps?q=4.170965613755108,73.5159096621892&z=17&output=embed"
-                  allowFullScreen
-                  loading="lazy"
-                  className="w-full h-[220px] md:h-[240px] lg:h-full"
-                />
-              </div>
-            </Reveal>
-          </div>
+            </div>
+          </Reveal>
         </div>
       </section>
     </FirmPageBySlug>

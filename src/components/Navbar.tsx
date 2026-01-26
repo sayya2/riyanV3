@@ -121,7 +121,11 @@ export default function Navbar() {
   //   }, 150);
   // };
 
-  const borderColor = isLightNavbar ? "border-white" : "border-red-700/0";
+  const borderColor = isFirmOpen
+    ? "border-transparent"
+    : isLightNavbar
+      ? "border-white"
+      : "border-red-700/0";
   const textColor = isLightNavbar ? "text-gray-900" : "text-white";
   const glassBg = "bg-white/10 backdrop-blur-sm";
   const baseBg =
@@ -129,11 +133,7 @@ export default function Navbar() {
       ? glassBg
       : "bg-gradient-to-r from-[#7a1c1a] via-[#7a1c1a] to-[#9b2c28]";
   const headerBg = isLightNavbar ? "bg-white shadow-md" : baseBg;
-  const firmPanelBorder = isLightNavbar
-    ? "border-t border-gray-200"
-    : isTransparentHero 
-      ? ""
-      : "border-t border-white/20";
+  const firmPanelBorder = "";
   const firmPanelLinkColor = isLightNavbar
     ? "text-gray-900 hover:text-primary"
     : "text-white hover:text-white/80";
@@ -161,7 +161,11 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <div className="relative w-36 h-22">
+              <div
+                className={`relative w-36 h-22 transition-all duration-300 ease-in-out ${
+                  isFirmOpen ? "md:translate-y-5.5 md:w-46 md:h-42" : ""
+                }`}
+              >
                 <Image
                   src={
                     isLightNavbar
@@ -224,7 +228,7 @@ export default function Navbar() {
                   >
                     {item.title}
                   </Link>
-                )
+                ),
               )}
             </nav>
           </div>
@@ -326,7 +330,7 @@ export default function Navbar() {
               <Link
                 key={link.id}
                 href={link.url}
-                className={`text-sm font-semibold uppercase tracking-wide transition-colors ${firmPanelLinkColor}`}
+                className={`text-xs! font-semibold uppercase tracking-wide transition-colors ${firmPanelLinkColor}`}
                 onClick={() => setIsFirmOpen(false)}
               >
                 {link.title}
