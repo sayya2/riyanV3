@@ -189,6 +189,9 @@ export default function FiltersBar({
               </button>
               {sectors.map((sector) => {
                 const count = sectorCounts[sector.slug];
+                if (count === 0) {
+                  return null;
+                }
                 return (
                   <button
                     key={sector.slug}
@@ -197,7 +200,6 @@ export default function FiltersBar({
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                   >
                     {sector.name}
-                    {count !== undefined ? ` (${count})` : ""}
                   </button>
                 );
               })}
@@ -242,6 +244,9 @@ export default function FiltersBar({
               </button>
               {services.map((svc) => {
                 const count = serviceCounts[svc.slug];
+                if (count === 0) {
+                  return null;
+                }
                 return (
                   <button
                     key={svc.slug}
@@ -250,7 +255,6 @@ export default function FiltersBar({
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                   >
                     {svc.name}
-                    {count !== undefined ? ` (${count})` : ""}
                   </button>
                 );
               })}

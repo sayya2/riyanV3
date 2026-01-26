@@ -10,14 +10,11 @@ function formatProjectStatus(project: {
   completed_year?: string | null;
 }) {
   const rawStatus = (project.year || "").trim().toLowerCase();
-  const completedYear = project.completed_year?.trim();
   const yearIsNumeric = /^\d{4}$/.test(project.year?.trim() || "");
 
   if (rawStatus === "ongoing") return "Ongoing";
-  if (rawStatus === "completed") {
-    return completedYear ? `Completed ${completedYear}` : "Completed";
-  }
-  if (yearIsNumeric) return `Completed ${project.year}`;
+  if (rawStatus === "completed") return "Completed";
+  if (yearIsNumeric) return "Completed";
   return project.year ? project.year : "Ongoing";
 }
 
