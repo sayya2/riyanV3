@@ -3,6 +3,7 @@ import { getClientLogos } from "@/lib/db-new";
 import ClientLogos from "@/components/ClientLogos";
 import Reveal from "@/components/Reveal";
 import SectorSlider from "@/components/SectorSlider";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { FirmPageBySlug } from "../_components/FirmPage";
 
 export const metadata = {
@@ -284,6 +285,7 @@ export default async function AboutPage() {
           <ClientLogos logosByCategory={clientLogos} />
         </Reveal>
       </section>
+      <ScrollToTopButton />
     </FirmPageBySlug>
   );
 }
