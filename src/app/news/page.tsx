@@ -1,12 +1,24 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getNewsCategories, getNewsPosts } from "@/lib/db";
+import { getNewsCategories, getNewsPosts } from "@/lib/directus";
 import FiltersBarNews from "@/components/news/FiltersBarNews";
+import Reveal from "@/components/Reveal";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full mx-auto px-[6%] md:px-[138px]";
+const cardHeights = [
+  "h-52 md:h-60",
+  "h-96 md:h-[32rem]",
+  "h-72 md:h-[24rem]",
+  "h-56 md:h-64",
+  "h-80 md:h-[26rem]",
+  "h-52 md:h-60",
+  "h-[18rem] md:h-[28rem]",
+  "h-60 md:h-[20rem]",
+];
 
 function stripHtml(input: string) {
   return input
@@ -54,9 +66,9 @@ export default async function NewsPage({
     console.log(
       "[NewsPage] articles sample",
       articles.slice(0, 3).map((a) => ({
-        ID: a.ID,
-        slug: a.post_name,
-        title: a.post_title,
+        id: a.id,
+        slug: a.slug,
+        title: a.title,
         categories: a.categories,
       })),
       "total",
@@ -67,66 +79,80 @@ export default async function NewsPage({
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="w-full mx-auto px-[10%] py-16 space-y-10 mt-30">
-        <div className="flex flex-col gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
-              News &amp; Updates
-            </h1>
-            <p className="text-gray-700 mt-2 max-w-2xl">
-              Browse articles, announcements, and press from our multidisciplinary teams.
-            </p>
+      <div className={`${contentShell} py-16 space-y-10 mt-17`}>
+        <Reveal>
+          <div className="flex flex-col gap-1">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
+                News &amp; Announcements
+              </h1>
+              <p className="text-gray-700 mt-2 max-w-2xl">
+                Browse articles, announcements, and press from our multidisciplinary teams.
+              </p>
+            </div>
+
+            <FiltersBarNews
+              categories={categories}
+              selectedCategory={category}
+              search={search}
+              perPage={limit}
+            />
           </div>
+        </Reveal>
 
-          <FiltersBarNews
-            categories={categories}
-            selectedCategory={category}
-            search={search}
-            perPage={limit}
-          />
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {articles.map((article) => {
-            const href = article.post_name ? `/news/${article.post_name}` : "#";
-            const categoriesText = (article.categories || []).join(", ");
+        <div className="columns-1 md:columns-2 xl:columns-3  gap-x-6">
+          {articles.map((article, index) => {
+            const href = article.slug ? `/news/${article.slug}` : "#";
+            const categoriesText = (article.categories || [])
+              .map(c => c.category_id?.name)
+              .filter(Boolean)
+              .join(", ");
             const excerpt =
-              article.post_excerpt && article.post_excerpt.trim().length > 0
-                ? stripHtml(article.post_excerpt)
-                : stripHtml(article.post_content || "").slice(0, 140);
-            const img = article.thumbnail_url || fallbackImg;
+              article.excerpt && article.excerpt.trim().length > 0
+                ? stripHtml(article.excerpt)
+                : stripHtml(article.content || "").slice(0, 140);
+            const img = article.featured_image || fallbackImg;
+            const cardHeight = cardHeights[index % cardHeights.length];
 
             return (
-              <Link
-                key={article.ID}
-                href={href}
-                className="group relative block overflow-hidden rounded-xl h-72 md:h-80 bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
+              <Reveal
+                key={article.id}
+                delay={index * 0.04}
+                duration={0.65}
+                offsetY={18}
+                className="mb-4 break-inside-avoid "
               >
-                <Image
-                  src={img}
-                  alt={article.post_title}
-                  fill
-                  sizes="(min-width:1024px) 33vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute inset-0 flex flex-col justify-end p-5 space-y-2">
-                  <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
-                    {categoriesText || "News"}
-                  </p>
-                  <h3 className="text-xl font-semibold text-white drop-shadow-sm">
-                    {article.post_title}
-                  </h3>
-                  <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
-                    {excerpt}
-                  </p>
-                </div>
-              </Link>
+                <Link
+                  href={href}
+                  className={`group relative block overflow-hidden mb-6 ${cardHeight} bg-gray-100 shadow-sm hover:shadow-lg transition-all duration-300`}
+                >
+                  <Image
+                    src={img}
+                    alt={article.title}
+                    fill
+                    sizes="(min-width:1024px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority={false}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 flex flex-col justify-end gap-2 p-5 !text-[98%]">
+                    <p className="!text-[0.7rem] uppercase tracking-widest text-white/80 font-semibold">
+                      {categoriesText || "News"}
+                    </p>
+                    <h3 className="news-card-title line-clamp-2 min-h-[2.6rem] font-semibold text-white drop-shadow-sm">
+                      {article.title}
+                    </h3>
+                    {/* <p className="hidden sm:block min-h-[2.6rem] text-sm text-white/80 leading-relaxed md:line-clamp-3">
+                      {excerpt}
+                    </p> */}
+                  </div>
+                </Link>
+              </Reveal>
             );
           })}
         </div>
       </div>
+      <ScrollToTopButton />
     </main>
   );
 }

@@ -7,7 +7,15 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export:projects": "node scripts/export-projects.js",
+    "export:projects:published": "node scripts/export-projects.js --status published",
+    "import:projects": "node scripts/import-projects.js",
+    "import:projects:dry": "node scripts/import-projects.js --dry-run",
+    "export:news": "node scripts/export-news.js",
+    "export:news:published": "node scripts/export-news.js --status published",
+    "import:news": "node scripts/import-news.js",
+    "import:news:dry": "node scripts/import-news.js --dry-run"
   },
   "private": true,
   "repository": {
@@ -22,21 +30,30 @@
   },
   "homepage": "https://github.com/sayya2/riyan#readme",
   "dependencies": {
+    "@directus/sdk": "^20.3.0",
     "@tailwindcss/postcss": "^4.1.17",
+    "directus-slug-generator": "^1.1.5",
+    "framer-motion": "^12.23.26",
     "lucide-react": "^0.555.0",
     "mysql2": "^3.15.3",
-    "next": "^16.0.6",
+    "next": "^16.1.0-canary.12",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@fast-csv/format": "^5.0.5",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "autoprefixer": "^10.4.22",
+    "csv-parser": "^3.2.0",
+    "dompurify": "^3.3.1",
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.6",
+    "jsdom": "^27.4.0",
+    "marked": "^17.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
+    "turndown": "^7.2.2",
     "typescript": "^5.9.3"
   }
 }

@@ -5,7 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnp
 .pnp.js
-
+.claude/
+develop 
 # Next.js
 .next/
 out/
@@ -13,8 +14,13 @@ dist/
 build/
 coverage/
 wp-content/
-
+wp-content
 *.yml
+!docker-compose.yml
+!docker-compose.prod.yml
+!docker-compose.pi.yml
+!.github/workflows/*.yml
+
 # Production
 .vercel
 
@@ -25,6 +31,7 @@ wp-content/
 .env.test.local
 .env.production.local
 .env.production
+.env.pi
 
 # Logs
 *.log
@@ -60,3 +67,15 @@ delete-blobs.txt
 # Documentation (exclude from production repo)
 *.md
 !README.md
+!docs/DEPLOYMENT.md
+
+# Scripts - only ignore data files in scripts/, not the scripts themselves
+scripts/*.sql
+scripts/*.tsv
+scripts/*.json
+scripts/New folder/
+scripts/tailscale/
+
+# Directus extensions (installed via npm in deploy workflow)
+directus/extensions/interfaces/slug-generator/
+directus/extensions/

@@ -1,0 +1,108 @@
+services:
+  mariadb:
+    image: mariadb:10.4
+    container_name: riyan_mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: riyan_nextjs
+      MYSQL_USER: user
+      MYSQL_PASSWORD: Riyanitaccess@26+
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - /opt/riyan/db_init:/docker-entrypoint-initdb.d
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    image: directus/directus:11.2
+    container_name: riyan_directus
+    restart: always
+    ports:
+      - "8055:8055"
+    environment:
+      KEY: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
+      SECRET: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
+      ADMIN_EMAIL: "admin@riyan.com.mv"
+      ADMIN_PASSWORD: "ChangeThisPassword123!"
+      DB_CLIENT: "mysql"
+      DB_HOST: "mariadb"
+      DB_PORT: "3306"
+      DB_DATABASE: "riyan_nextjs"
+      DB_USER: "user"
+      DB_PASSWORD: "Riyanitaccess@26+"
+      WEBSOCKETS_ENABLED: "true"
+      PUBLIC_URL: "http://100.80.223.36:8055"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "http://100.80.223.36:3000,https://riyan.com.mv"
+      CORS_CREDENTIALS: "true"
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_ROOT: "/app/public/wp-content/uploads"
+      CACHE_ENABLED: "true"
+      CACHE_STORE: "memory"
+    volumes:
+      - directus_data:/directus/uploads
+      - /opt/riyan/wp-content:/app/public/wp-content
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8055/server/health').then(() => process.exit(0)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web:
+    image: ghcr.io/sayya2/riyanwebsite:develop
+    container_name: riyan_web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mariadb
+      - DB_USER=user
+      - DB_PASSWORD=Riyanitaccess@26+
+      - DB_NAME=riyan_nextjs
+      - DB_PORT=3306
+      - NEXT_PUBLIC_SITE_URL=http://100.80.223.36:3000
+      - NEXT_PUBLIC_DIRECTUS_URL=http://100.80.223.36:8055
+      - DIRECTUS_URL=http://directus:8055
+      - DIRECTUS_TOKEN=your-directus-static-token-here
+      - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
+      - REVALIDATE_SECRET=replace-with-random-secret
+    volumes:
+      - /opt/riyan/wp-content:/app/public/wp-content
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      directus:
+        condition: service_healthy
+    networks:
+      - riyan_network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(() => process.exit(0)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  riyan_network:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+    driver: local
+  directus_data:
+    driver: local
