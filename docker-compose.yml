@@ -1,3 +1,14 @@
+# ========================================
+# LOCAL DEVELOPMENT ONLY - DO NOT USE IN PRODUCTION
+# ========================================
+# This docker-compose.yml contains hardcoded credentials for local development convenience.
+#
+# For production/Pi deployments, use:
+#   - docker-compose.pi.yml (Pi dev server)
+#   - docker-compose.prod.yml (Production)
+#
+# These files use environment variables from .env.pi or .env.prod for secure credential management.
+# ========================================
 
 services:
   mariadb:
@@ -10,7 +21,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: Riyanitaccess@26+
     ports:
-      - "3307:3306"
+      - "3310:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./db_init:/docker-entrypoint-initdb.d
@@ -65,6 +76,7 @@ services:
     volumes:
       - directus_data:/directus/uploads
       - ./wp-content:/app/public/wp-content
+      - ./directus/extensions:/directus/extensions
     depends_on:
       mariadb:
         condition: service_healthy
@@ -72,7 +84,7 @@ services:
       - riyan_network
     healthcheck:
       # Use 127.0.0.1 instead of localhost to avoid IPv6 (::1) resolution issues
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8055/server/health"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8055/server/health').then(() => process.exit(0)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -94,8 +106,10 @@ services:
       - DB_NAME=riyan_nextjs
       - DB_PORT=3306
       - NEXT_PUBLIC_SITE_URL=https://riyan.com.mv
+      - NEXT_PUBLIC_DIRECTUS_URL=http://localhost:8055
       - DIRECTUS_URL=http://directus:8055
       - DIRECTUS_TOKEN=your-directus-static-token-here
+      - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
       - REVALIDATE_SECRET=replace-with-random-secret
     volumes:
       - ./wp-content:/app/public/wp-content
@@ -108,7 +122,7 @@ services:
       - riyan_network
     healthcheck:
       # Use 127.0.0.1 instead of localhost to avoid IPv6 (::1) resolution issues
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(() => process.exit(0)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3

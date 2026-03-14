@@ -1,20 +1,46 @@
-import React from "react";
-import Image from "next/image";
+﻿import React from "react";
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-import { Building2, CalendarClock, MapPin } from "lucide-react";
+import {
+  Building2,
+  CalendarClock,
+  MapPin,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { getAdjacentProjects, getProjectBySlug } from "@/lib/directus";
+import { resolveFileUrl } from "@/lib/media";
+import Reveal from "@/components/Reveal";
+import ProjectGalleryCarousel from "@/components/ProjectGalleryCarousel";
+import ProjectAdjacentNav from "@/components/ProjectAdjacentNav";
 
 const fallbackImg =
   "/wp-content/uploads/about_gallery/1_Collaboration-Space.jpg";
 
-const contentShell = "w-full mx-auto px-[10%]";
+const contentShell = "w-full  px-[6%] md:px-[138px] lg:px-[138px]";
 
 const stripHtml = (input: string) =>
   input
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim();
+
+const formatProjectStatus = (project: {
+  year?: string | null;
+  completed_year?: string | null;
+}) => {
+  const rawStatus = (project.year || "").trim().toLowerCase();
+  const completedYear = project.completed_year?.trim();
+  const yearIsNumeric = /^\d{4}$/.test(project.year?.trim() || "");
+
+  if (rawStatus === "ongoing") return "Ongoing";
+  if (rawStatus === "completed") {
+    return completedYear ? `Completed ${completedYear}` : "Completed";
+  }
+  if (yearIsNumeric) return `Completed ${project.year}`;
+  return project.year ? project.year : "Ongoing";
+};
 
 type PageProps = {
   params: { slug: string } | Promise<{ slug: string }>;
@@ -49,21 +75,22 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     );
   }
 
-  const categories = (project.categories || [])
-    .map(c => c.category_id?.name)
+  const sectors = (project.sectors || [])
+    .map((c) => c.sector_id?.name)
     .filter(Boolean) as string[];
   const services = (project.services || [])
-    .map(s => s.service_id?.name)
+    .map((s) => s.service_id?.name)
     .filter(Boolean) as string[];
   const gallery = (project.gallery || [])
-    .map(g => g.media_id?.filename ? `/wp-content/uploads/${g.media_id.filename}` : null)
+    .map((g) => resolveFileUrl(g.media_id))
     .filter(Boolean) as string[];
-  const categoriesText = categories.join(", ");
+  const sectorsText = sectors.join(", ");
   const servicesText = services.join(", ");
   const img = project.featured_image || fallbackImg;
+  const statusText = formatProjectStatus(project);
   const stats = [
     { label: "Client", value: project.client || "Not specified" },
-    { label: "Year", value: project.year || "Not specified" },
+    { label: "Status", value: statusText || "Not specified" },
     { label: "Location", value: project.location || "Not specified" },
   ];
   const lead =
@@ -75,7 +102,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const shareText = project.title;
   const statIcons: Record<string, React.ReactElement> = {
     Client: <Building2 className="h-5 w-5" />,
-    Year: <CalendarClock className="h-5 w-5" />,
+    Status: <CalendarClock className="h-5 w-5" />,
     Location: <MapPin className="h-5 w-5" />,
   };
   const shareLinks = [
@@ -103,7 +130,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       icon: (
         <svg
           viewBox="0 0 24 24"
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="currentColor"
           aria-hidden="true"
         >
@@ -111,22 +138,22 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </svg>
       ),
     },
-    {
-      label: "Pinterest",
-      href: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(
-        shareUrl
-      )}&description=${encodeURIComponent(shareText)}`,
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M12.2 3C7.4 3 5 6.2 5 9.4c0 1.6.9 3.6 2.5 4.2.2.1.3 0 .3-.2l.5-1.9c0-.1 0-.2-.1-.3-.6-.8-.3-2.4.9-2.4 1.5 0 1.4 2.1.3 2.8-.2.1-.3.3-.2.5.2.8.5 2.2.6 2.5.1.5.4.6.6.4.3-.4.9-1.2 1.1-1.8.1-.3.5-1.7.5-1.7.3.6 1.2 1 2.1 1 2.8 0 4.7-2.4 4.7-5.3C18.8 6 16 3 12.2 3Z" />
-        </svg>
-      ),
-    },
+    // {
+    //   label: "Pinterest",
+    //   href: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(
+    //     shareUrl
+    //   )}&description=${encodeURIComponent(shareText)}`,
+    //   icon: (
+    //     <svg
+    //       viewBox="0 0 24 24"
+    //       className="h-4 w-4"
+    //       fill="currentColor"
+    //       aria-hidden="true"
+    //     >
+    //       <path d="M12.2 3C7.4 3 5 6.2 5 9.4c0 1.6.9 3.6 2.5 4.2.2.1.3 0 .3-.2l.5-1.9c0-.1 0-.2-.1-.3-.6-.8-.3-2.4.9-2.4 1.5 0 1.4 2.1.3 2.8-.2.1-.3.3-.2.5.2.8.5 2.2.6 2.5.1.5.4.6.6.4.3-.4.9-1.2 1.1-1.8.1-.3.5-1.7.5-1.7.3.6 1.2 1 2.1 1 2.8 0 4.7-2.4 4.7-5.3C18.8 6 16 3 12.2 3Z" />
+    //     </svg>
+    //   ),
+    // },
     {
       label: "LinkedIn",
       href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
@@ -144,165 +171,243 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       ),
     },
   ];
+  const prevImage =
+    (adjacent.previous?.featured_image &&
+      (resolveFileUrl(adjacent.previous.featured_image) ||
+        adjacent.previous.featured_image)) ||
+    "";
+  const nextImage =
+    (adjacent.next?.featured_image &&
+      (resolveFileUrl(adjacent.next.featured_image) ||
+        adjacent.next.featured_image)) ||
+    "";
 
   return (
     <main className="min-h-screen bg-white">
       <PageHero
         title={project.title}
-        eyebrow={categoriesText || servicesText || "Project"}
-        description={lead}
+        eyebrow={sectorsText || servicesText || "Project"}
+        // description={lead}
         imageUrl={img}
-        heightClass="min-h-[60vh] md:min-h-[80vh]"
+        heightClass="min-h-[100vh] md:min-h-[100vh]"
+        contentAlignment="bottom"
+        contentClassName={contentShell}
       />
 
-      <section className={`${contentShell} -mt-10 md:-mt-7 relative z-10`}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {stats.map((item) => (
-            <div
-              key={item.label}
-              className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
-              style={{
-                clipPath:
-                  "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px))",
-              }}
-            >
-              <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  {statIcons[item.label] || <Building2 className="h-5 w-5" />}
-                </span>
-                <div className="space-y-1">
-                  <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
-                    {item.label}
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900 leading-snug">
-                    {item.value}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <ProjectAdjacentNav
+        prev={
+          adjacent.previous
+            ? {
+                slug: adjacent.previous.slug,
+                title: adjacent.previous.title,
+                image: prevImage,
+                eyebrow: "Project",
+              }
+            : null
+        }
+        next={
+          adjacent.next
+            ? {
+                slug: adjacent.next.slug,
+                title: adjacent.next.title,
+                image: nextImage,
+                eyebrow: "Project",
+              }
+            : null
+        }
+        targetId="project-content"
+      />
 
-      <section className={`${contentShell} py-12 space-y-10`}>
-        <div className="grid lg:grid-cols-[2fr,1fr] gap-10">
+      <section
+        id="project-content"
+        className={`${contentShell} py-12 space-y-10`}
+      >
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
           <article className="space-y-6">
-            {lead ? (
-              <p className="text-lg text-gray-700 leading-relaxed">{lead}</p>
-            ) : null}
-            <div
-              className="prose prose-lg max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: project.content || "" }}
-            />
-            {(categories.length || services.length) ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {categories.length ? (
-                  <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Sectors</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {categories.map((cat) => (
-                        <span
-                          key={`cat-${cat}`}
-                          className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
-                        >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                {services.length ? (
-                  <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Services</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {services.map((svc) => (
-                        <span
-                          key={`svc-${svc}`}
-                          className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 border border-gray-200"
-                        >
-                          {svc}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
+            <Reveal>
+              <div
+                className="rich-content text-gray-800 space-y-4"
+                dangerouslySetInnerHTML={{ __html: project.content || "" }}
+              />
+            </Reveal>
             {gallery && gallery.length ? (
-              <div className="pt-6">
-                {/* <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  Project Gallery
-                </h3> */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {gallery.map((src, idx) => (
-                    <div
-                      key={`gallery-${idx}`}
-                      className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
-                    >
-                      <Image
-                        src={src}
-                        alt={`${project.title} image ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width:1024px) 33vw, 50vw"
-                      />
+              <Reveal>
+                <div className="pt-6">
+                  <ProjectGalleryCarousel
+                    images={gallery}
+                    title={project.title}
+                  />
+                </div>
+              </Reveal>
+            ) : null}
+          </article>
+
+          <aside className="space-y-6 w-full lg:max-w-[300px] lg:justify-self-end">
+            <Reveal>
+              <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
+                {/* <p className="!text-md uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                  Project details
+                </p> */}
+                <div className="space-y-4">
+                  {stats.map((item) => (
+                    <div key={item.label} className="flex items-start gap-4">
+                      <span className="mt-0.5 flex h-9 w-9 items-center justify-center bg-primary/10 text-primary">
+                        {statIcons[item.label] || (
+                          <Building2 className="h-5 w-5" />
+                        )}
+                      </span>
+                      <div className="space-y-0">
+                        <p className="!text-sm uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          {item.label}
+                        </p>
+                        <p className="!text-[0.688rem] font-semibold text-gray-900 leading-snug">
+                          {item.value}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            ) : null}
-          </article>
+            </Reveal>
 
-          <div className="space-y-6">
-           
+            {(sectors.length > 0 || services.length > 0) && (
+              <Reveal>
+                <div className="border border-gray-200/70 bg-white p-5 shadow-sm">
+                  {/* <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                    Sectors &amp; services
+                  </p> */}
+                  <div className=" space-y-4">
+                    {sectors.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          Sectors
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {sectors.map((sector) => (
+                            <span
+                              key={`sector-${sector}`}
+                              className="text-[11px] px-2.5 py-1 bg-gray-100 text-gray-800 border border-gray-200"
+                            >
+                              {sector}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-            {/* <Link
-              href="/projects"
-              className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors text-sm"
-            >
-              &larr; Back to Projects
-            </Link> */}
+                    {services.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500 font-semibold">
+                          Services
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {services.map((svc) => (
+                            <span
+                              key={`svc-${svc}`}
+                              className="text-[11px] px-2.5 py-1 bg-gray-100 text-gray-800 border border-gray-200"
+                            >
+                              {svc}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Reveal>
+            )}
+            <Reveal>
+              <div className=""> {/*border border-gray-200  bg-white p-5 shadow-sm space-y-5 */}
+                {/* <div className="space-y-4">
+                  <div className="space-y-3">
+                    <p className="text-xs uppercase tracking-[0.25em] text-gray-500 font-semibold">
+                      Share this project
+                    </p>
+                    <p className="text-[0.8rem] text-gray-600">
+                      Send the story to your team.
+                    </p>
+                  </div>
 
-            <div className="flex justify-between items-center gap-3 pt-2">
-              {adjacent.previous ? (
-                <Link
-                  href={`/projects/${adjacent.previous.slug}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                >
-                  &larr; {adjacent.previous.title}
-                </Link>
-              ) : (
+                  <div className="flex items-center gap-4  bg-white  py-2">
+                    {shareLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-9 w-9 items-center justify-center4 text-gray-800 hover:bg-gray-100 transition-colors"
+                        aria-label={`Share on ${link.label}`}
+                      >
+                        {link.icon}
+                      </a>
+                    ))}
+                  </div>
+                </div> */}
 
-                <span />
+                {(adjacent.previous || adjacent.next) && (
+                  <div className="space-y-6 pt-1 md:hidden -mb-5">
+                    {adjacent.previous ? (
+                      <Link
+                        href={`/projects/${adjacent.previous.slug}`}
+                        className="block w-[calc(100%+2.5rem)] -mx-5 bg-white shadow-sm overflow-hidden"
+                      >
+                        <div className="relative w-full aspect-[16/9] bg-gray-100">
+                          {prevImage ? (
+                            <img
+                              src={prevImage}
+                              alt={adjacent.previous.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-3 text-white">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
+                                Previous
+                              </p>
+                              <p className="text-sm font-semibold leading-snug line-clamp-2">
+                                {adjacent.previous.title}
+                              </p>
+                            </div>
+                            <ChevronLeft className="h-4 w-4 text-white/80" />
+                          </div>
+                        </div>
+                      </Link>
+                    ) : null}
 
-              )}
-               <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm font-semibold text-gray-800">Share</span>
-              {shareLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-800 hover:bg-gray-100 transition-colors"
-                  aria-label={`Share on ${link.label}`}
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </div>
-              {adjacent.next ? (
-                <Link
-                  href={`/projects/${adjacent.next.slug}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-100 transition-colors"
-                >
-                  {adjacent.next.title} &rarr;
-                </Link>
-              ) : (
-                <span />
-              )}
-            </div>
-          </div>
+                    {adjacent.next ? (
+                      <Link
+                        href={`/projects/${adjacent.next.slug}`}
+                        className="block w-[calc(100%+2.5rem)] -mx-5 bg-white shadow-sm overflow-hidden"
+                      >
+                        <div className="relative w-full aspect-[16/9] bg-gray-100">
+                          {nextImage ? (
+                            <img
+                              src={nextImage}
+                              alt={adjacent.next.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-3 text-white">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">
+                                Next
+                              </p>
+                              <p className="text-sm font-semibold leading-snug line-clamp-2">
+                                {adjacent.next.title}
+                              </p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-white/80" />
+                          </div>
+                        </div>
+                      </Link>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          </aside>
         </div>
       </section>
     </main>

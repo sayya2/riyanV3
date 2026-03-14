@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { resolveImageUrl } from './media';
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -40,7 +41,7 @@ export interface Project {
   location?: string;
   status: 'draft' | 'published' | 'archived';
   published_at: string;
-  categories?: string[];
+  sectors?: string[];
   services?: string[];
   gallery?: string[];
 }
@@ -100,7 +101,7 @@ export interface HeroSlide {
   status: 'draft' | 'published';
 }
 
-export interface ProjectCategory {
+export interface Sector {
   id: number;
   name: string;
   slug: string;
@@ -129,6 +130,16 @@ export interface Tag {
   name: string;
   slug: string;
 }
+
+export type ClientLogoCategory =
+  | "Government of Maldives"
+  | "Local Brands"
+  | "International Brands"
+  | "Bilateral & Multilateral Agencies";
+
+export type ClientLogo = { name: string; url: string };
+
+export type ClientLogosByCategory = Record<ClientLogoCategory, ClientLogo[]>;
 
 export interface AdjacentProject {
   slug: string;
@@ -163,18 +174,18 @@ export async function getMenuItems(location: string = 'primary'): Promise<MenuIt
 // PROJECT FUNCTIONS
 // =====================================================
 
-export async function getProjectCategories(): Promise<ProjectCategory[]> {
+export async function getProjectSectors(): Promise<Sector[]> {
   const [rows] = await pool.query<any[]>(
     `SELECT
        pc.*,
-       COUNT(ppc.project_id) as count
-     FROM project_categories pc
-     LEFT JOIN project_project_categories ppc ON pc.id = ppc.category_id
-     LEFT JOIN projects p ON p.id = ppc.project_id AND p.status = 'published'
+       COUNT(ps.project_id) as count
+     FROM sectors pc
+     LEFT JOIN project_sectors ps ON pc.id = ps.sector_id
+     LEFT JOIN projects p ON p.id = ps.project_id AND p.status = 'published'
      GROUP BY pc.id
      ORDER BY pc.sort_order, pc.name`
   );
-  return rows as ProjectCategory[];
+  return rows as Sector[];
 }
 
 export async function getProjectServices(): Promise<Service[]> {
@@ -192,12 +203,12 @@ export async function getProjectServices(): Promise<Service[]> {
 }
 
 export async function getProjects({
-  categorySlug,
+  sectorSlug,
   serviceSlug,
   search,
   limit = 24,
 }: {
-  categorySlug?: string;
+  sectorSlug?: string;
   serviceSlug?: string;
   search?: string;
   limit?: number;
@@ -205,11 +216,11 @@ export async function getProjects({
   let query = `
     SELECT DISTINCT
       p.*,
-      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS categories,
+      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS sectors,
       GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS services
     FROM projects p
-    LEFT JOIN project_project_categories ppc ON p.id = ppc.project_id
-    LEFT JOIN project_categories pc ON pc.id = ppc.category_id
+    LEFT JOIN project_sectors pse ON p.id = pse.project_id
+    LEFT JOIN sectors pc ON pc.id = pse.sector_id
     LEFT JOIN project_services ps ON p.id = ps.project_id
     LEFT JOIN services s ON s.id = ps.service_id
     WHERE p.status = 'published'
@@ -217,13 +228,13 @@ export async function getProjects({
 
   const params: any[] = [];
 
-  if (categorySlug) {
+  if (sectorSlug) {
     query += ` AND EXISTS (
-      SELECT 1 FROM project_project_categories ppc2
-      JOIN project_categories pc2 ON pc2.id = ppc2.category_id
-      WHERE ppc2.project_id = p.id AND pc2.slug = ?
+      SELECT 1 FROM project_sectors ps2
+      JOIN sectors pc2 ON pc2.id = ps2.sector_id
+      WHERE ps2.project_id = p.id AND pc2.slug = ?
     )`;
-    params.push(categorySlug);
+    params.push(sectorSlug);
   }
 
   if (serviceSlug) {
@@ -247,7 +258,8 @@ export async function getProjects({
 
   return rows.map((row) => ({
     ...row,
-    categories: row.categories ? row.categories.split(', ') : [],
+    featured_image: resolveImageUrl(row.featured_image),
+    sectors: row.sectors ? row.sectors.split(', ') : [],
     services: row.services ? row.services.split(', ') : [],
   }));
 }
@@ -255,11 +267,11 @@ export async function getProjects({
 export async function getProjectBySlug(slug: string): Promise<(Project & { gallery: string[] }) | null> {
   const [rows] = await pool.query<any[]>(
     `SELECT p.*,
-      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS categories,
+      GROUP_CONCAT(DISTINCT pc.name ORDER BY pc.name SEPARATOR ', ') AS sectors,
       GROUP_CONCAT(DISTINCT s.name ORDER BY s.name SEPARATOR ', ') AS services
      FROM projects p
-     LEFT JOIN project_project_categories ppc ON p.id = ppc.project_id
-     LEFT JOIN project_categories pc ON pc.id = ppc.category_id
+     LEFT JOIN project_sectors pse ON p.id = pse.project_id
+     LEFT JOIN sectors pc ON pc.id = pse.sector_id
      LEFT JOIN project_services ps ON p.id = ps.project_id
      LEFT JOIN services s ON s.id = ps.service_id
      WHERE p.slug = ? AND p.status = 'published'
@@ -274,9 +286,10 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
 
   // Get gallery images
   const [galleryRows] = await pool.query<any[]>(
-    `SELECT m.filepath
+    `SELECT df.id as directus_id, m.filepath
      FROM project_gallery pg
-     JOIN media m ON m.id = pg.media_id
+     LEFT JOIN directus_files df ON df.id = pg.media_id
+     LEFT JOIN media m ON m.id = pg.media_id_legacy
      WHERE pg.project_id = ?
      ORDER BY pg.sort_order`,
     [project.id]
@@ -284,9 +297,12 @@ export async function getProjectBySlug(slug: string): Promise<(Project & { galle
 
   return {
     ...project,
-    categories: project.categories ? project.categories.split(', ') : [],
+    featured_image: resolveImageUrl(project.featured_image),
+    sectors: project.sectors ? project.sectors.split(', ') : [],
     services: project.services ? project.services.split(', ') : [],
-    gallery: galleryRows.map((row) => row.filepath),
+    gallery: galleryRows
+      .map((row) => resolveImageUrl(row.directus_id || row.filepath))
+      .filter(Boolean) as string[],
   };
 }
 
@@ -384,6 +400,7 @@ export async function getNewsPosts({
 
   return rows.map((row) => ({
     ...row,
+    featured_image: resolveImageUrl(row.featured_image),
     categories: row.categories ? row.categories.split(', ') : [],
     tags: row.tags ? row.tags.split(', ') : [],
   }));
@@ -410,9 +427,10 @@ export async function getNewsBySlug(slug: string): Promise<(NewsPost & { gallery
   const news = rows[0];
 
   const [galleryRows] = await pool.query<any[]>(
-    `SELECT m.filepath
+    `SELECT df.id as directus_id, m.filepath
      FROM news_gallery ng
-     JOIN media m ON m.id = ng.media_id
+     LEFT JOIN directus_files df ON df.id = ng.media_id
+     LEFT JOIN media m ON m.id = ng.media_id
      WHERE ng.news_id = ?
      ORDER BY ng.sort_order`,
     [news.id]
@@ -420,9 +438,12 @@ export async function getNewsBySlug(slug: string): Promise<(NewsPost & { gallery
 
   return {
     ...news,
+    featured_image: resolveImageUrl(news.featured_image),
     categories: news.categories ? news.categories.split(', ') : [],
     tags: news.tags ? news.tags.split(', ') : [],
-    gallery: galleryRows.map((row) => row.filepath),
+    gallery: galleryRows
+      .map((row) => resolveImageUrl(row.directus_id || row.filepath))
+      .filter(Boolean) as string[],
   };
 }
 
@@ -538,7 +559,11 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
     `SELECT * FROM pages WHERE slug = ? AND status = 'published' LIMIT 1`,
     [slug]
   );
-  return rows.length ? (rows[0] as Page) : null;
+  if (!rows.length) return null;
+  return {
+    ...(rows[0] as Page),
+    featured_image: resolveImageUrl(rows[0].featured_image),
+  };
 }
 
 // =====================================================
@@ -550,25 +575,120 @@ export async function getHeroSlides(sliderAlias?: string): Promise<HeroSlide[]> 
   const [rows] = await pool.query<any[]>(
     `SELECT * FROM hero_slides WHERE status = 'published' ORDER BY sort_order`
   );
-  return rows as HeroSlide[];
+  return rows.map((row) => ({
+    ...row,
+    image_url: resolveImageUrl(row.image_url) || row.image_url,
+  })) as HeroSlide[];
 }
 
 // =====================================================
 // MEDIA FUNCTIONS
 // =====================================================
 
-export async function getClientLogos(): Promise<{ name: string; url: string }[]> {
-  const [rows] = await pool.query<any[]>(
-    `SELECT title as name, filepath as url
-     FROM media
-     WHERE filepath LIKE '%/2025/09/%'
-       AND (filepath LIKE '%.png' OR filepath LIKE '%.jpg' OR filepath LIKE '%.svg')
-     ORDER BY title`
+export async function getClientLogos(): Promise<ClientLogosByCategory> {
+  const categories: ClientLogoCategory[] = [
+    "Government of Maldives",
+    "Local Brands",
+    "International Brands",
+    "Bilateral & Multilateral Agencies",
+  ];
+
+  const empty: ClientLogosByCategory = {
+    "Government of Maldives": [],
+    "Local Brands": [],
+    "International Brands": [],
+    "Bilateral & Multilateral Agencies": [],
+  };
+
+  const categoryFolderSlugs: Record<ClientLogoCategory, string> = {
+    "Government of Maldives": "government_of_maldives",
+    "Local Brands": "local_brands",
+    "International Brands": "international_brands",
+    "Bilateral & Multilateral Agencies": "bilateral_and_multilateral_agencies",
+  };
+
+  const [clientFolderRows] = await pool.query<any[]>(
+    `SELECT id FROM directus_folders
+     WHERE LOWER(TRIM(name)) = 'clients'
+     LIMIT 1`
   );
-  return rows as { name: string; url: string }[];
+
+  if (!clientFolderRows.length) return empty;
+
+  const clientsFolderId = clientFolderRows[0]?.id as string | undefined;
+  if (!clientsFolderId) return empty;
+
+  const folderSlugs = categories.map((category) => categoryFolderSlugs[category]);
+  const folderPlaceholders = folderSlugs.map(() => "?").join(", ");
+
+  const [categoryFolders] = await pool.query<any[]>(
+    `SELECT id, LOWER(TRIM(name)) as name
+     FROM directus_folders
+     WHERE parent = ?
+       AND LOWER(TRIM(name)) IN (${folderPlaceholders})`,
+    [clientsFolderId, ...folderSlugs]
+  );
+
+  if (!categoryFolders.length) return empty;
+
+  const folderIdByCategory = new Map<ClientLogoCategory, string>();
+  categoryFolders.forEach((row) => {
+    const name = String(row.name || "").toLowerCase();
+    const category = categories.find(
+      (item) => categoryFolderSlugs[item] === name
+    );
+    if (category && row.id) {
+      folderIdByCategory.set(category, row.id);
+    }
+  });
+
+  const folderIds = Array.from(folderIdByCategory.values());
+  if (!folderIds.length) return empty;
+
+  const folderIdPlaceholders = folderIds.map(() => "?").join(", ");
+  const [rows] = await pool.query<any[]>(
+    `SELECT id, title, filename_download, filename_disk, folder
+     FROM directus_files
+     WHERE folder IN (${folderIdPlaceholders})
+     ORDER BY title`,
+    folderIds
+  );
+
+  const result: ClientLogosByCategory = { ...empty };
+
+  rows.forEach((row) => {
+    const folderId = row.folder as string | null;
+    const category = categories.find(
+      (item) => folderIdByCategory.get(item) === folderId
+    );
+    if (!category) return;
+
+    const name =
+      row.title || row.filename_download || row.filename_disk || "Client logo";
+    const url = resolveImageUrl(row.id) || "";
+    if (!url) return;
+    result[category].push({ name, url });
+  });
+
+  return result;
 }
 
 export async function getAboutCarouselImages(): Promise<string[]> {
+  const folderId = process.env.DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID;
+
+  if (folderId) {
+    const [rows] = await pool.query<any[]>(
+      `SELECT id
+       FROM directus_files
+       WHERE folder = ?
+       ORDER BY title`,
+      [folderId]
+    );
+    return rows
+      .map((row) => resolveImageUrl(row.id))
+      .filter(Boolean) as string[];
+  }
+
   const [rows] = await pool.query<any[]>(
     `SELECT filepath FROM media
      WHERE filepath LIKE '%/about_carousel/%'
