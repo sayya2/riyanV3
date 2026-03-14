@@ -15,6 +15,7 @@ coverage/
 wp-content/
 
 *.yml
+!.github/workflows/*.yml
 # Production
 .vercel
 
