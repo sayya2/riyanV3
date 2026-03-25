@@ -4,10 +4,10 @@ services:
     container_name: riyan_mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: riyan_nextjs
-      MYSQL_USER: user
-      MYSQL_PASSWORD: Riyanitaccess@26+
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -28,16 +28,16 @@ services:
     ports:
       - "8055:8055"
     environment:
-      KEY: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
-      SECRET: "4NVp8stQsExN9F8VnZ8hSom03OuCIWqB"
-      ADMIN_EMAIL: "admin@riyan.com.mv"
-      ADMIN_PASSWORD: "ChangeThisPassword123!"
+      KEY: "${DIRECTUS_KEY}"
+      SECRET: "${DIRECTUS_SECRET}"
+      ADMIN_EMAIL: "${DIRECTUS_ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${DIRECTUS_ADMIN_PASSWORD}"
       DB_CLIENT: "mysql"
-      DB_HOST: "mariadb"
-      DB_PORT: "3306"
-      DB_DATABASE: "riyan_nextjs"
-      DB_USER: "user"
-      DB_PASSWORD: "Riyanitaccess@26+"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_DATABASE: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
       WEBSOCKETS_ENABLED: "true"
       PUBLIC_URL: "http://100.80.223.36:8055"
       CORS_ENABLED: "true"
@@ -69,18 +69,18 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - DB_HOST=mariadb
-      - DB_USER=user
-      - DB_PASSWORD=Riyanitaccess@26+
-      - DB_NAME=riyan_nextjs
-      - DB_PORT=3306
-      - NEXT_PUBLIC_SITE_URL=http://100.80.223.36:3000
-      - NEXT_PUBLIC_DIRECTUS_URL=http://100.80.223.36:8055
-      - DIRECTUS_URL=http://directus:8055
-      - DIRECTUS_TOKEN=your-directus-static-token-here
+      - NODE_ENV=${NODE_ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+      - NEXT_PUBLIC_DIRECTUS_URL=${NEXT_PUBLIC_DIRECTUS_URL}
+      - DIRECTUS_URL=${DIRECTUS_URL}
+      - DIRECTUS_TOKEN=${DIRECTUS_TOKEN}
       - DIRECTUS_ABOUT_CAROUSEL_FOLDER_ID=a0999f8d-a585-4b92-9f9f-9a6e910782a7
-      - REVALIDATE_SECRET=replace-with-random-secret
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
     volumes:
       - /opt/riyan/wp-content:/app/public/wp-content
     depends_on:
