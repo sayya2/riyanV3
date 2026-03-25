@@ -3,6 +3,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 
 const NEWS_TAG = "directus:news";
 const PROJECTS_TAG = "directus:projects";
+const HERO_TAG = "directus:hero";
 
 function isValidSecret(request: NextRequest): boolean {
   const expected = process.env.REVALIDATE_SECRET;
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
   // Always invalidate Directus caches
   revalidateTag(NEWS_TAG, "default");
   revalidateTag(PROJECTS_TAG, "default");
+  revalidateTag(HERO_TAG, "default");
 
   // Revalidate main surfaces
   revalidatePath("/");
@@ -124,6 +126,7 @@ export async function GET(request: NextRequest) {
 
   revalidateTag(NEWS_TAG, "default");
   revalidateTag(PROJECTS_TAG, "default");
+  revalidateTag(HERO_TAG, "default");
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/projects");

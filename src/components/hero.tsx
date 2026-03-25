@@ -1,5 +1,6 @@
 import HeroSliderClient from "./hero-slider-client";
-import pool, { type HeroSlide } from "@/lib/db-new";
+import { getHeroSlides, type DirectusHeroSlide } from "@/lib/directus";
+import type { HeroSlide } from "@/lib/db-new";
 import { resolveImageUrl } from "@/lib/media";
 
 const fallbackImage = "/wp-content/uploads/2022/06/hd-1800x900-1.png";
@@ -13,52 +14,45 @@ const stripHtml = (input: string) =>
 const truncate = (input: string, limit = 160) =>
   input.length > limit ? `${input.slice(0, limit - 3)}...` : input;
 
-type ProjectRow = {
-  id: number;
-  slug: string | null;
-  title: string | null;
-  excerpt: string | null;
-  content: string | null;
-  featured_image: string | null;
-};
+const heroSlideToSlide = (slide: DirectusHeroSlide, index: number): HeroSlide | null => {
+  const project =
+    slide.project_id && typeof slide.project_id === "object" ? slide.project_id : null;
 
-const projectToSlide = (project: ProjectRow, index: number): HeroSlide => {
-  const rawDescription =
-    project.excerpt?.trim() || project.content?.trim() || "";
+  const rawDescription = project
+    ? project.excerpt?.trim() || project.content?.trim() || slide.description?.trim() || ""
+    : slide.description?.trim() || "";
   const description = rawDescription ? truncate(stripHtml(rawDescription)) : "";
 
+  const title = project?.title?.trim() || slide.title?.trim() || "Project";
+  const image =
+    resolveImageUrl(project?.featured_image) ||
+    resolveImageUrl(slide.image_url) ||
+    fallbackImage;
+  const link = project?.slug ? `/projects/${project.slug}` : slide.link_url || "";
+
+  if (!title && !image) return null;
+
   return {
-    id: project.id,
-    title: project.title || "Project",
+    id: slide.id,
+    title,
     description,
-    image_url: resolveImageUrl(project.featured_image) || fallbackImage,
-    link_url: project.slug ? `/projects/${project.slug}` : "",
-    sort_order: index,
+    image_url: image,
+    link_url: link,
+    sort_order: Number.isFinite(slide.sort_order) ? slide.sort_order : index,
     status: "published",
   };
-};
-
-const getRecentProjects = async (limit = 7): Promise<ProjectRow[]> => {
-  const [rows] = await pool.query<any[]>(
-    `SELECT id, slug, title, excerpt, content, featured_image
-     FROM projects
-     WHERE status = 'published'
-     ORDER BY published_at DESC, id DESC
-     LIMIT ?`,
-    [limit]
-  );
-
-  return rows as ProjectRow[];
 };
 
 const Hero = async () => {
   let slides: HeroSlide[] = [];
 
   try {
-    const projects = await getRecentProjects(7);
-    slides = projects.map(projectToSlide);
+    const heroSlides = await getHeroSlides();
+    slides = heroSlides
+      .map(heroSlideToSlide)
+      .filter((slide): slide is HeroSlide => slide !== null);
   } catch (error) {
-    console.error("Failed to load hero projects:", error);
+    console.error("Failed to load hero slides:", error);
   }
 
   return <HeroSliderClient slides={slides} />;

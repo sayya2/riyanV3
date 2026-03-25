@@ -7,6 +7,7 @@ const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN;
 
 const DIRECTUS_NEWS_TAG = 'directus:news';
 const DIRECTUS_PROJECTS_TAG = 'directus:projects';
+const DIRECTUS_HERO_TAG = 'directus:hero';
 
 const taggedFetch: typeof fetch = (input: any, init?: any) => {
   const nextInit = {
@@ -18,6 +19,7 @@ const taggedFetch: typeof fetch = (input: any, init?: any) => {
           ...(init?.next?.tags || []),
           DIRECTUS_NEWS_TAG,
           DIRECTUS_PROJECTS_TAG,
+          DIRECTUS_HERO_TAG,
         ])
       ),
     },
@@ -489,10 +491,85 @@ export interface DirectusService {
   description: string | null;
 }
 
+type DirectusHeroSlideProject = {
+  id: number;
+  slug: string | null;
+  title: string | null;
+  excerpt: string | null;
+  content: string | null;
+  featured_image: string | null;
+  status: 'draft' | 'published' | 'archived';
+};
+
+export interface DirectusHeroSlide {
+  id: number;
+  title: string | null;
+  description: string | null;
+  image_url: string | null;
+  link_url: string | null;
+  sort_order: number;
+  status: 'draft' | 'published';
+  project_id?: DirectusHeroSlideProject | number | null;
+}
+
 const normalizeProject = (project: any): DirectusProject => ({
   ...(project as DirectusProject),
   featured_image: resolveImageUrl(project?.featured_image),
 });
+
+const normalizeHeroSlide = (slide: DirectusHeroSlide): DirectusHeroSlide => ({
+  ...slide,
+  image_url: resolveImageUrl(slide?.image_url),
+  project_id:
+    slide && typeof slide.project_id === 'object' && slide.project_id !== null
+      ? {
+          ...(slide.project_id as DirectusHeroSlideProject),
+          featured_image: resolveImageUrl(
+            (slide.project_id as DirectusHeroSlideProject).featured_image
+          ),
+        }
+      : slide.project_id,
+});
+
+export async function getHeroSlides(): Promise<DirectusHeroSlide[]> {
+  try {
+    const slides = await directus.request(
+      readItems('hero_slides', {
+        fields: [
+          'id',
+          'title',
+          'description',
+          'image_url',
+          'link_url',
+          'sort_order',
+          'status',
+          'project_id.id',
+          'project_id.slug',
+          'project_id.title',
+          'project_id.excerpt',
+          'project_id.content',
+          'project_id.featured_image',
+          'project_id.status',
+        ],
+        filter: {
+          status: { _eq: 'published' },
+        },
+        sort: ['sort_order', 'id'],
+        limit: -1,
+      })
+    );
+
+    return (slides as DirectusHeroSlide[])
+      .map(normalizeHeroSlide)
+      .filter((slide) => {
+        if (!slide.project_id || typeof slide.project_id !== 'object') return true;
+        return slide.project_id.status === 'published';
+      });
+  } catch (error) {
+    console.error('[getHeroSlides] Directus API error:', error);
+    return [];
+  }
+}
 
 async function getProjectIdsForSectorSlug(sectorSlug: string): Promise<number[]> {
   const [sectorRowsResult, categoryRowsResult] = await Promise.allSettled([
