@@ -32,6 +32,7 @@ services:
       SECRET: "${DIRECTUS_SECRET}"
       ADMIN_EMAIL: "${DIRECTUS_ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${DIRECTUS_ADMIN_PASSWORD}"
+      EXTENSIONS_PATH: "/directus/extensions"
       DB_CLIENT: "mysql"
       DB_HOST: "${DB_HOST}"
       DB_PORT: "${DB_PORT}"
@@ -50,6 +51,7 @@ services:
     volumes:
       - directus_data:/directus/uploads
       - /opt/riyan/wp-content:/app/public/wp-content
+      - /opt/riyan/app/directus/extensions:/directus/extensions
     depends_on:
       mariadb:
         condition: service_healthy
