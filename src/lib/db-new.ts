@@ -62,6 +62,7 @@ export interface NewsPost {
 
 export interface Career {
   id: number;
+  job_id?: string | null;
   slug: string;
   title: string;
   excerpt: string;

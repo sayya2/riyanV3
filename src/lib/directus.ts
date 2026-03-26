@@ -8,6 +8,7 @@ const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN;
 const DIRECTUS_NEWS_TAG = 'directus:news';
 const DIRECTUS_PROJECTS_TAG = 'directus:projects';
 const DIRECTUS_HERO_TAG = 'directus:hero';
+const DIRECTUS_CAREERS_TAG = 'directus:careers';
 
 const taggedFetch: typeof fetch = (input: any, init?: any) => {
   const nextInit = {
@@ -20,6 +21,7 @@ const taggedFetch: typeof fetch = (input: any, init?: any) => {
           DIRECTUS_NEWS_TAG,
           DIRECTUS_PROJECTS_TAG,
           DIRECTUS_HERO_TAG,
+          DIRECTUS_CAREERS_TAG,
         ])
       ),
     },
@@ -1189,6 +1191,7 @@ export async function getAdjacentProjects(slug: string): Promise<{
 
 export interface DirectusCareer {
   id: number;
+  job_id: string | null;
   slug: string;
   title: string;
   excerpt: string | null;
@@ -1245,6 +1248,7 @@ export async function getCareerPosts({
       readItems('careers', {
         fields: [
           'id',
+          'job_id',
           'slug',
           'title',
           'excerpt',
@@ -1284,6 +1288,7 @@ export async function getCareerBySlug(slug: string): Promise<DirectusCareer | nu
       readItems('careers', {
         fields: [
           'id',
+          'job_id',
           'slug',
           'title',
           'excerpt',
@@ -1317,6 +1322,7 @@ export async function getCareerBySlug(slug: string): Promise<DirectusCareer | nu
           readItem('careers', Number(slug), {
             fields: [
               'id',
+              'job_id',
               'slug',
               'title',
               'excerpt',

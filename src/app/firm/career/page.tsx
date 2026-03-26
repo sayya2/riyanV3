@@ -77,6 +77,7 @@ export default async function CareerPage() {
               <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory items-stretch">
                 {roles.map((role, index) => {
                   const href = role.slug ? `/firm/career/${role.slug}` : "#";
+                  const jobId = role.job_id?.trim() || `ID ${role.id}`;
                   const cleanedContent = sanitizeContent(role.content || "");
                   const excerpt =
                     role.excerpt && role.excerpt.trim().length > 0
@@ -93,7 +94,7 @@ export default async function CareerPage() {
                       delay={index * 0.05}
                       className="h-full self-stretch snap-start flex-none w-[240px] sm:w-[260px] md:w-[280px]"
                     >
-                      <div className="group flex h-[240px] sm:h-[260px] md:h-[280px] flex-col border border-gray-200 bg-gray-50 p-4 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+                      <div className="group flex min-h-[280px] sm:min-h-[300px] md:min-h-[320px] flex-col border border-gray-200 bg-gray-50 p-4 shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
                         <div className="flex flex-1 flex-col space-y-2">
                           <div className="min-h-[14px]">
                             {role.closing_date ? (
@@ -115,6 +116,9 @@ export default async function CareerPage() {
                               <p className="text-[0.65rem] uppercase tracking-wider text-gray-500 font-semibold">
                                 {role.department || "Role"}
                               </p>
+                              <p className="text-[0.65rem] uppercase tracking-[0.18em] text-primary font-semibold">
+                                {jobId}
+                              </p>
                               <h2 className="project-card-title text-primary font-semibold text-gray-900 line-clamp-2">
                                 {role.title}
                               </h2>
@@ -125,7 +129,7 @@ export default async function CareerPage() {
                             <ArrowRight className="h-4 w-4 text-primary opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 flex-shrink-0" />
                           </div>
 
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-1.5 pt-1">
                             <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 border border-gray-200">
                               <MapPin className="h-3 w-3 text-primary" />
                               <span className="text-[0.65rem]">{role.location || "Maldives"}</span>
@@ -139,13 +143,13 @@ export default async function CareerPage() {
                           </div>
                         </div>
 
-                          <Link
-                            href={href}
-                            className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-white text-[0.7rem] font-semibold px-4 py-2 transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
-                          >
-                            View details
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </Link>
+                        <Link
+                          href={href}
+                          className="mt-4 inline-flex items-center justify-center gap-2 bg-primary text-white text-[0.7rem] font-semibold px-4 py-2 transition-all duration-200 hover:bg-[#5f0e0f] hover:-translate-y-0.5"
+                        >
+                          View details
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
                       </div>
                     </Reveal>
                   );

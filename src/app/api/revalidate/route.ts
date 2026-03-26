@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 const NEWS_TAG = "directus:news";
 const PROJECTS_TAG = "directus:projects";
 const HERO_TAG = "directus:hero";
+const CAREERS_TAG = "directus:careers";
 
 function isValidSecret(request: NextRequest): boolean {
   const expected = process.env.REVALIDATE_SECRET;
@@ -59,6 +60,10 @@ async function tryResolveProjectSlug(key: unknown): Promise<string | null> {
   return tryResolveSlug("projects", key);
 }
 
+async function tryResolveCareerSlug(key: unknown): Promise<string | null> {
+  return tryResolveSlug("careers", key);
+}
+
 type DirectusWebhookPayload = {
   event?: string;
   collection?: string;
@@ -86,11 +91,13 @@ export async function POST(request: NextRequest) {
   revalidateTag(NEWS_TAG, "default");
   revalidateTag(PROJECTS_TAG, "default");
   revalidateTag(HERO_TAG, "default");
+  revalidateTag(CAREERS_TAG, "default");
 
   // Revalidate main surfaces
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/projects");
+  revalidatePath("/firm/career");
 
   const keys = Array.isArray(body?.keys)
     ? body.keys
@@ -114,6 +121,13 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (collection === "careers") {
+    for (const key of keys) {
+      const slug = await tryResolveCareerSlug(key);
+      if (slug) revalidatePath(`/firm/career/${slug}`);
+    }
+  }
+
   return NextResponse.json({ ok: true, collection, revalidated: keys.length });
 }
 
@@ -127,9 +141,11 @@ export async function GET(request: NextRequest) {
   revalidateTag(NEWS_TAG, "default");
   revalidateTag(PROJECTS_TAG, "default");
   revalidateTag(HERO_TAG, "default");
+  revalidateTag(CAREERS_TAG, "default");
   revalidatePath("/");
   revalidatePath("/news");
   revalidatePath("/projects");
+  revalidatePath("/firm/career");
   if (path) revalidatePath(path);
 
   return NextResponse.json({ ok: true });

@@ -115,6 +115,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
   }
 
   const lead = role.excerpt ? stripHtml(role.excerpt) : "";
+  const jobId = role.job_id?.trim() || `ID ${role.id}`;
   const posted = formatDate(role.published_at);
   const closing = formatDate(role.closing_date, "Open until filled");
 
@@ -203,6 +204,7 @@ export default async function CareerDetailPage({ params }: PageProps) {
   ];
 
   const metaItems = [
+    { label: "Job ID", value: jobId },
     { label: "Location", value: role.location || "Not specified" },
     { label: "Type", value: role.employment_type || "Not specified" },
     { label: "Department", value: role.department || "Not specified" },
@@ -230,6 +232,9 @@ export default async function CareerDetailPage({ params }: PageProps) {
             <div className="space-y-3 max-w-3xl">
               <p className="text-xs uppercase tracking-[0.25em] text-gray-500">
                 Career Opportunity
+              </p>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+                {jobId}
               </p>
               <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">
                 {role.title}
